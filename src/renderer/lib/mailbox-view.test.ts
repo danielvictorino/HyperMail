@@ -80,19 +80,17 @@ describe("mailbox-view", () => {
   });
 
   it("filters threads by section without mixing archive into inbox", () => {
-    expect(filterThreadsBySection(threads, "inbox").map((thread) => thread.thread.id)).toEqual([
-      "t1",
-      "t2",
-      "t4"
-    ]);
-    expect(filterThreadsBySection(threads, "snoozed").map((thread) => thread.thread.id)).toEqual([
-      "t5"
-    ]);
-    expect(filterThreadsBySection(threads, "archive").map((thread) => thread.thread.id)).toEqual([
-      "t3"
-    ]);
-    expect(filterThreadsBySection(threads, "vip").map((thread) => thread.thread.id)).toEqual([
-      "t2"
-    ]);
+    expect(
+      filterThreadsBySection(threads, "inbox").map((thread) => thread.thread.id)
+    ).toEqual(["t1", "t2", "t4"]);
+    expect(
+      filterThreadsBySection(threads, "snoozed").map((thread) => thread.thread.id)
+    ).toEqual(["t5"]);
+    expect(
+      filterThreadsBySection(threads, "archive").map((thread) => thread.thread.id)
+    ).toEqual(["t3"]);
+    expect(
+      filterThreadsBySection(threads, "vip").map((thread) => thread.thread.id)
+    ).toEqual(["t2"]);
   });
 });

@@ -8,7 +8,9 @@ import type {
 
 const SERVICE_NAME = "HyperMail";
 
-export interface StoredAuthSession<TSummary extends AuthSessionSummary = AuthSessionSummary> {
+export interface StoredAuthSession<
+  TSummary extends AuthSessionSummary = AuthSessionSummary
+> {
   summary: TSummary;
   accessToken: string;
   refreshToken?: string;
@@ -45,11 +47,12 @@ export async function loadLatestStoredSession(): Promise<StoredAuthSession | nul
     loadStoredSession("microsoft")
   ]);
 
-  return sessions
-    .filter((session): session is StoredAuthSession => session !== null)
-    .sort(
-      (left, right) => right.summary.connectedAt - left.summary.connectedAt
-    )[0] ?? null;
+  return (
+    sessions
+      .filter((session): session is StoredAuthSession => session !== null)
+      .sort((left, right) => right.summary.connectedAt - left.summary.connectedAt)[0] ??
+    null
+  );
 }
 
 export async function saveStoredSession(
@@ -68,10 +71,7 @@ export async function clearStoredSession(provider: AuthProvider): Promise<void> 
 }
 
 export async function clearAllStoredSessions(): Promise<void> {
-  await Promise.all([
-    clearStoredSession("google"),
-    clearStoredSession("microsoft")
-  ]);
+  await Promise.all([clearStoredSession("google"), clearStoredSession("microsoft")]);
 }
 
 export function createGoogleSessionSummary(

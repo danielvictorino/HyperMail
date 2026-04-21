@@ -62,13 +62,13 @@ export async function syncGmailAccount(
   await applyGmailSyncPayload(payload, database);
   await database.metadata.put({
     key: getSyncStatsKey(accountId),
-      value: JSON.stringify({
-        durationMs: Math.round(performance.now() - startedAt),
-        threadCount: payload.threadSnapshots.length,
-        mode: payload.mode,
-        recoveryReason: payload.recoveryReason,
-        removedThreadCount: payload.removedThreadIds.length
-      } satisfies GmailSyncTelemetry),
+    value: JSON.stringify({
+      durationMs: Math.round(performance.now() - startedAt),
+      threadCount: payload.threadSnapshots.length,
+      mode: payload.mode,
+      recoveryReason: payload.recoveryReason,
+      removedThreadCount: payload.removedThreadIds.length
+    } satisfies GmailSyncTelemetry),
     updatedAt: payload.syncedAt
   });
   return payload;
@@ -95,39 +95,35 @@ export async function applyGmailSyncPayload(
   payload: GmailMailboxSyncPayload,
   database = hypermailDb
 ): Promise<void> {
-  await database.transaction(
-    "rw",
-    database.tables,
-    async () => {
-      await database.accounts.put(payload.account);
-      await replaceLabels(payload.account.id, payload.labels, database);
+  await database.transaction("rw", database.tables, async () => {
+    await database.accounts.put(payload.account);
+    await replaceLabels(payload.account.id, payload.labels, database);
 
-      if (payload.mode === "full") {
-        await deleteStaleThreads(payload.account.id, payload.activeThreadIds, database);
-      }
-
-      if (payload.removedThreadIds.length > 0) {
-        await deleteThreads(payload.removedThreadIds, database);
-      }
-
-      for (const snapshot of payload.threadSnapshots) {
-        await upsertThreadSnapshot(snapshot, database);
-      }
-
-      await database.metadata.bulkPut([
-        {
-          key: getHistoryKey(payload.account.id),
-          value: payload.historyId,
-          updatedAt: payload.syncedAt
-        },
-        {
-          key: getSyncedAtKey(payload.account.id),
-          value: String(payload.syncedAt),
-          updatedAt: payload.syncedAt
-        }
-      ]);
+    if (payload.mode === "full") {
+      await deleteStaleThreads(payload.account.id, payload.activeThreadIds, database);
     }
-  );
+
+    if (payload.removedThreadIds.length > 0) {
+      await deleteThreads(payload.removedThreadIds, database);
+    }
+
+    for (const snapshot of payload.threadSnapshots) {
+      await upsertThreadSnapshot(snapshot, database);
+    }
+
+    await database.metadata.bulkPut([
+      {
+        key: getHistoryKey(payload.account.id),
+        value: payload.historyId,
+        updatedAt: payload.syncedAt
+      },
+      {
+        key: getSyncedAtKey(payload.account.id),
+        value: String(payload.syncedAt),
+        updatedAt: payload.syncedAt
+      }
+    ]);
+  });
 }
 
 async function replaceLabels(
@@ -140,7 +136,9 @@ async function replaceLabels(
     .equals(accountId)
     .primaryKeys()) as string[];
   const nextLabelIds = new Set(labels.map((label) => label.id));
-  const staleLabelIds = existingLabelIds.filter((labelId) => !nextLabelIds.has(labelId));
+  const staleLabelIds = existingLabelIds.filter(
+    (labelId) => !nextLabelIds.has(labelId)
+  );
 
   if (staleLabelIds.length > 0) {
     await database.labels.bulkDelete(staleLabelIds);
@@ -244,8 +242,7 @@ async function upsertThreadSnapshot(
     attachments: message.attachments.map((attachment) => ({
       ...attachment,
       cacheState:
-        attachment.attachmentId &&
-        cachedAttachmentIds.has(attachment.attachmentId)
+        attachment.attachmentId && cachedAttachmentIds.has(attachment.attachmentId)
           ? "cached"
           : attachment.cacheState
     }))

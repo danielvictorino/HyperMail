@@ -255,9 +255,7 @@ export function buildThreadSummaryInstructions(): string {
   ].join("\n");
 }
 
-export function buildThreadSummaryInput(
-  thread: MailAssistantThreadContext
-): string {
+export function buildThreadSummaryInput(thread: MailAssistantThreadContext): string {
   return [
     "Summarize the following email thread for fast triage.",
     formatThreadContext(thread)
@@ -275,9 +273,7 @@ export function buildSplitSuggestionInstructions(): string {
   ].join("\n");
 }
 
-export function buildSplitSuggestionInput(
-  thread: MailAssistantThreadContext
-): string {
+export function buildSplitSuggestionInput(thread: MailAssistantThreadContext): string {
   return [
     "Classify the following thread into the best split inbox bucket.",
     formatThreadContext(thread)
@@ -326,9 +322,7 @@ export function buildDraftReplyInput(input: {
   ].join("\n\n");
 }
 
-export function renderDraftSuggestionHtml(
-  suggestion: MailDraftSuggestion
-): string {
+export function renderDraftSuggestionHtml(suggestion: MailDraftSuggestion): string {
   const blocks = [
     suggestion.greeting,
     ...suggestion.paragraphs,

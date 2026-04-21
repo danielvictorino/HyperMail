@@ -28,10 +28,7 @@ export const useConnectivityStore = create<ConnectivityState>((set, get) => ({
     const nextValue = !get().manualOffline;
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        MANUAL_OFFLINE_STORAGE_KEY,
-        String(nextValue)
-      );
+      window.localStorage.setItem(MANUAL_OFFLINE_STORAGE_KEY, String(nextValue));
     }
 
     set({ manualOffline: nextValue });

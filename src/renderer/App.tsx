@@ -24,14 +24,14 @@ export default function App() {
     ? "Demo mailbox"
     : auth.session?.provider === "microsoft"
       ? "Microsoft auth ready"
-    : mailbox.isRemoteSyncing
-      ? "Syncing Gmail"
-      : mailbox.lastSyncedAt
-        ? `Synced ${new Date(mailbox.lastSyncedAt).toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit"
-          })}`
-        : "Awaiting Gmail sync";
+      : mailbox.isRemoteSyncing
+        ? "Syncing Gmail"
+        : mailbox.lastSyncedAt
+          ? `Synced ${new Date(mailbox.lastSyncedAt).toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit"
+            })}`
+          : "Awaiting Gmail sync";
   const commandPalette = useCommandPalette({
     authSession: auth.session,
     connectGmail: auth.connectGoogle,

@@ -12,9 +12,7 @@ import type {
 import { applyModifiersToThread } from "../modifiers/modifier-factory";
 import { hypermailDb } from "./hypermail-db";
 
-function summarizeQueue(
-  records: PersistedModifierRecord[]
-): QueueSummary {
+function summarizeQueue(records: PersistedModifierRecord[]): QueueSummary {
   return records.reduce<QueueSummary>(
     (summary, record) => {
       summary.total += 1;

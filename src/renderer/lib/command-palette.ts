@@ -126,11 +126,7 @@ export function rankCommands(
 
   return commands
     .map((command, index) => {
-      const haystack = [
-        command.label,
-        command.subtitle ?? "",
-        ...command.keywords
-      ]
+      const haystack = [command.label, command.subtitle ?? "", ...command.keywords]
         .join(" ")
         .toLowerCase();
 
@@ -185,12 +181,7 @@ export function groupRankedCommands(
   commands: RankedCommand[]
 ): Array<{ group: CommandGroup; items: RankedCommand[] }> {
   const grouped = new Map<CommandGroup, RankedCommand[]>();
-  const groupOrder: CommandGroup[] = [
-    "Actions",
-    "Threads",
-    "Sections",
-    "System"
-  ];
+  const groupOrder: CommandGroup[] = ["Actions", "Threads", "Sections", "System"];
 
   for (const command of commands) {
     const existing = grouped.get(command.group) ?? [];

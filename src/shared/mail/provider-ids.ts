@@ -19,9 +19,7 @@ export function isMicrosoftAccountId(accountId: string): boolean {
   return accountId.startsWith("microsoft:");
 }
 
-export function getMailProviderFromAccountId(
-  accountId: string
-): MailProvider | null {
+export function getMailProviderFromAccountId(accountId: string): MailProvider | null {
   if (isGoogleAccountId(accountId)) {
     return "google";
   }

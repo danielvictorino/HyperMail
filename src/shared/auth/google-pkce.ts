@@ -46,7 +46,11 @@ export interface OAuthCallbackValidationInput {
 
 export type OAuthCallbackValidation =
   | { ok: true; code: string }
-  | { ok: false; reason: "provider-error" | "state-mismatch" | "missing-code"; detail: string };
+  | {
+      ok: false;
+      reason: "provider-error" | "state-mismatch" | "missing-code";
+      detail: string;
+    };
 
 export function validateOAuthCallback(
   input: OAuthCallbackValidationInput
@@ -91,9 +95,7 @@ export function buildGoogleAuthUrl(options: BuildGoogleAuthUrlOptions): string {
   return `https://accounts.google.com/o/oauth2/v2/auth?${searchParams.toString()}`;
 }
 
-export function buildMicrosoftAuthUrl(
-  options: BuildMicrosoftAuthUrlOptions
-): string {
+export function buildMicrosoftAuthUrl(options: BuildMicrosoftAuthUrlOptions): string {
   const tenant = options.tenant?.trim() || "common";
   const searchParams = new URLSearchParams({
     client_id: options.clientId,

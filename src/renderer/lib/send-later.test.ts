@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatSendLaterLabel,
-  parseNaturalLanguageSendLater
-} from "./send-later";
+import { formatSendLaterLabel, parseNaturalLanguageSendLater } from "./send-later";
 
 describe("send later parser", () => {
   const now = new Date("2026-04-20T10:15:00");

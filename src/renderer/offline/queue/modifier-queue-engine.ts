@@ -1,8 +1,9 @@
-import type {
-  PersistedModifierRecord,
-  QueueStatus
-} from "@shared/mail/models";
-import { loadThreadSnapshot, type HypermailDatabase, writeThreadSnapshot } from "../db/hypermail-db";
+import type { PersistedModifierRecord, QueueStatus } from "@shared/mail/models";
+import {
+  loadThreadSnapshot,
+  type HypermailDatabase,
+  writeThreadSnapshot
+} from "../db/hypermail-db";
 import { hydrateModifier } from "../modifiers/modifier-factory";
 import type { MailGateway } from "./mail-gateway";
 

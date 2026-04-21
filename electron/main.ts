@@ -122,9 +122,7 @@ function assertMicrosoftClientId(): string {
   const clientId = process.env.MICROSOFT_OAUTH_CLIENT_ID?.trim();
 
   if (!clientId) {
-    throw new Error(
-      formatMissingRuntimeConfigMessage("MICROSOFT_OAUTH_CLIENT_ID")
-    );
+    throw new Error(formatMissingRuntimeConfigMessage("MICROSOFT_OAUTH_CLIENT_ID"));
   }
 
   return clientId;
@@ -373,9 +371,7 @@ function registerIpcHandlers(): void {
   ipcMain.handle("shell:get-release-diagnostics", async () =>
     getReleaseDiagnosticsSummary()
   );
-  ipcMain.handle("shell:get-auto-update-status", async () =>
-    getAutoUpdateStatus()
-  );
+  ipcMain.handle("shell:get-auto-update-status", async () => getAutoUpdateStatus());
   ipcMain.handle("shell:check-for-updates", async () => {
     try {
       return await checkForUpdates();

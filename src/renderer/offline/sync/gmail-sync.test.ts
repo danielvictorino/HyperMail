@@ -3,7 +3,11 @@ import "fake-indexeddb/auto";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { GmailMailboxSyncPayload } from "@shared/contracts";
 import { HypermailDatabase } from "../db/hypermail-db";
-import { applyGmailSyncPayload, getGmailHistoryId, getLastGmailSyncedAt } from "./gmail-sync";
+import {
+  applyGmailSyncPayload,
+  getGmailHistoryId,
+  getLastGmailSyncedAt
+} from "./gmail-sync";
 
 describe("applyGmailSyncPayload", () => {
   let database: HypermailDatabase;
@@ -148,7 +152,8 @@ describe("applyGmailSyncPayload", () => {
               fromEmail: "maya@example.com",
               to: ["daniel@example.com"],
               cc: [],
-              bodyPlain: "The Gmail sync writer should keep only the current thread set.",
+              bodyPlain:
+                "The Gmail sync writer should keep only the current thread set.",
               unread: true,
               starred: true,
               archived: false,
@@ -171,7 +176,9 @@ describe("applyGmailSyncPayload", () => {
     await applyGmailSyncPayload(payload, database);
 
     expect(await database.threads.get(staleThreadId)).toBeUndefined();
-    expect(await database.messages.get(`${accountId}:message:stale-message`)).toBeUndefined();
+    expect(
+      await database.messages.get(`${accountId}:message:stale-message`)
+    ).toBeUndefined();
     expect(
       await database.attachmentCache.get(
         `${accountId}:message:stale-message:attachment-cache:stale-attachment`

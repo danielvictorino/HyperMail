@@ -129,7 +129,11 @@ export function ContextRail({
                 : "border-amber-400/20 bg-amber-400/10 text-amber-100"
             }
           >
-            {effectiveOnline ? <Wifi className="mr-1 h-3 w-3" /> : <WifiOff className="mr-1 h-3 w-3" />}
+            {effectiveOnline ? (
+              <Wifi className="mr-1 h-3 w-3" />
+            ) : (
+              <WifiOff className="mr-1 h-3 w-3" />
+            )}
             {effectiveOnline ? "Live" : "Offline"}
           </Badge>
         </div>
@@ -194,10 +198,7 @@ export function ContextRail({
         </div>
         <div className="space-y-2">
           <Metric label="Asset cache" value={runtimeCacheStatus} />
-          <Metric
-            label="Cached assets"
-            value={String(runtimeCacheItemCount)}
-          />
+          <Metric label="Cached assets" value={String(runtimeCacheItemCount)} />
           <Metric
             label="Attachments"
             value={String(attachmentCacheSummary.cachedItems)}
@@ -262,11 +263,11 @@ export function ContextRail({
         {autoUpdateStatus ? (
           <>
             <div className="space-y-2">
-              <Metric label="Updater" value={formatUpdatePhase(autoUpdateStatus.phase)} />
               <Metric
-                label="Current build"
-                value={autoUpdateStatus.currentVersion}
+                label="Updater"
+                value={formatUpdatePhase(autoUpdateStatus.phase)}
               />
+              <Metric label="Current build" value={autoUpdateStatus.currentVersion} />
               <Metric
                 label="Available build"
                 value={autoUpdateStatus.availableVersion ?? "none"}
@@ -368,7 +369,8 @@ export function ContextRail({
           <Metric label="Draft rows" value={String(performanceSummary.draftCount)} />
         </div>
         <p className="mt-3 text-xs leading-5 text-muted">
-          Generated {formatRelativeTime(performanceSummary.generatedAt)} from IndexedDB, before any network round-trip.
+          Generated {formatRelativeTime(performanceSummary.generatedAt)} from IndexedDB,
+          before any network round-trip.
         </p>
       </div>
 
@@ -387,7 +389,7 @@ export function ContextRail({
         <p className="mt-3 text-xs leading-5 text-muted">
           {assistantConfig.enabled
             ? "Voice drafts use local sent mail as examples and keep results cached on-device."
-            : assistantConfig.reason ?? "AI assistance is disabled."}
+            : (assistantConfig.reason ?? "AI assistance is disabled.")}
         </p>
         {assistantError ? (
           <p className="mt-3 text-xs leading-5 text-amber-100">{assistantError}</p>
@@ -457,7 +459,9 @@ export function ContextRail({
                 variant="ghost"
                 size="sm"
                 className="h-8 px-2"
-                disabled={!selectedThread || !assistantConfig.enabled || isSummarizingThread}
+                disabled={
+                  !selectedThread || !assistantConfig.enabled || isSummarizingThread
+                }
                 onClick={() => void onSummarizeThread(selectedThread)}
               >
                 {isSummarizingThread ? (
@@ -514,7 +518,9 @@ export function ContextRail({
                 variant="ghost"
                 size="sm"
                 className="h-8 px-2"
-                disabled={!selectedThread || !assistantConfig.enabled || isClassifyingThread}
+                disabled={
+                  !selectedThread || !assistantConfig.enabled || isClassifyingThread
+                }
                 onClick={() => void onSuggestThreadSplit(selectedThread)}
               >
                 {isClassifyingThread ? (
@@ -559,7 +565,8 @@ export function ContextRail({
               </>
             ) : (
               <p className="mt-2 text-sm leading-6 text-muted">
-                Split suggestions help keep VIP, Important, and Other clean without adding Gmail clutter.
+                Split suggestions help keep VIP, Important, and Other clean without
+                adding Gmail clutter.
               </p>
             )}
           </div>

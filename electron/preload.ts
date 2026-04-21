@@ -12,32 +12,26 @@ const desktopApi: HypermailDesktopApi = {
     getRuntimeConfig: () => ipcRenderer.invoke("ai:get-runtime-config"),
     summarizeThread: (input) => ipcRenderer.invoke("ai:summarize-thread", input),
     suggestSplit: (input) => ipcRenderer.invoke("ai:suggest-split", input),
-    generateDraftReply: (input) =>
-      ipcRenderer.invoke("ai:generate-draft-reply", input)
+    generateDraftReply: (input) => ipcRenderer.invoke("ai:generate-draft-reply", input)
   },
   mail: {
-    syncGmailMailbox: (input) =>
-      ipcRenderer.invoke("mail:sync-gmail-mailbox", input),
-    setThreadStarred: (input) =>
-      ipcRenderer.invoke("mail:set-thread-starred", input),
-    setThreadArchived: (input) =>
-      ipcRenderer.invoke("mail:set-thread-archived", input),
+    syncGmailMailbox: (input) => ipcRenderer.invoke("mail:sync-gmail-mailbox", input),
+    setThreadStarred: (input) => ipcRenderer.invoke("mail:set-thread-starred", input),
+    setThreadArchived: (input) => ipcRenderer.invoke("mail:set-thread-archived", input),
     unsubscribeGmailThread: (input) =>
       ipcRenderer.invoke("mail:unsubscribe-gmail-thread", input),
     downloadGmailAttachment: (input) =>
       ipcRenderer.invoke("mail:download-gmail-attachment", input),
     saveCachedAttachment: (input) =>
       ipcRenderer.invoke("mail:save-cached-attachment", input),
-    sendGmailDraft: (input) =>
-      ipcRenderer.invoke("mail:send-gmail-draft", input)
+    sendGmailDraft: (input) => ipcRenderer.invoke("mail:send-gmail-draft", input)
   },
   shell: {
     getAppVersion: () => ipcRenderer.invoke("shell:get-app-version"),
     getPlatform: () => ipcRenderer.invoke("shell:get-platform"),
     getRuntimeConfigSummary: () =>
       ipcRenderer.invoke("shell:get-runtime-config-summary"),
-    getReleaseDiagnostics: () =>
-      ipcRenderer.invoke("shell:get-release-diagnostics"),
+    getReleaseDiagnostics: () => ipcRenderer.invoke("shell:get-release-diagnostics"),
     getAutoUpdateStatus: () => ipcRenderer.invoke("shell:get-auto-update-status"),
     checkForUpdates: () => ipcRenderer.invoke("shell:check-for-updates"),
     downloadUpdate: () => ipcRenderer.invoke("shell:download-update"),

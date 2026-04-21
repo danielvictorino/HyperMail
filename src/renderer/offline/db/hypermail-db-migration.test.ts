@@ -11,7 +11,10 @@ import { HypermailDatabase } from "./hypermail-db";
  * trigger v1 -> v2 -> v3 upgrades.
  */
 class V1Database extends Dexie {
-  accounts!: Dexie.Table<{ id: string; email: string; provider: string; updatedAt: number }, string>;
+  accounts!: Dexie.Table<
+    { id: string; email: string; provider: string; updatedAt: number },
+    string
+  >;
   threads!: Dexie.Table<Record<string, unknown>, string>;
   messages!: Dexie.Table<Record<string, unknown>, string>;
   labels!: Dexie.Table<Record<string, unknown>, string>;

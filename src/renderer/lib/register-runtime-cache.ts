@@ -48,9 +48,7 @@ export function registerRuntimeCache(): void {
     .register("/hypermail-sw.js")
     .then(async (registration) => {
       const worker =
-        registration.active ??
-        registration.installing ??
-        registration.waiting;
+        registration.active ?? registration.installing ?? registration.waiting;
 
       if (worker) {
         worker.postMessage({ type: "HYPERMAIL_CACHE_STATUS" });

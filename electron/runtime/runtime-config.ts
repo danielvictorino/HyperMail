@@ -34,9 +34,7 @@ function createSummary(loadedConfigPath: string | null): RuntimeConfigSummary {
     microsoftOAuthReady: Boolean(process.env.MICROSOFT_OAUTH_CLIENT_ID?.trim()),
     openAiReady: Boolean(process.env.OPENAI_API_KEY?.trim()),
     updatesUrlConfigured: Boolean(process.env.HYPERMAIL_UPDATES_URL?.trim()),
-    crashReportUploadConfigured: Boolean(
-      process.env.HYPERMAIL_CRASH_REPORT_URL?.trim()
-    )
+    crashReportUploadConfigured: Boolean(process.env.HYPERMAIL_CRASH_REPORT_URL?.trim())
   };
 }
 

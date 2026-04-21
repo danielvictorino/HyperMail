@@ -1,3 +1,4 @@
+import type { LocalMailUnsubscribe } from "@shared/mail/models";
 import { OfflineQueueError, type MailGateway } from "./mail-gateway";
 
 interface ConnectivityReader {
@@ -45,7 +46,7 @@ export class DemoMailGateway implements MailGateway {
   async unsubscribeThread(input: {
     accountId: string;
     threadId: string;
-    unsubscribe: import("@shared/mail/models").LocalMailUnsubscribe;
+    unsubscribe: LocalMailUnsubscribe;
     idempotencyKey: string;
   }): Promise<void> {
     await this.simulateRequest(input.idempotencyKey);

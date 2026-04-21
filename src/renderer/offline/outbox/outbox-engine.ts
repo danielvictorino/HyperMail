@@ -92,7 +92,9 @@ export class OutboxEngine {
       this.connectivity.setQueueError(null);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "HyperMail could not deliver the queued reply.";
+        error instanceof Error
+          ? error.message
+          : "HyperMail could not deliver the queued reply.";
       await markDraftFailed(draft, message, this.database);
       this.connectivity.setQueueError(message);
     } finally {

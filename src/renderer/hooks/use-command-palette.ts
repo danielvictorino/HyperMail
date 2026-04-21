@@ -13,7 +13,7 @@ import {
 } from "../lib/command-palette";
 import { useCommandPaletteStore } from "../state/command-palette-store";
 import type { MailboxSectionId } from "../state/inbox-ui-store";
-import { useMailboxLab } from "./use-mailbox-lab";
+import type { useMailboxLab } from "./use-mailbox-lab";
 
 interface ExecutableCommand extends CommandSearchEntry {
   execute: () => void | Promise<void>;
@@ -72,7 +72,9 @@ export function useCommandPalette({
 
   const activeCommand = rankedCommands[activeIndex] ?? null;
 
-  async function executeCommand(command: RankedExecutableCommand | null): Promise<void> {
+  async function executeCommand(
+    command: RankedExecutableCommand | null
+  ): Promise<void> {
     if (!command) {
       return;
     }
@@ -121,7 +123,8 @@ function buildCommands({
       id: "reply-current",
       group: "Actions",
       label: "Reply to current thread",
-      subtitle: selectedThread?.thread.subject ?? "Open the composer for the selected thread",
+      subtitle:
+        selectedThread?.thread.subject ?? "Open the composer for the selected thread",
       hint: "R",
       intent: "reply",
       keywords: ["reply", "respond", "current thread", "composer"],
@@ -135,7 +138,9 @@ function buildCommands({
       id: "draft-current",
       group: "Actions",
       label: "Draft reply in my voice",
-      subtitle: selectedThread?.thread.subject ?? "Generate a concise reply from local voice examples",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Generate a concise reply from local voice examples",
       hint: "D",
       intent: "draft",
       keywords: ["draft", "voice", "ai", "reply", "current thread"],
@@ -149,7 +154,9 @@ function buildCommands({
       id: "summarize-current",
       group: "Actions",
       label: "Summarize current thread",
-      subtitle: selectedThread?.thread.subject ?? "Generate a fast triage summary for the selected thread",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Generate a fast triage summary for the selected thread",
       hint: "A",
       intent: "summarize",
       keywords: ["summarize", "summary", "brief", "triage", "current thread"],
@@ -163,7 +170,9 @@ function buildCommands({
       id: "classify-current",
       group: "Actions",
       label: "Suggest split for current thread",
-      subtitle: selectedThread?.thread.subject ?? "Classify the thread into VIP, Important, or Other",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Classify the thread into VIP, Important, or Other",
       hint: "L",
       intent: "classify",
       keywords: ["label", "split", "classify", "vip", "important", "other"],
@@ -177,13 +186,17 @@ function buildCommands({
       id: "snooze-current",
       group: "Actions",
       label:
-        selectedThread?.thread.snoozedUntil && selectedThread.thread.snoozedUntil > Date.now()
+        selectedThread?.thread.snoozedUntil &&
+        selectedThread.thread.snoozedUntil > Date.now()
           ? "Unsnooze current thread"
           : "Snooze current thread",
-      subtitle: selectedThread?.thread.subject ?? "Pause the selected thread until tomorrow morning",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Pause the selected thread until tomorrow morning",
       hint: "Z",
       intent:
-        selectedThread?.thread.snoozedUntil && selectedThread.thread.snoozedUntil > Date.now()
+        selectedThread?.thread.snoozedUntil &&
+        selectedThread.thread.snoozedUntil > Date.now()
           ? "unsnooze"
           : "snooze",
       keywords: ["snooze", "unsnooze", "later", "pause", "tomorrow 8am"],
@@ -241,7 +254,9 @@ function buildCommands({
       label: selectedThread?.thread.archived
         ? "Restore current thread"
         : "Archive current thread",
-      subtitle: selectedThread?.thread.subject ?? "Move the selected thread out of the working set",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Move the selected thread out of the working set",
       hint: "E",
       intent: selectedThread?.thread.archived ? "restore" : "archive",
       keywords: ["archive", "restore", "current thread", "done", "clear"],
@@ -254,8 +269,11 @@ function buildCommands({
     {
       id: "star-current",
       group: "Actions",
-      label: selectedThread?.thread.starred ? "Unstar current thread" : "Star current thread",
-      subtitle: selectedThread?.thread.subject ?? "Toggle the selected thread pin state",
+      label: selectedThread?.thread.starred
+        ? "Unstar current thread"
+        : "Star current thread",
+      subtitle:
+        selectedThread?.thread.subject ?? "Toggle the selected thread pin state",
       hint: "S",
       intent: selectedThread?.thread.starred ? "unstar" : "star",
       keywords: ["star", "favorite", "pin", "current thread"],
@@ -294,9 +312,7 @@ function buildCommands({
     {
       id: authSession ? "gmail-disconnect" : "gmail-connect",
       group: "System",
-      label: authSession
-        ? `Disconnect ${connectedProviderLabel}`
-        : "Connect Gmail",
+      label: authSession ? `Disconnect ${connectedProviderLabel}` : "Connect Gmail",
       subtitle: authSession
         ? "Return to the seeded demo mailbox"
         : "Attach Gmail through the secure Electron auth flow",
@@ -480,13 +496,7 @@ function buildThreadCommands(
       hint: "E",
       intent: thread.thread.archived ? "restore" : "archive",
       threadId: thread.thread.id,
-      keywords: [
-        ...keywords,
-        "archive",
-        "restore",
-        "done",
-        "clear"
-      ],
+      keywords: [...keywords, "archive", "restore", "done", "clear"],
       execute: async () => {
         mailbox.selectThread(thread.thread.id);
         await mailbox.toggleArchive(thread);

@@ -44,9 +44,7 @@ function cloneThreadSnapshot(snapshot: ThreadSnapshot): ThreadSnapshot {
 }
 
 export abstract class ThreadModifier<TType extends ModifierType> {
-  protected constructor(
-    private readonly record: PersistedModifierRecord<TType>
-  ) {}
+  protected constructor(private readonly record: PersistedModifierRecord<TType>) {}
 
   get id(): string {
     return this.record.id;

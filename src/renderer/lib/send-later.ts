@@ -140,7 +140,7 @@ function applyClockTime(baseDate: Date, value: string): Date | null {
   const minute = Number.parseInt(match[2] ?? "0", 10);
   const meridiem = match[3];
 
-  if (minute > 59 || hour > 23 || hour === 0 && meridiem) {
+  if (minute > 59 || hour > 23 || (hour === 0 && meridiem)) {
     return null;
   }
 

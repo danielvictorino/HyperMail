@@ -2,12 +2,7 @@ import type { ReactNode } from "react";
 import { Clock3, Inbox, LogOut, Sparkles } from "lucide-react";
 import type { AuthSessionSummary } from "@shared/contracts";
 import { Badge } from "../ui/badge";
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "../ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 
 interface AccountProfileCardProps {

@@ -1,11 +1,6 @@
 import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import { Badge } from "../ui/badge";
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "../ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 
 interface ConnectAccountCardProps {
@@ -30,10 +25,9 @@ export function ConnectAccountCard({
             Connect Gmail with a native desktop OAuth flow.
           </CardTitle>
           <CardDescription className="max-w-2xl text-base">
-            Tokens never enter the renderer. HyperMail uses a PKCE-based loopback
-            flow in Electron, stores refresh tokens in the OS keychain, and keeps the
-            UI lean enough to stay comfortably under the first interaction latency
-            budget.
+            Tokens never enter the renderer. HyperMail uses a PKCE-based loopback flow
+            in Electron, stores refresh tokens in the OS keychain, and keeps the UI lean
+            enough to stay comfortably under the first interaction latency budget.
           </CardDescription>
         </div>
       </CardHeader>
@@ -45,8 +39,8 @@ export function ConnectAccountCard({
               <p className="text-sm font-medium text-foreground">Gmail scopes</p>
             </div>
             <p className="text-sm leading-6 text-muted">
-              `gmail.modify`, `gmail.send`, `openid`, `email`, and `profile`.
-              Enough for sync and drafting, without taking on broad account access.
+              `gmail.modify`, `gmail.send`, `openid`, `email`, and `profile`. Enough for
+              sync and drafting, without taking on broad account access.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">

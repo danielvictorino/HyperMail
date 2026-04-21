@@ -35,9 +35,7 @@ export function formatSnoozedUntil(timestamp: number): string {
   });
 }
 
-export function getMailboxNavItems(
-  threads: ThreadProjection[]
-): MailboxNavItem[] {
+export function getMailboxNavItems(threads: ThreadProjection[]): MailboxNavItem[] {
   return [
     createNavItem("inbox", "Inbox", threads),
     createNavItem("important", "Important", threads),
@@ -56,8 +54,7 @@ export function filterThreadsBySection(
   switch (section) {
     case "inbox":
       return threads.filter(
-        (thread) =>
-          !thread.thread.archived && !isThreadActivelySnoozed(thread.thread)
+        (thread) => !thread.thread.archived && !isThreadActivelySnoozed(thread.thread)
       );
     case "important":
       return threads.filter(
@@ -91,8 +88,7 @@ export function filterThreadsBySection(
       return threads.filter((thread) => isThreadActivelySnoozed(thread.thread));
     case "archive":
       return threads.filter(
-        (thread) =>
-          thread.thread.archived && !isThreadActivelySnoozed(thread.thread)
+        (thread) => thread.thread.archived && !isThreadActivelySnoozed(thread.thread)
       );
     default:
       return threads;
@@ -158,13 +154,17 @@ export function formatThreadTimestamp(timestamp: number): string {
   return `${diffDays}d`;
 }
 
-export function buildSenderInsight(thread: ThreadProjection | null): SenderInsight | null {
+export function buildSenderInsight(
+  thread: ThreadProjection | null
+): SenderInsight | null {
   if (!thread) {
     return null;
   }
 
   const primaryEmail =
-    thread.thread.participantEmails.find((email) => !email.endsWith("@hypermail.local")) ??
+    thread.thread.participantEmails.find(
+      (email) => !email.endsWith("@hypermail.local")
+    ) ??
     thread.thread.participantEmails[0] ??
     "unknown@example.com";
   const domain = primaryEmail.split("@")[1] ?? "example.com";

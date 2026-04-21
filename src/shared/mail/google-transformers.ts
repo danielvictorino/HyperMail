@@ -143,10 +143,7 @@ export function mapGmailLabelsToLocal(
     id: `${accountId}:label:${label.id}`,
     accountId,
     name: label.name,
-    color:
-      label.color?.backgroundColor ??
-      LABEL_COLOR_FALLBACKS[label.id] ??
-      "#52525b",
+    color: label.color?.backgroundColor ?? LABEL_COLOR_FALLBACKS[label.id] ?? "#52525b",
     kind: label.type
   }));
 }
@@ -178,13 +175,12 @@ export function mapGmailThreadToSnapshot(
   }
 
   const correspondents = collectCorrespondents(account.email, thread.messages ?? []);
-  const participantEmails =
-    correspondents.map((participant) => participant.email) ||
-    [latestMessage.fromEmail];
-  const participantNames =
-    correspondents.map(
-      (participant) => participant.name?.trim() || participant.email
-    ) || [latestMessage.fromName || latestMessage.fromEmail];
+  const participantEmails = correspondents.map((participant) => participant.email) || [
+    latestMessage.fromEmail
+  ];
+  const participantNames = correspondents.map(
+    (participant) => participant.name?.trim() || participant.email
+  ) || [latestMessage.fromName || latestMessage.fromEmail];
   const safeParticipantEmails =
     participantEmails.length > 0 ? participantEmails : [latestMessage.fromEmail];
   const safeParticipantNames =
@@ -542,10 +538,7 @@ function parseAddressList(value: string | undefined): ParsedAddress[] {
         };
       }
 
-      const emailOnly = token
-        .replace(/^"|"$/g, "")
-        .trim()
-        .toLowerCase();
+      const emailOnly = token.replace(/^"|"$/g, "").trim().toLowerCase();
 
       if (!emailOnly.includes("@")) {
         return null;
@@ -564,7 +557,7 @@ function splitAddresses(value: string): string[] {
   let inQuotes = false;
 
   for (const character of value) {
-    if (character === "\"") {
+    if (character === '"') {
       inQuotes = !inQuotes;
       current += character;
       continue;
@@ -642,10 +635,7 @@ function extractAttachments(
   return attachments;
 }
 
-function findBodyByMimeType(
-  part: GmailMessagePart,
-  mimeType: string
-): string | null {
+function findBodyByMimeType(part: GmailMessagePart, mimeType: string): string | null {
   if (part.mimeType === mimeType && part.body?.data) {
     return decodeBase64Url(part.body.data);
   }
@@ -678,7 +668,8 @@ function visitParts(
 
 function decodeBase64Url(value: string): string {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
-  const padding = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
+  const padding =
+    normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
   return Buffer.from(normalized + padding, "base64").toString("utf8");
 }
 
@@ -692,7 +683,7 @@ function stripHtml(html: string): string {
     .replace(/&lt;/gi, "<")
     .replace(/&gt;/gi, ">")
     .replace(/&#39;/gi, "'")
-    .replace(/&quot;/gi, "\"");
+    .replace(/&quot;/gi, '"');
 }
 
 function normalizeBodyText(value: string): string {

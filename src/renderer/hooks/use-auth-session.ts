@@ -33,14 +33,19 @@ export function useAuthSession() {
     queryKey: ["hypermail", "shell-context"],
     queryFn: async () => {
       const api = getDesktopApi();
-      const [releaseDiagnostics, autoUpdateStatus, platform, appVersion, runtimeConfig] =
-        await Promise.all([
-          api.shell.getReleaseDiagnostics(),
-          api.shell.getAutoUpdateStatus(),
-          api.shell.getPlatform(),
-          api.shell.getAppVersion(),
-          api.shell.getRuntimeConfigSummary()
-        ]);
+      const [
+        releaseDiagnostics,
+        autoUpdateStatus,
+        platform,
+        appVersion,
+        runtimeConfig
+      ] = await Promise.all([
+        api.shell.getReleaseDiagnostics(),
+        api.shell.getAutoUpdateStatus(),
+        api.shell.getPlatform(),
+        api.shell.getAppVersion(),
+        api.shell.getRuntimeConfigSummary()
+      ]);
 
       return {
         releaseDiagnostics,
@@ -133,9 +138,7 @@ export function useAuthSession() {
     },
     onError: (error) => {
       setError(
-        error instanceof Error
-          ? error.message
-          : "HyperMail could not sign out."
+        error instanceof Error ? error.message : "HyperMail could not sign out."
       );
     }
   });

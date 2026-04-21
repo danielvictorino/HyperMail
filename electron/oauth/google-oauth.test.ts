@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  GoogleTokenRefreshError,
-  performTokenRefresh
-} from "./google-oauth";
+import { GoogleTokenRefreshError, performTokenRefresh } from "./google-oauth";
 
 function mockFetchResponse(
   status: number,

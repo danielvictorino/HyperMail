@@ -64,7 +64,11 @@ export const downloadGmailAttachmentRequestSchema = z.object({
   attachmentId: idString,
   filename: nonEmptyString,
   mimeType: nonEmptyString,
-  size: z.number().int().nonnegative().max(100 * 1024 * 1024)
+  size: z
+    .number()
+    .int()
+    .nonnegative()
+    .max(100 * 1024 * 1024)
 });
 
 export const cachedAttachmentPayloadSchema = z.object({
@@ -75,7 +79,11 @@ export const cachedAttachmentPayloadSchema = z.object({
   attachmentId: idString,
   filename: nonEmptyString,
   mimeType: nonEmptyString,
-  size: z.number().int().nonnegative().max(100 * 1024 * 1024),
+  size: z
+    .number()
+    .int()
+    .nonnegative()
+    .max(100 * 1024 * 1024),
   contentBase64: z.string().max(200 * 1024 * 1024),
   downloadedAt: z.number().int().nonnegative()
 });
@@ -154,10 +162,7 @@ export function parseIpcPayload<TSchema extends IpcSchema>(
   return result.data;
 }
 
-export const EXTERNAL_URL_PROTOCOL_ALLOWLIST = new Set([
-  "https:",
-  "mailto:"
-]);
+export const EXTERNAL_URL_PROTOCOL_ALLOWLIST = new Set(["https:", "mailto:"]);
 
 export function isAllowedExternalUrl(rawUrl: string): boolean {
   try {

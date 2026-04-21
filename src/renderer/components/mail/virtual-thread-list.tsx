@@ -129,7 +129,8 @@ export function VirtualThreadList({
               <div className="space-y-3">
                 <p className="text-sm font-medium text-foreground">No local matches</p>
                 <p className="max-w-xs text-sm leading-6 text-muted">
-                  Search only hits the cached mailbox. Try a sender, subject fragment, or a phrase from the thread body.
+                  Search only hits the cached mailbox. Try a sender, subject fragment,
+                  or a phrase from the thread body.
                 </p>
               </div>
             ) : (
@@ -137,10 +138,14 @@ export function VirtualThreadList({
                 <InboxZeroArtwork sectionLabel={sectionLabel} />
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-foreground">
-                    {sectionLabel === "All inbox" ? "Inbox Zero" : `${sectionLabel} cleared`}
+                    {sectionLabel === "All inbox"
+                      ? "Inbox Zero"
+                      : `${sectionLabel} cleared`}
                   </p>
                   <p className="max-w-xs text-sm leading-6 text-muted">
-                    HyperMail keeps the empty state intentional. The daily artwork changes with the date, so clearing a split feels like progress instead of dead space.
+                    HyperMail keeps the empty state intentional. The daily artwork
+                    changes with the date, so clearing a split feels like progress
+                    instead of dead space.
                   </p>
                 </div>
               </div>

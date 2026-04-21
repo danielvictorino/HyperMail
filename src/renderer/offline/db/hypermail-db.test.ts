@@ -124,10 +124,7 @@ describe("deleteAccountCascade", () => {
       await database.messages.where("accountId").equals(purgeAccountId).count()
     ).toBe(0);
     expect(
-      await database.queuedModifiers
-        .where("accountId")
-        .equals(purgeAccountId)
-        .count()
+      await database.queuedModifiers.where("accountId").equals(purgeAccountId).count()
     ).toBe(0);
     expect(
       await database.threads.where("accountId").equals(keepAccountId).count()

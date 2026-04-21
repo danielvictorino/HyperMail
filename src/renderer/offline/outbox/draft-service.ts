@@ -3,7 +3,12 @@ import type {
   LocalMailMessage,
   ThreadProjection
 } from "@shared/mail/models";
-import { hypermailDb, loadThreadSnapshot, writeThreadSnapshot, type HypermailDatabase } from "../db/hypermail-db";
+import {
+  hypermailDb,
+  loadThreadSnapshot,
+  writeThreadSnapshot,
+  type HypermailDatabase
+} from "../db/hypermail-db";
 
 function createDraftId(threadId: string): string {
   return `${threadId}:draft`;
@@ -27,7 +32,7 @@ function htmlToPlainText(value: string): string {
     .replace(/&lt;/gi, "<")
     .replace(/&gt;/gi, ">")
     .replace(/&#39;/gi, "'")
-    .replace(/&quot;/gi, "\"")
+    .replace(/&quot;/gi, '"')
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]{2,}/g, " ")
     .trim();
@@ -216,23 +221,18 @@ export async function markDraftSending(
     return;
   }
 
-  await database.transaction(
-    "rw",
-    database.drafts,
-    database.messages,
-    async () => {
-      await database.drafts.update(draftId, {
-        status: "sending",
-        updatedAt: Date.now(),
-        lastError: undefined
-      });
+  await database.transaction("rw", database.drafts, database.messages, async () => {
+    await database.drafts.update(draftId, {
+      status: "sending",
+      updatedAt: Date.now(),
+      lastError: undefined
+    });
 
-      await database.messages.update(draft.clientMessageId, {
-        deliveryState: "sending",
-        sentAt: Date.now()
-      });
-    }
-  );
+    await database.messages.update(draft.clientMessageId, {
+      deliveryState: "sending",
+      sentAt: Date.now()
+    });
+  });
 }
 
 export async function markDraftDelivered(
@@ -269,20 +269,15 @@ export async function markDraftFailed(
   message: string,
   database = hypermailDb
 ): Promise<void> {
-  await database.transaction(
-    "rw",
-    database.drafts,
-    database.messages,
-    async () => {
-      await database.drafts.update(draft.id, {
-        status: "failed",
-        updatedAt: Date.now(),
-        lastError: message
-      });
+  await database.transaction("rw", database.drafts, database.messages, async () => {
+    await database.drafts.update(draft.id, {
+      status: "failed",
+      updatedAt: Date.now(),
+      lastError: message
+    });
 
-      await database.messages.update(draft.clientMessageId, {
-        deliveryState: "failed"
-      });
-    }
-  );
+    await database.messages.update(draft.clientMessageId, {
+      deliveryState: "failed"
+    });
+  });
 }

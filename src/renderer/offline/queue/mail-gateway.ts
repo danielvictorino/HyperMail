@@ -1,3 +1,5 @@
+import type { LocalMailUnsubscribe } from "@shared/mail/models";
+
 export class OfflineQueueError extends Error {
   readonly transient = true;
 
@@ -31,7 +33,7 @@ export interface SetThreadSnoozedInput {
 export interface UnsubscribeThreadInput {
   accountId: string;
   threadId: string;
-  unsubscribe: import("@shared/mail/models").LocalMailUnsubscribe;
+  unsubscribe: LocalMailUnsubscribe;
   idempotencyKey: string;
 }
 
@@ -54,5 +56,7 @@ export interface MailGateway {
   setThreadArchived(input: SetThreadArchivedInput): Promise<void>;
   setThreadSnoozed(input: SetThreadSnoozedInput): Promise<void>;
   unsubscribeThread(input: UnsubscribeThreadInput): Promise<void>;
-  sendDraft(input: SendDraftInput): Promise<{ remoteMessageId?: string; sentAt: number }>;
+  sendDraft(
+    input: SendDraftInput
+  ): Promise<{ remoteMessageId?: string; sentAt: number }>;
 }

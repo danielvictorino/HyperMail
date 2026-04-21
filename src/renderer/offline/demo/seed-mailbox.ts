@@ -104,10 +104,30 @@ export async function ensureSeededMailbox(
   }
 
   const labels = [
-    { id: `${descriptor.id}:label:inbox`, name: "Inbox", color: "#6b7280", kind: "system" as const },
-    { id: `${descriptor.id}:label:starred`, name: "Starred", color: "#a27eff", kind: "system" as const },
-    { id: `${descriptor.id}:label:vip`, name: "VIP", color: "#d97706", kind: "system" as const },
-    { id: `${descriptor.id}:label:calendar`, name: "Calendar", color: "#0ea5e9", kind: "user" as const }
+    {
+      id: `${descriptor.id}:label:inbox`,
+      name: "Inbox",
+      color: "#6b7280",
+      kind: "system" as const
+    },
+    {
+      id: `${descriptor.id}:label:starred`,
+      name: "Starred",
+      color: "#a27eff",
+      kind: "system" as const
+    },
+    {
+      id: `${descriptor.id}:label:vip`,
+      name: "VIP",
+      color: "#d97706",
+      kind: "system" as const
+    },
+    {
+      id: `${descriptor.id}:label:calendar`,
+      name: "Calendar",
+      color: "#0ea5e9",
+      kind: "user" as const
+    }
   ].map((label) => ({
     ...label,
     accountId: descriptor.id
@@ -118,7 +138,8 @@ export async function ensureSeededMailbox(
       id: createThreadId(descriptor.id, "launch"),
       accountId: descriptor.id,
       subject: "Launch review before tomorrow’s customer demo",
-      snippet: "The deck is tight. I only need the short version of the narrative for slide five.",
+      snippet:
+        "The deck is tight. I only need the short version of the narrative for slide five.",
       participantNames: ["Maya Chen", descriptor.displayName],
       participantEmails: ["maya@galaxies.ai", descriptor.email],
       split: "important" as const,
@@ -139,7 +160,8 @@ export async function ensureSeededMailbox(
       id: createThreadId(descriptor.id, "roadmap"),
       accountId: descriptor.id,
       subject: "Roadmap checkpoint for offline architecture",
-      snippet: "Per-thread queues are the right call. We should keep rollback as replay, not mutation reversal.",
+      snippet:
+        "Per-thread queues are the right call. We should keep rollback as replay, not mutation reversal.",
       participantNames: ["Noah Patel", descriptor.displayName],
       participantEmails: ["noah@hypermail.dev", descriptor.email],
       split: "vip" as const,
@@ -157,7 +179,8 @@ export async function ensureSeededMailbox(
       id: createThreadId(descriptor.id, "calendar"),
       accountId: descriptor.id,
       subject: "Calendar sync edge-cases when the network flakes",
-      snippet: "If the user edits offline, the newest committed version should win after reconnect.",
+      snippet:
+        "If the user edits offline, the newest committed version should win after reconnect.",
       participantNames: ["Jules Rivera", descriptor.displayName],
       participantEmails: ["jules@ops.example", descriptor.email],
       split: "other" as const,

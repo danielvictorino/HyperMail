@@ -55,7 +55,11 @@ import {
   queueDraftForDelivery,
   saveDraftForThread
 } from "../offline/outbox/draft-service";
-import { modifierQueueEngine, outboxEngine, startOfflineRuntime } from "../offline/runtime";
+import {
+  modifierQueueEngine,
+  outboxEngine,
+  startOfflineRuntime
+} from "../offline/runtime";
 import {
   getGmailSyncTelemetry,
   getLastGmailSyncedAt,
@@ -82,7 +86,9 @@ interface MailboxLabState {
   isSearching: boolean;
   searchFocusNonce: number;
   visibleThreads: ThreadProjection[];
-  setSelectedSection: (section: ReturnType<typeof useInboxUiStore.getState>["selectedSection"]) => void;
+  setSelectedSection: (
+    section: ReturnType<typeof useInboxUiStore.getState>["selectedSection"]
+  ) => void;
   setSearchQuery: (searchQuery: string) => void;
   clearSearchQuery: () => void;
   requestSearchFocus: () => void;
@@ -105,13 +111,11 @@ interface MailboxLabState {
   threadSummaryGeneratedAt: number | null;
   splitSuggestion: MailSplitSuggestion | null;
   splitSuggestionGeneratedAt: number | null;
-  assistantDraftSeed:
-    | {
-        threadId: string;
-        bodyHtml: string;
-        version: number;
-      }
-    | null;
+  assistantDraftSeed: {
+    threadId: string;
+    bodyHtml: string;
+    version: number;
+  } | null;
   isSummarizingThread: boolean;
   isGeneratingDraft: boolean;
   isClassifyingThread: boolean;
@@ -172,26 +176,18 @@ function buildAccountDescriptor(
   };
 }
 
-export function useMailboxLab(
-  session: AuthSessionSummary | null
-): MailboxLabState {
+export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabState {
   useConnectivityBootstrap();
 
   const selectedThreadId = useInboxUiStore((state) => state.selectedThreadId);
-  const setSelectedThreadId = useInboxUiStore(
-    (state) => state.setSelectedThreadId
-  );
+  const setSelectedThreadId = useInboxUiStore((state) => state.setSelectedThreadId);
   const selectedSection = useInboxUiStore((state) => state.selectedSection);
-  const setSelectedSectionState = useInboxUiStore(
-    (state) => state.setSelectedSection
-  );
+  const setSelectedSectionState = useInboxUiStore((state) => state.setSelectedSection);
   const searchQuery = useInboxUiStore((state) => state.searchQuery);
   const searchFocusNonce = useInboxUiStore((state) => state.searchFocusNonce);
   const setSearchQueryState = useInboxUiStore((state) => state.setSearchQuery);
   const clearSearchQueryState = useInboxUiStore((state) => state.clearSearchQuery);
-  const requestSearchFocusState = useInboxUiStore(
-    (state) => state.requestSearchFocus
-  );
+  const requestSearchFocusState = useInboxUiStore((state) => state.requestSearchFocus);
   const composerOpen = useInboxUiStore((state) => state.composerOpen);
   const openComposer = useInboxUiStore((state) => state.openComposer);
   const closeComposer = useInboxUiStore((state) => state.closeComposer);
@@ -216,12 +212,10 @@ export function useMailboxLab(
     model: DEFAULT_OPENAI_MODEL,
     reason: "Loading AI runtime..."
   });
-  const [threadSummaryRecord, setThreadSummaryRecord] = useState<
-    MailAssistantArtifactRecord<MailThreadSummary> | null
-  >(null);
-  const [splitSuggestionRecord, setSplitSuggestionRecord] = useState<
-    MailAssistantArtifactRecord<MailSplitSuggestion> | null
-  >(null);
+  const [threadSummaryRecord, setThreadSummaryRecord] =
+    useState<MailAssistantArtifactRecord<MailThreadSummary> | null>(null);
+  const [splitSuggestionRecord, setSplitSuggestionRecord] =
+    useState<MailAssistantArtifactRecord<MailSplitSuggestion> | null>(null);
   const [assistantDraftSeed, setAssistantDraftSeed] = useState<{
     threadId: string;
     bodyHtml: string;
@@ -666,9 +660,7 @@ export function useMailboxLab(
     }
   }
 
-  async function generateThreadSummary(
-    thread = selectedThread
-  ): Promise<void> {
+  async function generateThreadSummary(thread = selectedThread): Promise<void> {
     if (!thread) {
       return;
     }
@@ -710,9 +702,7 @@ export function useMailboxLab(
     }
   }
 
-  async function generateVoiceDraft(
-    thread = selectedThread
-  ): Promise<void> {
+  async function generateVoiceDraft(thread = selectedThread): Promise<void> {
     if (!thread) {
       return;
     }
@@ -758,9 +748,7 @@ export function useMailboxLab(
     }
   }
 
-  async function suggestThreadSplit(
-    thread = selectedThread
-  ): Promise<void> {
+  async function suggestThreadSplit(thread = selectedThread): Promise<void> {
     if (!thread) {
       return;
     }

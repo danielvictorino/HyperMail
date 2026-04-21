@@ -4,10 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { Clock3, LoaderCircle, Send, Sparkles } from "lucide-react";
 import type { ThreadProjection } from "@shared/mail/models";
-import {
-  formatSendLaterLabel,
-  parseNaturalLanguageSendLater
-} from "@/lib/send-later";
+import { formatSendLaterLabel, parseNaturalLanguageSendLater } from "@/lib/send-later";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -23,20 +20,15 @@ interface ThreadComposerProps {
     bodyHtml: string,
     sendAt: number
   ) => Promise<void>;
-  onQueueReplyLater: (
-    thread: ThreadProjection,
-    bodyHtml: string
-  ) => Promise<void>;
+  onQueueReplyLater: (thread: ThreadProjection, bodyHtml: string) => Promise<void>;
   onGenerateDraft: (thread?: ThreadProjection | null) => Promise<void>;
   isGeneratingDraft: boolean;
   assistantEnabled: boolean;
-  draftSeed:
-    | {
-        threadId: string;
-        bodyHtml: string;
-        version: number;
-      }
-    | null;
+  draftSeed: {
+    threadId: string;
+    bodyHtml: string;
+    version: number;
+  } | null;
   onConsumeDraftSeed: () => void;
 }
 
@@ -111,12 +103,7 @@ export function ThreadComposer({
   }, [editor, loadDraft, open, thread.thread.id]);
 
   useEffect(() => {
-    if (
-      !editor ||
-      !open ||
-      !draftSeed ||
-      draftSeed.threadId !== thread.thread.id
-    ) {
+    if (!editor || !open || !draftSeed || draftSeed.threadId !== thread.thread.id) {
       return;
     }
 
@@ -207,11 +194,14 @@ export function ThreadComposer({
         <div>
           <p className="text-sm font-medium text-foreground">Instant Reply</p>
           <p className="mt-1 text-xs text-muted">
-            Drafts stay local first, then the outbox engine delivers when the network is ready.
+            Drafts stay local first, then the outbox engine delivers when the network is
+            ready.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className="border-white/10 bg-white/[0.03] text-muted">{statusLabel}</Badge>
+          <Badge className="border-white/10 bg-white/[0.03] text-muted">
+            {statusLabel}
+          </Badge>
           <Button variant="ghost" size="sm" onClick={onClose}>
             Close
           </Button>

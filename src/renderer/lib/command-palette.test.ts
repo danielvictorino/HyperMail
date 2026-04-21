@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { groupRankedCommands, rankCommands, type CommandSearchEntry } from "./command-palette";
+import {
+  groupRankedCommands,
+  rankCommands,
+  type CommandSearchEntry
+} from "./command-palette";
 
 const commands: CommandSearchEntry[] = [
   {

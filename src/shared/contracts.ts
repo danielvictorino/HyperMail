@@ -123,9 +123,7 @@ export interface ElectronShellApi {
   downloadUpdate: () => Promise<AutoUpdateStatus>;
   installDownloadedUpdate: () => Promise<void>;
   openLogsDirectory: () => Promise<void>;
-  onAutoUpdateStatus: (
-    listener: (status: AutoUpdateStatus) => void
-  ) => () => void;
+  onAutoUpdateStatus: (listener: (status: AutoUpdateStatus) => void) => () => void;
 }
 
 export interface GmailMailboxSyncRequest {

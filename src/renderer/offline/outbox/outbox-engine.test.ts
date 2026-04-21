@@ -180,7 +180,7 @@ describe("OutboxEngine", () => {
     connectivity.setOnline(true);
 
     await waitFor(async () => {
-      expect((await database.drafts.count())).toBe(0);
+      expect(await database.drafts.count()).toBe(0);
     });
 
     const deliveredSnapshot = await loadInboxSnapshot(accountId, database);

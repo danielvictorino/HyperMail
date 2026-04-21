@@ -22,21 +22,16 @@ describe("ipc-contracts", () => {
 
     it("rejects missing accountId", () => {
       expect(() =>
-        parseIpcPayload(
-          "mail:sync-gmail-mailbox",
-          gmailMailboxSyncRequestSchema,
-          {}
-        )
+        parseIpcPayload("mail:sync-gmail-mailbox", gmailMailboxSyncRequestSchema, {})
       ).toThrow(IpcValidationError);
     });
 
     it("rejects negative maxResults", () => {
       expect(() =>
-        parseIpcPayload(
-          "mail:sync-gmail-mailbox",
-          gmailMailboxSyncRequestSchema,
-          { accountId: "a", maxResults: -1 }
-        )
+        parseIpcPayload("mail:sync-gmail-mailbox", gmailMailboxSyncRequestSchema, {
+          accountId: "a",
+          maxResults: -1
+        })
       ).toThrow(IpcValidationError);
     });
   });
@@ -44,16 +39,12 @@ describe("ipc-contracts", () => {
   describe("setThreadStarredRequestSchema", () => {
     it("rejects wrong starred type", () => {
       expect(() =>
-        parseIpcPayload(
-          "mail:set-thread-starred",
-          setThreadStarredRequestSchema,
-          {
-            accountId: "a",
-            threadId: "t",
-            starred: "yes",
-            idempotencyKey: "k"
-          }
-        )
+        parseIpcPayload("mail:set-thread-starred", setThreadStarredRequestSchema, {
+          accountId: "a",
+          threadId: "t",
+          starred: "yes",
+          idempotencyKey: "k"
+        })
       ).toThrow(IpcValidationError);
     });
   });
@@ -119,9 +110,7 @@ describe("ipc-contracts", () => {
 
   describe("fuzz / hostile payloads", () => {
     it("rejects prototype-pollution-shaped keys gracefully", () => {
-      const hostile = JSON.parse(
-        '{"accountId":"a","__proto__":{"polluted":true}}'
-      );
+      const hostile = JSON.parse('{"accountId":"a","__proto__":{"polluted":true}}');
       const parsed = parseIpcPayload(
         "mail:sync-gmail-mailbox",
         gmailMailboxSyncRequestSchema,
@@ -150,26 +139,18 @@ describe("ipc-contracts", () => {
 
     it("rejects array where a scalar is expected", () => {
       expect(() =>
-        parseIpcPayload(
-          "mail:set-thread-starred",
-          setThreadStarredRequestSchema,
-          {
-            accountId: ["a"],
-            threadId: "t",
-            starred: true,
-            idempotencyKey: "k"
-          }
-        )
+        parseIpcPayload("mail:set-thread-starred", setThreadStarredRequestSchema, {
+          accountId: ["a"],
+          threadId: "t",
+          starred: true,
+          idempotencyKey: "k"
+        })
       ).toThrow(IpcValidationError);
     });
 
     it("rejects null payload", () => {
       expect(() =>
-        parseIpcPayload(
-          "mail:sync-gmail-mailbox",
-          gmailMailboxSyncRequestSchema,
-          null
-        )
+        parseIpcPayload("mail:sync-gmail-mailbox", gmailMailboxSyncRequestSchema, null)
       ).toThrow(IpcValidationError);
     });
 

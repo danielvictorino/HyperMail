@@ -1,6 +1,7 @@
 import "fake-indexeddb/auto";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { LocalMailUnsubscribe } from "@shared/mail/models";
 import { loadInboxSnapshot } from "../db/load-inbox-snapshot";
 import { HypermailDatabase } from "../db/hypermail-db";
 import { SetThreadArchivedModifier } from "../modifiers/set-thread-archived-modifier";
@@ -90,7 +91,7 @@ class TestGateway implements MailGateway {
   async unsubscribeThread(input: {
     accountId: string;
     threadId: string;
-    unsubscribe: import("@shared/mail/models").LocalMailUnsubscribe;
+    unsubscribe: LocalMailUnsubscribe;
     idempotencyKey: string;
   }): Promise<void> {
     this.operations.push(`unsubscribe:${input.unsubscribe.method}`);

@@ -24,7 +24,9 @@ function fakeEvent(init: {
   } as unknown as KeyboardEvent;
 }
 
-function fakeThread(overrides: Partial<ThreadProjection["thread"]> = {}): ThreadProjection {
+function fakeThread(
+  overrides: Partial<ThreadProjection["thread"]> = {}
+): ThreadProjection {
   return {
     thread: {
       id: "t1",
@@ -88,10 +90,7 @@ function makeOptions(
 describe("dispatchKeyboardEvent", () => {
   it("Ctrl+K opens the command palette", async () => {
     const options = makeOptions();
-    await dispatchKeyboardEvent(
-      fakeEvent({ key: "k", ctrlKey: true }),
-      options
-    );
+    await dispatchKeyboardEvent(fakeEvent({ key: "k", ctrlKey: true }), options);
     expect(options.openCommandPalette).toHaveBeenCalledOnce();
   });
 

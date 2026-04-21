@@ -1,9 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  createSingleFlight,
-  parseRetryAfterHeader,
-  retryWithBackoff
-} from "./retry";
+import { createSingleFlight, parseRetryAfterHeader, retryWithBackoff } from "./retry";
 
 describe("retryWithBackoff", () => {
   it("returns on the first successful attempt", async () => {
@@ -38,9 +34,9 @@ describe("retryWithBackoff", () => {
     const op = vi.fn(async () => {
       throw err;
     });
-    await expect(
-      retryWithBackoff(op, { maxAttempts: 3, baseDelayMs: 1 })
-    ).rejects.toBe(err);
+    await expect(retryWithBackoff(op, { maxAttempts: 3, baseDelayMs: 1 })).rejects.toBe(
+      err
+    );
     expect(op).toHaveBeenCalledTimes(1);
   });
 
@@ -50,9 +46,9 @@ describe("retryWithBackoff", () => {
     const op = vi.fn(async () => {
       throw err;
     });
-    await expect(
-      retryWithBackoff(op, { maxAttempts: 2, baseDelayMs: 1 })
-    ).rejects.toBe(err);
+    await expect(retryWithBackoff(op, { maxAttempts: 2, baseDelayMs: 1 })).rejects.toBe(
+      err
+    );
     expect(op).toHaveBeenCalledTimes(2);
   });
 });

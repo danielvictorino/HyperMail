@@ -58,9 +58,7 @@ export function CommandPalette({
             placeholder="Search actions, sections, threads..."
             className="w-full border-none bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted"
           />
-          <Badge className="border-white/10 bg-white/[0.03] text-muted">
-            Enter
-          </Badge>
+          <Badge className="border-white/10 bg-white/[0.03] text-muted">Enter</Badge>
         </div>
 
         <div className="max-h-[70vh] overflow-auto px-2 py-2">

@@ -104,14 +104,8 @@ export async function deleteAccountCascade(
       await database.messages.where("accountId").equals(accountId).delete();
       await database.labels.where("accountId").equals(accountId).delete();
       await database.drafts.where("accountId").equals(accountId).delete();
-      await database.attachmentCache
-        .where("accountId")
-        .equals(accountId)
-        .delete();
-      await database.queuedModifiers
-        .where("accountId")
-        .equals(accountId)
-        .delete();
+      await database.attachmentCache.where("accountId").equals(accountId).delete();
+      await database.queuedModifiers.where("accountId").equals(accountId).delete();
     }
   );
 }

@@ -108,9 +108,7 @@ export function MailSidebar({
             size="sm"
             className="mt-4 w-full"
             disabled={authBusy}
-            onClick={() =>
-              void (connected ? onDisconnectGmail() : onConnectGmail())
-            }
+            onClick={() => void (connected ? onDisconnectGmail() : onConnectGmail())}
           >
             {connected ? `Disconnect ${providerLabel}` : "Connect Gmail"}
           </Button>

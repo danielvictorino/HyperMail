@@ -121,9 +121,7 @@ export async function getAuthorizedGoogleSession(
   return nextSession;
 }
 
-export async function signInWithGoogle(
-  clientId: string
-): Promise<AuthSessionSummary> {
+export async function signInWithGoogle(clientId: string): Promise<AuthSessionSummary> {
   const authorization = await requestAuthorizationCode(clientId);
   const tokenResponse = await exchangeAuthorizationCode(clientId, authorization);
   const account = await fetchGmailAccountProfile(tokenResponse.access_token);
@@ -323,15 +321,10 @@ async function refreshAccessToken(
         scope: refreshed.scope ?? storedSession.scope
       };
     } catch (error) {
-      if (
-        error instanceof GoogleTokenRefreshError &&
-        !error.transient
-      ) {
+      if (error instanceof GoogleTokenRefreshError && !error.transient) {
         await clearStoredSession("google");
       }
-      throw error instanceof Error
-        ? error
-        : new Error("Google token refresh failed.");
+      throw error instanceof Error ? error : new Error("Google token refresh failed.");
     }
   });
 }
@@ -372,7 +365,9 @@ export async function performTokenRefresh(
   const transient =
     response.status === 429 ||
     (response.status >= 500 && response.status < 600) ||
-    (response.status === 400 && errorCode !== null && !NON_TRANSIENT_OAUTH_CODES.has(errorCode));
+    (response.status === 400 &&
+      errorCode !== null &&
+      !NON_TRANSIENT_OAUTH_CODES.has(errorCode));
 
   throw new GoogleTokenRefreshError(
     `Google token refresh failed with ${response.status}${detail ? `: ${detail}` : "."}`,
@@ -396,8 +391,7 @@ async function readOAuthErrorDetail(
     };
     return {
       errorCode: parsed.error ?? null,
-      detail:
-        parsed.error_description ?? parsed.error ?? trimmed.slice(0, 280)
+      detail: parsed.error_description ?? parsed.error ?? trimmed.slice(0, 280)
     };
   } catch {
     return { errorCode: null, detail: trimmed.slice(0, 280) };

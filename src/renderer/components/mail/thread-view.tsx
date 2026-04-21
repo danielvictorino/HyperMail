@@ -18,10 +18,7 @@ import type {
   ThreadProjection
 } from "@shared/mail/models";
 import { formatAttachmentSize } from "@/offline/attachments/attachment-cache";
-import {
-  formatSnoozedUntil,
-  isThreadActivelySnoozed
-} from "@/lib/mailbox-view";
+import { formatSnoozedUntil, isThreadActivelySnoozed } from "@/lib/mailbox-view";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -64,13 +61,11 @@ interface ThreadViewProps {
   isGeneratingDraft: boolean;
   onSummarizeThread: (thread?: ThreadProjection | null) => Promise<void>;
   onGenerateVoiceDraft: (thread?: ThreadProjection | null) => Promise<void>;
-  draftSeed:
-    | {
-        threadId: string;
-        bodyHtml: string;
-        version: number;
-      }
-    | null;
+  draftSeed: {
+    threadId: string;
+    bodyHtml: string;
+    version: number;
+  } | null;
   onConsumeDraftSeed: () => void;
 }
 
@@ -126,7 +121,8 @@ export function ThreadView({
   }
 
   const activelySnoozed = isThreadActivelySnoozed(thread.thread);
-  const canUnsubscribe = Boolean(thread.thread.unsubscribe) && !thread.thread.unsubscribedAt;
+  const canUnsubscribe =
+    Boolean(thread.thread.unsubscribe) && !thread.thread.unsubscribedAt;
 
   return (
     <section className="flex h-full min-h-0 flex-col bg-panel/60">
@@ -210,7 +206,9 @@ export function ThreadView({
               hint="Z"
               icon={<Clock3 className="h-4 w-4" />}
               onClick={() =>
-                void (activelySnoozed ? onUnsnoozeThread(thread) : onSnoozeThread(thread))
+                void (activelySnoozed
+                  ? onUnsnoozeThread(thread)
+                  : onSnoozeThread(thread))
               }
             />
             <ActionButton

@@ -1,7 +1,4 @@
-import type {
-  PersistedModifierRecord,
-  ThreadSnapshot
-} from "@shared/mail/models";
+import type { PersistedModifierRecord, ThreadSnapshot } from "@shared/mail/models";
 import { createModifierRecord, ThreadModifier } from "./thread-modifier";
 import type { ModifierPersistContext } from "./thread-modifier";
 

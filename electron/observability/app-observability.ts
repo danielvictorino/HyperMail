@@ -92,16 +92,13 @@ export function attachWindowObservability(window: BrowserWindow): void {
     });
   });
 
-  contents.on(
-    "did-fail-load",
-    (_event, errorCode, errorDescription, validatedUrl) => {
-      log.error("[renderer] did-fail-load", {
-        errorCode,
-        errorDescription,
-        validatedUrl
-      });
-    }
-  );
+  contents.on("did-fail-load", (_event, errorCode, errorDescription, validatedUrl) => {
+    log.error("[renderer] did-fail-load", {
+      errorCode,
+      errorDescription,
+      validatedUrl
+    });
+  });
 
   window.on("unresponsive", () => {
     log.warn("[window] unresponsive");

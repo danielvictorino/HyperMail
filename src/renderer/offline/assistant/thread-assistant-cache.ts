@@ -58,7 +58,10 @@ export async function listVoiceExamplesForAccount(
   accountEmail: string,
   database = hypermailDb
 ): Promise<MailVoiceExample[]> {
-  const messages = await database.messages.where("accountId").equals(accountId).toArray();
+  const messages = await database.messages
+    .where("accountId")
+    .equals(accountId)
+    .toArray();
   return selectVoiceExamples(messages, accountEmail);
 }
 

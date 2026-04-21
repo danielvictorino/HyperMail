@@ -63,10 +63,7 @@ describe("mail-assistant helpers", () => {
       "daniel@example.com"
     );
 
-    expect(voiceExamples.map((example) => example.id)).toEqual([
-      "sent-1",
-      "sent-2"
-    ]);
+    expect(voiceExamples.map((example) => example.id)).toEqual(["sent-1", "sent-2"]);
     expect(voiceExamples[0]?.bodyPlain).toContain("tighten the narrative");
   });
 

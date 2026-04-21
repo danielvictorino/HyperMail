@@ -19,7 +19,8 @@ const config: Config = {
       },
       boxShadow: {
         shell: "0 18px 60px rgba(0, 0, 0, 0.42)",
-        focus: "0 0 0 1px rgba(162, 126, 255, 0.45), 0 0 0 6px rgba(162, 126, 255, 0.12)"
+        focus:
+          "0 0 0 1px rgba(162, 126, 255, 0.45), 0 0 0 6px rgba(162, 126, 255, 0.12)"
       },
       fontFamily: {
         sans: ["Inter Variable", "Inter", "sans-serif"]

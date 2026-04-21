@@ -208,10 +208,7 @@ async function gmailModify(
       );
 
       if (!response.ok) {
-        throw await createGmailApiError(
-          response,
-          `/threads/${remoteThreadId}/modify`
-        );
+        throw await createGmailApiError(response, `/threads/${remoteThreadId}/modify`);
       }
     },
     {
@@ -233,10 +230,7 @@ async function gmailSendMessage(
   });
 }
 
-async function loadGoogleSessionForAccount(
-  clientId: string,
-  accountId: string
-) {
+async function loadGoogleSessionForAccount(clientId: string, accountId: string) {
   const session = await getAuthorizedGoogleSession(clientId);
 
   if (!session) {
@@ -362,7 +356,11 @@ async function fetchThreads(
 ): Promise<Array<GmailThreadResource | null>> {
   const threads: Array<GmailThreadResource | null> = [];
 
-  for (let index = 0; index < remoteThreadIds.length; index += THREAD_FETCH_CONCURRENCY) {
+  for (
+    let index = 0;
+    index < remoteThreadIds.length;
+    index += THREAD_FETCH_CONCURRENCY
+  ) {
     const batch = remoteThreadIds.slice(index, index + THREAD_FETCH_CONCURRENCY);
     const nextThreads = await Promise.all(
       batch.map((remoteThreadId) => fetchThread(accessToken, remoteThreadId))
@@ -419,9 +417,7 @@ export async function syncGmailMailbox(
 
   const rawThreads = await fetchThreads(accessToken, remoteThreadIds);
   const threadSnapshots = rawThreads
-    .map((thread) =>
-      thread ? mapGmailThreadToSnapshot(localAccount, thread) : null
-    )
+    .map((thread) => (thread ? mapGmailThreadToSnapshot(localAccount, thread) : null))
     .filter((thread): thread is NonNullable<typeof thread> => thread !== null);
 
   const fetchedThreadIds = new Set(threadSnapshots.map((thread) => thread.thread.id));
@@ -435,9 +431,7 @@ export async function syncGmailMailbox(
     threadSnapshots,
     removedThreadIds,
     activeThreadIds:
-      mode === "full"
-        ? threadSnapshots.map((thread) => thread.thread.id)
-        : [],
+      mode === "full" ? threadSnapshots.map((thread) => thread.thread.id) : [],
     historyId: profile.historyId,
     mode,
     recoveryReason,
@@ -478,7 +472,11 @@ export async function unsubscribeGmailThread(
   const session = await loadGoogleSessionForAccount(clientId, input.accountId);
   const remoteThreadId = getGoogleRemoteThreadId(input.accountId, input.threadId);
 
-  await performUnsubscribeRequest(session.accessToken, session.summary.account.email, input.unsubscribe);
+  await performUnsubscribeRequest(
+    session.accessToken,
+    session.summary.account.email,
+    input.unsubscribe
+  );
   await gmailModify(session.accessToken, remoteThreadId, {
     addLabelIds: [],
     removeLabelIds: ["INBOX"]

@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  MicrosoftTokenRefreshError,
-  performTokenRefresh
-} from "./microsoft-oauth";
+import { MicrosoftTokenRefreshError, performTokenRefresh } from "./microsoft-oauth";
 
 function mockFetchResponse(
   status: number,
@@ -42,8 +39,7 @@ describe("microsoft performTokenRefresh", () => {
     global.fetch = vi.fn(async () =>
       mockFetchResponse(400, {
         error: "invalid_grant",
-        error_description:
-          "AADSTS70008: The refresh token has expired or is invalid."
+        error_description: "AADSTS70008: The refresh token has expired or is invalid."
       })
     ) as typeof fetch;
 
@@ -91,11 +87,7 @@ describe("microsoft performTokenRefresh", () => {
 
   it("classifies 429 as transient and captures Retry-After", async () => {
     global.fetch = vi.fn(async () =>
-      mockFetchResponse(
-        429,
-        { error: "throttled" },
-        { "Retry-After": "9" }
-      )
+      mockFetchResponse(429, { error: "throttled" }, { "Retry-After": "9" })
     ) as typeof fetch;
 
     try {

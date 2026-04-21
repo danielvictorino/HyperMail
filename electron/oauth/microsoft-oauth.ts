@@ -313,9 +313,7 @@ async function refreshAccessToken(
           isTransient: (error) =>
             error instanceof MicrosoftTokenRefreshError && error.transient,
           getRetryAfterMs: (error) =>
-            error instanceof MicrosoftTokenRefreshError
-              ? error.retryAfterMs
-              : null
+            error instanceof MicrosoftTokenRefreshError ? error.retryAfterMs : null
         }
       );
       return {
@@ -324,10 +322,7 @@ async function refreshAccessToken(
         scope: refreshed.scope ?? storedSession.scope
       };
     } catch (error) {
-      if (
-        error instanceof MicrosoftTokenRefreshError &&
-        !error.transient
-      ) {
+      if (error instanceof MicrosoftTokenRefreshError && !error.transient) {
         await clearStoredSession("microsoft");
       }
       throw error instanceof Error
@@ -373,7 +368,9 @@ export async function performTokenRefresh(
   const transient =
     response.status === 429 ||
     (response.status >= 500 && response.status < 600) ||
-    (response.status === 400 && errorCode !== null && !NON_TRANSIENT_OAUTH_CODES.has(errorCode));
+    (response.status === 400 &&
+      errorCode !== null &&
+      !NON_TRANSIENT_OAUTH_CODES.has(errorCode));
 
   throw new MicrosoftTokenRefreshError(
     `Microsoft token refresh failed with ${response.status}${detail ? `: ${detail}` : "."}`,
@@ -397,8 +394,7 @@ async function readOAuthErrorDetail(
     };
     return {
       errorCode: parsed.error ?? null,
-      detail:
-        parsed.error_description ?? parsed.error ?? trimmed.slice(0, 280)
+      detail: parsed.error_description ?? parsed.error ?? trimmed.slice(0, 280)
     };
   } catch {
     return { errorCode: null, detail: trimmed.slice(0, 280) };

@@ -3,10 +3,7 @@ import { OutboxEngine } from "./outbox/outbox-engine";
 import { DemoMailGateway } from "./queue/demo-mail-gateway";
 import { ModifierQueueEngine } from "./queue/modifier-queue-engine";
 import { ProviderMailGateway } from "./queue/provider-mail-gateway";
-import {
-  getEffectiveOnline,
-  useConnectivityStore
-} from "../state/connectivity-store";
+import { getEffectiveOnline, useConnectivityStore } from "../state/connectivity-store";
 
 const connectivityAdapter = {
   isOnline: () => getEffectiveOnline(),
@@ -25,11 +22,7 @@ export const modifierQueueEngine = new ModifierQueueEngine(
   gateway,
   connectivityAdapter
 );
-export const outboxEngine = new OutboxEngine(
-  hypermailDb,
-  gateway,
-  connectivityAdapter
-);
+export const outboxEngine = new OutboxEngine(hypermailDb, gateway, connectivityAdapter);
 
 let started = false;
 

@@ -32,9 +32,7 @@ describe("isGmailApiTransientError", () => {
   it("treats 400/401/403/404 as non-transient", () => {
     for (const status of [400, 401, 403, 404]) {
       expect(
-        isGmailApiTransientError(
-          new GmailApiError("r", status, "/p", null, null)
-        )
+        isGmailApiTransientError(new GmailApiError("r", status, "/p", null, null))
       ).toBe(false);
     }
   });
@@ -90,11 +88,7 @@ describe("gmailJson retry behavior", () => {
     let attempt = 0;
     global.fetch = vi.fn(async () => {
       attempt += 1;
-      return jsonResponse(
-        429,
-        { error: { message: "rate" } },
-        { "Retry-After": "0" }
-      );
+      return jsonResponse(429, { error: { message: "rate" } }, { "Retry-After": "0" });
     }) as typeof fetch;
 
     await expect(gmailJson("tok", "/labels")).rejects.toBeInstanceOf(GmailApiError);
