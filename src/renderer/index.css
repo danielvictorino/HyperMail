@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --hm-bg: 6 7 10;
+  --hm-panel: 12 13 18;
+  --hm-panel-strong: 17 18 25;
+  --hm-border: 255 255 255;
+  --hm-foreground: 245 247 252;
+  --hm-muted: 127 133 150;
+  --hm-accent: 167 139 250;
+  --hm-accent-soft: 91 71 158;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(167, 139, 250, 0.18), transparent 32%),
+    radial-gradient(circle at 85% 14%, rgba(96, 165, 250, 0.1), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 18%),
+    rgb(var(--hm-bg));
+  color: rgb(var(--hm-foreground));
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.013em;
+  font-feature-settings: "cv11" 1, "ss01" 1, "tnum" 1;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(167, 139, 250, 0.24);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.34);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror p {
+  margin: 0 0 0.9em;
+}
+
+.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+#root {
+  isolation: isolate;
+}
