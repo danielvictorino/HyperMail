@@ -8,6 +8,20 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.1.4](https://github.com/danielvictorino/HyperMail/compare/v0.1.3...v0.1.4) (2026-04-21)
+
+
+### Features
+
+* attachment overload cleanup, Dexie migration fixtures, Windows release workflow ([6224961](https://github.com/danielvictorino/HyperMail/commit/62249617b25ba80de03ba5592dcd640f735a4564))
+* **oauth:** harden Microsoft refresh with backoff, single-flight, and state-tampering guard ([5efc3b1](https://github.com/danielvictorino/HyperMail/commit/5efc3b14d02f3362b8ef1cc9d6b8782699b8bd70))
+
+
+### Bug Fixes
+
+* **ci:** release-please job must always run to create the release tag ([c4035d4](https://github.com/danielvictorino/HyperMail/commit/c4035d41088b0f696e174e4d4db9702196ba09fc))
+* **ci:** release-please package job checks out merged commit, not unpushed tag ([971ab70](https://github.com/danielvictorino/HyperMail/commit/971ab70d041fc5d9483d82d027f1c70bd0f0748d))
+
 ## [0.1.3](https://github.com/danielvictorino/HyperMail/compare/v0.1.2...v0.1.3) (2026-04-21)
 
 

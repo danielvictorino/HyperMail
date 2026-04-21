@@ -1,6 +1,6 @@
 {
   "name": "hypermail",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "A keyboard-first, offline-first email client inspired by Superhuman.",
   "main": "dist-electron/main.js",
