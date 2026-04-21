@@ -8,6 +8,13 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.1.2](https://github.com/danielvictorino/HyperMail/compare/v0.1.1...v0.1.2) (2026-04-21)
+
+
+### Features
+
+* **oauth:** harden Microsoft refresh with backoff, single-flight, and state-tampering guard ([5efc3b1](https://github.com/danielvictorino/HyperMail/commit/5efc3b14d02f3362b8ef1cc9d6b8782699b8bd70))
+
 ## [0.1.1](https://github.com/danielvictorino/HyperMail/compare/v0.1.0...v0.1.1) (2026-04-21)
 
 
