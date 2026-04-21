@@ -35,7 +35,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-please.outputs.tag_name }}
+          # release-please creates a draft release; the git tag isn't pushed
+          # until the draft is published by the finalize job. Check out the
+          # merged release commit directly.
+          ref: ${{ github.sha }}
 
       - uses: actions/setup-node@v4
         with:
