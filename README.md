@@ -1,68 +1,103 @@
-# HyperMail
+<h1 align="center">HyperMail</h1>
 
-HyperMail is a Gmail-first, keyboard-first, offline-first desktop email client inspired by Superhuman.
+<p align="center">
+  <a href="https://github.com/danielvictorino/HyperMail/actions/workflows/verify.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/danielvictorino/HyperMail/verify.yml?style=flat-square&label=ci" /></a>
+  <a href="https://github.com/danielvictorino/HyperMail/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/danielvictorino/HyperMail?style=flat-square&include_prereleases" /></a>
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows-blue?style=flat-square" />
+  <img alt="License" src="https://img.shields.io/badge/license-Proprietary-red?style=flat-square" />
+  <img alt="Electron" src="https://img.shields.io/badge/electron-35-47848f?style=flat-square" />
+  <img alt="React" src="https://img.shields.io/badge/react-19-61dafb?style=flat-square" />
+</p>
 
-## Current scope
+<h3 align="center">A keyboard-first, offline-first Gmail client that feels like Superhuman — running as a native Windows app.</h3>
 
-- Electron desktop shell with React 19 + TypeScript
-- Gmail OAuth desktop flow with PKCE and secure token storage via `keytar`
-- Dexie-backed local mailbox cache with optimistic modifier queue
-- offline thread reading, cached attachment export, compose drafts, send later, snooze, unsubscribe, and cached search
-- command palette, keyboard engine, AI summaries, and voice drafting
+<p align="center">
+  <a href="https://danielvictorino.github.io/HyperMail/">Docs</a> ·
+  <a href="https://github.com/danielvictorino/HyperMail/releases/latest">Download</a> ·
+  <a href="docs/security.md">Security</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
 
-## Development quickstart
+---
 
-1. Copy `.env.example` to `.env`.
-2. Add `GOOGLE_OAUTH_CLIENT_ID`.
-3. Optionally add `OPENAI_API_KEY`.
-4. Optionally add `HYPERMAIL_UPDATES_URL` and `HYPERMAIL_CRASH_REPORT_URL`.
-5. Install dependencies with `npm install`.
-6. Start the app with `npm run dev`.
+HyperMail puts your Gmail inbox behind a keyboard-driven, offline-capable desktop client. Sync is optimistic, mutations queue locally and reconcile with Gmail when you reconnect, and the command palette + j/k/e/s/z shortcuts keep your hands off the mouse.
+
+- **Offline-first** — Dexie-backed local cache, modifier queue survives app kills and flushes when you reconnect.
+- **Keyboard-first** — `Ctrl+K` palette, single-key shortcuts (j/k to move, e archive, s star, z snooze, u unsubscribe, a summarize, d voice draft, l split).
+- **Secure by default** — Electron sandbox + context isolation, CSP, IPC zod validation, `https:`/`mailto:`-only external links.
+- **Optional AI** — per-thread summaries, split suggestions, and voice drafts via OpenAI (requires your own key).
+
+## Install
+
+Download the latest Windows release:
+
+- **NSIS installer** — [`HyperMail-*-win-x64.exe`](https://github.com/danielvictorino/HyperMail/releases/latest)
+- **Portable** — [`HyperMail-*-portable-x64.exe`](https://github.com/danielvictorino/HyperMail/releases/latest)
+- **Checksums** — [`SHA256SUMS.txt`](https://github.com/danielvictorino/HyperMail/releases/latest)
+
+Verify the download:
+
+```powershell
+Get-FileHash HyperMail-*.exe -Algorithm SHA256
+# Compare against SHA256SUMS.txt from the release
+```
+
+## Quick start (dev)
+
+```bash
+# Prerequisites: Node 20, Git, Python + C++ build tools for keytar on Windows
+git clone https://github.com/danielvictorino/HyperMail.git
+cd HyperMail
+cp .env.example .env   # fill GOOGLE_OAUTH_CLIENT_ID
+npm install
+npm run dev
+```
+
+Full verification before shipping:
+
+```bash
+npm run verify   # typecheck + test + build
+```
 
 ## Runtime config
 
-In development, HyperMail prefers:
+| Variable | Required | Purpose |
+|---|---|---|
+| `GOOGLE_OAUTH_CLIENT_ID` | ✅ | Google desktop OAuth client ID (PKCE, installed-app flow) |
+| `MICROSOFT_OAUTH_CLIENT_ID` | — | Microsoft desktop OAuth client ID (optional) |
+| `OPENAI_API_KEY` | — | Enables thread summary, voice draft, split |
+| `HYPERMAIL_UPDATES_URL` | — | Windows auto-update feed; disables auto-update if unset |
+| `HYPERMAIL_UPDATE_CHANNEL` | — | Defaults to `latest` |
+| `HYPERMAIL_CRASH_REPORT_URL` | — | Optional remote crash upload |
 
-- `<repo>/.env`
+**Config file locations** — `./.env` in dev; `%APPDATA%\HyperMail\.env` in packaged builds. If no config is found, the runtime UI reports the preferred path.
 
-In a packaged desktop build, HyperMail prefers:
+## Architecture at a glance
 
-- `%APPDATA%\\HyperMail\\.env` on Windows
+```
+electron/            # main process — OAuth, Gmail, Dexie IPC bridge, updater
+  main.ts            # CSP, sandbox, validated IPC handlers
+  oauth/             # Google + Microsoft PKCE, keytar token store
+  gmail/             # Gmail REST client (Retry-After-aware backoff)
+  runtime/retry.ts   # retryWithBackoff + single-flight lock
+src/
+  shared/            # cross-process contracts + zod IPC schemas
+  renderer/          # React 19 + Tailwind UI, virtualized list, keyboard engine, Dexie
+docs/                # security.md, smoke-test-checklist.md, release-notes
+.github/workflows/   # verify.yml (matrix CI) + release-please.yml (packaged Windows releases)
+```
 
-If no config file is found, the app now reports the preferred path directly in the runtime UI and in error messages.
+See [AGENTS.md](AGENTS.md) for a more detailed agent-oriented briefing.
 
-Packaged builds can also use:
+## Docs
 
-- `HYPERMAIL_UPDATES_URL` for Windows NSIS update checks
-- `HYPERMAIL_UPDATE_CHANNEL` for channel selection, defaulting to `latest`
-- `HYPERMAIL_CRASH_REPORT_URL` for optional remote crash upload
+- [Security model](docs/security.md)
+- [Smoke test checklist](docs/smoke-test-checklist.md)
+- [Release notes](docs/release-notes/)
+- [Changelog](CHANGELOG.md)
 
-If the update URL is missing, the packaged app still works normally and simply keeps auto-update disabled.
-If the crash-report URL is missing, HyperMail still keeps local crash dumps and main-process logs on disk.
+## License
 
-## Build and package
+Proprietary. See [LICENSE](LICENSE). Viewing the source on GitHub is permitted for evaluation. Redistribution, modification, and commercial use require written permission.
 
-- `npm run build:brand`
-- `npm run build`
-- `npm run package:dir`
-- `npm run dist`
-
-`package:dir` creates an unpacked app for smoke testing. `dist` creates installer artifacts through `electron-builder`.
-See [docs/distribution-playbook.md](/C:/Users/Daniel Victorino/Vaults/daniel_victorino/Projects/HyperMail/docs/distribution-playbook.md) for the Windows release flow.
-
-## Smoke test
-
-1. Build an unpacked app with `npm run package:dir`.
-2. Put your packaged-build `.env` in the preferred runtime config path shown in the app.
-3. Launch the unpacked app and confirm the `Runtime config` card shows `Gmail OAuth: ready`.
-4. Connect Gmail.
-5. Confirm initial sync, cached attachment export, offline search, queued archive/star/snooze/unsubscribe, and send-later still work.
-6. If Gmail incremental sync can no longer continue from stored history, confirm HyperMail falls back to a full refresh cleanly.
-7. If AI is configured, generate a summary and a voice draft.
-8. Open the logs folder from the right rail and confirm packaged release diagnostics are visible.
-
-## Verification
-
-- `npm run typecheck`
-- `npm test`
-- `npm run build`
+Contact: danielvictorino@galaxies.gg

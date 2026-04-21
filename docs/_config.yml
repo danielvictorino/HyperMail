@@ -1,0 +1,22 @@
+title: HyperMail
+description: Keyboard-first, offline-first Gmail client for Windows
+theme: jekyll-theme-cayman
+github:
+  repository_url: https://github.com/danielvictorino/HyperMail
+  repository_name: danielvictorino/HyperMail
+
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
+
+include:
+  - release-notes
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
