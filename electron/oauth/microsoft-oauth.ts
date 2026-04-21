@@ -5,7 +5,8 @@ import {
   buildMicrosoftAuthUrl,
   createCodeChallenge,
   createCodeVerifier,
-  createRandomState
+  createRandomState,
+  validateOAuthCallback
 } from "../../src/shared/auth/google-pkce";
 import type {
   AuthSessionSummary,
@@ -19,6 +20,37 @@ import {
   saveStoredSession,
   type StoredAuthSession
 } from "./token-store";
+import {
+  createSingleFlight,
+  parseRetryAfterHeader,
+  retryWithBackoff
+} from "../runtime/retry";
+
+export class MicrosoftTokenRefreshError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly retryAfterMs: number | null,
+    readonly errorCode: string | null,
+    readonly transient: boolean
+  ) {
+    super(message);
+    this.name = "MicrosoftTokenRefreshError";
+  }
+}
+
+const refreshSingleFlight = createSingleFlight<string, MicrosoftTokenResponse>();
+
+const NON_TRANSIENT_OAUTH_CODES = new Set([
+  "invalid_grant",
+  "invalid_client",
+  "unauthorized_client",
+  "invalid_request",
+  "unsupported_grant_type",
+  "invalid_scope",
+  "consent_required",
+  "interaction_required"
+]);
 
 const MICROSOFT_TENANT = "common";
 const MICROSOFT_GRAPH_ME_ENDPOINT =
@@ -161,20 +193,26 @@ async function requestAuthorizationCode(
             return;
           }
 
-          const callbackState = requestUrl.searchParams.get("state");
-          const callbackCode = requestUrl.searchParams.get("code");
-          const callbackError = requestUrl.searchParams.get("error");
+          const validation = validateOAuthCallback({
+            expectedState: state,
+            receivedState: requestUrl.searchParams.get("state"),
+            receivedCode: requestUrl.searchParams.get("code"),
+            receivedError: requestUrl.searchParams.get("error")
+          });
 
-          if (callbackError) {
-            writeCallbackHtml(response, "Authentication cancelled.");
-            settleFailure(new Error(`Microsoft OAuth returned: ${callbackError}`));
-            server.close();
-            return;
-          }
-
-          if (!callbackCode || callbackState !== state) {
-            writeCallbackHtml(response, "Authentication failed.");
-            settleFailure(new Error("OAuth callback was invalid."));
+          if (!validation.ok) {
+            const message =
+              validation.reason === "provider-error"
+                ? "Authentication cancelled."
+                : "Authentication failed.";
+            writeCallbackHtml(response, message);
+            settleFailure(
+              new Error(
+                validation.reason === "provider-error"
+                  ? `Microsoft OAuth returned: ${validation.detail}`
+                  : validation.detail
+              )
+            );
             server.close();
             return;
           }
@@ -182,7 +220,7 @@ async function requestAuthorizationCode(
           writeCallbackHtml(response, "HyperMail is connected.");
 
           settleSuccess({
-            code: callbackCode,
+            code: validation.code,
             redirectUri: `http://127.0.0.1:${(server.address() as AddressInfo).port}/oauth/microsoft/callback`,
             verifier
           });
@@ -262,29 +300,109 @@ async function refreshAccessToken(
   clientId: string,
   storedSession: StoredAuthSession
 ): Promise<MicrosoftTokenResponse> {
-  const response = await fetch(getMicrosoftTokenEndpoint(), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: new URLSearchParams({
-      client_id: clientId,
-      grant_type: "refresh_token",
-      refresh_token: storedSession.refreshToken ?? ""
-    })
-  });
+  const refreshToken = storedSession.refreshToken ?? "";
+  const flightKey = `microsoft:${refreshToken}`;
 
-  if (!response.ok) {
-    await clearStoredSession("microsoft");
-    throw new Error(`Microsoft token refresh failed with ${response.status}.`);
+  return await refreshSingleFlight(flightKey, async () => {
+    try {
+      const refreshed = await retryWithBackoff(
+        () => performTokenRefresh(clientId, refreshToken),
+        {
+          maxAttempts: 3,
+          baseDelayMs: 1000,
+          isTransient: (error) =>
+            error instanceof MicrosoftTokenRefreshError && error.transient,
+          getRetryAfterMs: (error) =>
+            error instanceof MicrosoftTokenRefreshError
+              ? error.retryAfterMs
+              : null
+        }
+      );
+      return {
+        ...refreshed,
+        refresh_token: storedSession.refreshToken,
+        scope: refreshed.scope ?? storedSession.scope
+      };
+    } catch (error) {
+      if (
+        error instanceof MicrosoftTokenRefreshError &&
+        !error.transient
+      ) {
+        await clearStoredSession("microsoft");
+      }
+      throw error instanceof Error
+        ? error
+        : new Error("Microsoft token refresh failed.");
+    }
+  });
+}
+
+export async function performTokenRefresh(
+  clientId: string,
+  refreshToken: string
+): Promise<MicrosoftTokenResponse> {
+  let response: Response;
+  try {
+    response = await fetch(getMicrosoftTokenEndpoint(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        client_id: clientId,
+        grant_type: "refresh_token",
+        refresh_token: refreshToken
+      })
+    });
+  } catch (networkError) {
+    throw new MicrosoftTokenRefreshError(
+      `Microsoft token refresh network error: ${(networkError as Error).message}`,
+      0,
+      null,
+      null,
+      true
+    );
   }
 
-  const refreshed = (await response.json()) as MicrosoftTokenResponse;
-  return {
-    ...refreshed,
-    refresh_token: storedSession.refreshToken,
-    scope: refreshed.scope ?? storedSession.scope
-  };
+  if (response.ok) {
+    return (await response.json()) as MicrosoftTokenResponse;
+  }
+
+  const retryAfterMs = parseRetryAfterHeader(response.headers.get("Retry-After"));
+  const { errorCode, detail } = await readOAuthErrorDetail(response);
+  const transient =
+    response.status === 429 ||
+    (response.status >= 500 && response.status < 600) ||
+    (response.status === 400 && errorCode !== null && !NON_TRANSIENT_OAUTH_CODES.has(errorCode));
+
+  throw new MicrosoftTokenRefreshError(
+    `Microsoft token refresh failed with ${response.status}${detail ? `: ${detail}` : "."}`,
+    response.status,
+    retryAfterMs,
+    errorCode,
+    transient
+  );
+}
+
+async function readOAuthErrorDetail(
+  response: Response
+): Promise<{ errorCode: string | null; detail: string | null }> {
+  const rawBody = await response.text();
+  const trimmed = rawBody.trim();
+  if (!trimmed) return { errorCode: null, detail: null };
+  try {
+    const parsed = JSON.parse(trimmed) as {
+      error?: string;
+      error_description?: string;
+    };
+    return {
+      errorCode: parsed.error ?? null,
+      detail:
+        parsed.error_description ?? parsed.error ?? trimmed.slice(0, 280)
+    };
+  } catch {
+    return { errorCode: null, detail: trimmed.slice(0, 280) };
+  }
 }
 
 export async function fetchMicrosoftAccountProfile(
