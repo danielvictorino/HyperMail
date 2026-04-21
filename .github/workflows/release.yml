@@ -76,12 +76,12 @@ jobs:
           retention-days: 30
 
       - name: Attach to GitHub release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || inputs.tag != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: |
-          $tag = "${{ github.ref_name }}"
+          $tag = if ("${{ inputs.tag }}" -ne "") { "${{ inputs.tag }}" } else { "${{ github.ref_name }}" }
           $assets = Get-ChildItem -Path release -File |
             Where-Object { $_.Name -like "HyperMail-*.exe" -or `
                            $_.Name -like "HyperMail-*.blockmap" -or `
