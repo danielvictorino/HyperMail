@@ -49,7 +49,6 @@ We explicitly do **not** target defense against a local attacker with code execu
 
 ## What's *not* yet hardened
 
-- The `downloadGmailAttachment` function in `electron/gmail/google-mail-service.ts:487–491` has a broken first overload that `main.ts` works around via `as unknown as` — worth fixing the signatures in place.
 - Source maps are `"hidden"` in prod. If you ship the `dist/` directory to an update server, do **not** also ship the `.map` files. Upload them to the crash reporter instead.
 - No Dexie migration fixture tests yet. The v3 `.upgrade()` backfill is in place but we have not run a real v1 → v3 upgrade against a seeded DB.
 - `exactOptionalPropertyTypes` is not enabled because it tends to cascade; revisit when we add a contracts audit task.

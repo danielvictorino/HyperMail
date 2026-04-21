@@ -286,10 +286,7 @@ function registerIpcHandlers(): void {
         downloadGmailAttachmentRequestSchema,
         input
       );
-      return await downloadGmailAttachment(
-        assertGoogleClientId(),
-        parsed as unknown as Parameters<typeof downloadGmailAttachment>[1]
-      );
+      return await downloadGmailAttachment(assertGoogleClientId(), parsed);
     } catch (error) {
       throw normalizeError(error);
     }

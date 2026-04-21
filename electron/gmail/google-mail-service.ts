@@ -1,5 +1,6 @@
 import type {
   CachedAttachmentPayload,
+  DownloadGmailAttachmentRequest,
   GmailMailboxSyncPayload,
   GmailMailboxSyncRequest,
   SendDraftRequest,
@@ -486,19 +487,7 @@ export async function unsubscribeGmailThread(
 
 export async function downloadGmailAttachment(
   clientId: string,
-  input: CachedAttachmentPayload
-): Promise<CachedAttachmentPayload>;
-export async function downloadGmailAttachment(
-  clientId: string,
-  input: {
-    accountId: string;
-    threadId: string;
-    messageId: string;
-    attachmentId: string;
-    filename: string;
-    mimeType: string;
-    size: number;
-  }
+  input: DownloadGmailAttachmentRequest
 ): Promise<CachedAttachmentPayload> {
   const session = await loadGoogleSessionForAccount(clientId, input.accountId);
   const remoteMessageId = getGoogleRemoteMessageId(input.accountId, input.messageId);
