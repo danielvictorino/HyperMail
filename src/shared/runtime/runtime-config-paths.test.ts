@@ -6,13 +6,19 @@ import {
 } from "./runtime-config-paths";
 
 describe("runtime-config-paths", () => {
+  const cwd = path.resolve("/workspace/hypermail");
+  const userDataPath = path.resolve("/users/Daniel/AppData/Roaming/HyperMail");
+  const appPath = path.resolve("/workspace/hypermail");
+  const execDir = path.resolve("/Program Files/HyperMail");
+  const resourcesPath = path.resolve("/Program Files/HyperMail/resources");
+
   const baseOptions = {
     explicitPath: null,
-    cwd: "C:/workspace/hypermail",
-    userDataPath: "C:/Users/Daniel/AppData/Roaming/HyperMail",
-    appPath: "C:/workspace/hypermail",
-    execDir: "C:/Program Files/HyperMail",
-    resourcesPath: "C:/Program Files/HyperMail/resources"
+    cwd,
+    userDataPath,
+    appPath,
+    execDir,
+    resourcesPath
   };
 
   it("prefers the repo env path in development", () => {
@@ -21,7 +27,7 @@ describe("runtime-config-paths", () => {
       packaged: false
     });
 
-    expect(preferred).toBe(path.resolve("C:/workspace/hypermail/.env"));
+    expect(preferred).toBe(path.join(cwd, ".env"));
   });
 
   it("prefers the userData env path when packaged", () => {
@@ -30,24 +36,23 @@ describe("runtime-config-paths", () => {
       packaged: true
     });
 
-    expect(preferred).toBe(
-      path.resolve("C:/Users/Daniel/AppData/Roaming/HyperMail/.env")
-    );
+    expect(preferred).toBe(path.join(userDataPath, ".env"));
   });
 
   it("orders packaged search paths toward userData and executable-adjacent config", () => {
+    const explicitPath = path.resolve("/portable/hypermail.env");
     const searchPaths = buildRuntimeConfigSearchPaths({
       ...baseOptions,
-      explicitPath: "D:/portable/hypermail.env",
+      explicitPath,
       packaged: true
     });
 
     expect(searchPaths).toEqual([
-      path.resolve("D:/portable/hypermail.env"),
-      path.resolve("C:/Users/Daniel/AppData/Roaming/HyperMail/.env"),
-      path.resolve("C:/Program Files/HyperMail/.env"),
-      path.resolve("C:/Program Files/HyperMail/resources/.env"),
-      path.resolve("C:/workspace/hypermail/.env")
+      path.resolve(explicitPath),
+      path.resolve(path.join(userDataPath, ".env")),
+      path.resolve(path.join(execDir, ".env")),
+      path.resolve(path.join(resourcesPath, ".env")),
+      path.resolve(path.join(cwd, ".env"))
     ]);
   });
 });
