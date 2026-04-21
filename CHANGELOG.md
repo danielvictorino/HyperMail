@@ -8,6 +8,13 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.1.1](https://github.com/danielvictorino/HyperMail/compare/v0.1.0...v0.1.1) (2026-04-21)
+
+
+### Features
+
+* attachment overload cleanup, Dexie migration fixtures, Windows release workflow ([6224961](https://github.com/danielvictorino/HyperMail/commit/62249617b25ba80de03ba5592dcd640f735a4564))
+
 ## [0.1.1-hardened] — 2026-04-21
 
 Five-day security, reliability, and test-coverage pass on the v0.1.0 foundation.
