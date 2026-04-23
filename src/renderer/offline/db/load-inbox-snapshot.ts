@@ -10,7 +10,10 @@ import type {
   ThreadSnapshot
 } from "@shared/mail/models";
 import { applyModifiersToThread } from "../modifiers/modifier-factory";
+import { suggestLocalTriageSplit } from "../../lib/local-triage-rules";
 import { hypermailDb } from "./hypermail-db";
+
+const FOLLOW_UP_ACTION_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
 function summarizeQueue(records: PersistedModifierRecord[]): QueueSummary {
   return records.reduce<QueueSummary>(
@@ -105,12 +108,28 @@ export async function loadInboxSnapshot(
         (left, right) => left.createdAt - right.createdAt
       );
       const projected = applyModifiersToThread(baseSnapshot, threadQueue);
+      const waitingSince = getWaitingSince(account?.email ?? null, projected);
+      const localRule = suggestLocalTriageSplit(projected);
+      const actionNeeded =
+        projected.thread.unread ||
+        projected.thread.split === "vip" ||
+        projected.thread.split === "important" ||
+        localRule?.split === "vip" ||
+        localRule?.split === "important" ||
+        Boolean(
+          waitingSince && Date.now() - waitingSince >= FOLLOW_UP_ACTION_THRESHOLD_MS
+        );
 
       return {
         ...projected,
         queueDepth: threadQueue.length,
         pendingModifierIds: threadQueue.map((record) => record.id),
-        pendingModifierTypes: threadQueue.map((record) => record.type)
+        pendingModifierTypes: threadQueue.map((record) => record.type),
+        waitingForReply: waitingSince !== null,
+        waitingSince,
+        actionNeeded,
+        localRuleSplit: localRule?.split ?? null,
+        localRuleReason: localRule?.reason ?? null
       };
     })
     .sort((left, right) => right.thread.lastMessageAt - left.thread.lastMessageAt);
@@ -137,4 +156,33 @@ export async function loadInboxSnapshot(
       generatedAt: Date.now()
     }
   };
+}
+
+function getWaitingSince(
+  accountEmail: string | null,
+  snapshot: ThreadSnapshot
+): number | null {
+  if (!accountEmail || snapshot.thread.archived || snapshot.thread.snoozedUntil) {
+    return null;
+  }
+
+  const latestMessage = snapshot.messages[snapshot.messages.length - 1] ?? null;
+
+  if (!latestMessage) {
+    return null;
+  }
+
+  if (latestMessage.fromEmail.toLowerCase() !== accountEmail.toLowerCase()) {
+    return null;
+  }
+
+  if (
+    latestMessage.deliveryState === "queued" ||
+    latestMessage.deliveryState === "sending" ||
+    latestMessage.deliveryState === "failed"
+  ) {
+    return null;
+  }
+
+  return latestMessage.sentAt;
 }

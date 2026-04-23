@@ -3,6 +3,7 @@ import {
   Command,
   Inbox,
   Mail,
+  Send,
   Sparkles,
   Star,
   Archive,
@@ -36,6 +37,7 @@ const navIcons: Record<MailboxSectionId, ReactNode> = {
   inbox: <Inbox className="h-4 w-4" />,
   important: <Sparkles className="h-4 w-4" />,
   vip: <ShieldCheck className="h-4 w-4" />,
+  waiting: <Send className="h-4 w-4" />,
   other: <Mail className="h-4 w-4" />,
   starred: <Star className="h-4 w-4" />,
   snoozed: <Clock3 className="h-4 w-4" />,
@@ -160,6 +162,7 @@ export function MailSidebar({
             <ShortcutRow label="Reply" hint="R" />
             <ShortcutRow label="Voice draft" hint="D" />
             <ShortcutRow label="Summarize" hint="A" />
+            <ShortcutRow label="Waiting" hint="4" />
             <ShortcutRow label="Snooze" hint="Z" />
             <ShortcutRow label="Unsubscribe" hint="U" />
             <ShortcutRow label="Archive" hint="E" />

@@ -29,7 +29,7 @@ import type {
 import type { InboxSnapshot, ThreadProjection } from "@shared/mail/models";
 import type { GmailSyncTelemetry } from "@/offline/sync/gmail-sync";
 import type { RuntimeCacheStatus } from "@/state/runtime-cache-store";
-import type { CalendarContext, SenderInsight } from "@/lib/mailbox-view";
+import type { CalendarContext, DailyBrief, SenderInsight } from "@/lib/mailbox-view";
 import { AiSettingsPanel } from "./ai-settings-panel";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -49,6 +49,7 @@ interface ContextRailProps {
   draftSummary: InboxSnapshot["draftSummary"];
   attachmentCacheSummary: InboxSnapshot["attachmentCacheSummary"];
   performanceSummary: InboxSnapshot["performance"];
+  dailyBrief: DailyBrief;
   runtimeCacheStatus: RuntimeCacheStatus;
   runtimeCacheDetail: string;
   runtimeCacheItemCount: number;
@@ -79,6 +80,7 @@ interface ContextRailProps {
   onSummarizeThread: (thread?: ThreadProjection | null) => Promise<void>;
   onSuggestThreadSplit: (thread?: ThreadProjection | null) => Promise<void>;
   onApplySuggestedSplit: () => Promise<void>;
+  onApplyLocalRuleSplit: () => Promise<void>;
 }
 
 export function ContextRail({
@@ -96,6 +98,7 @@ export function ContextRail({
   draftSummary,
   attachmentCacheSummary,
   performanceSummary,
+  dailyBrief,
   runtimeCacheStatus,
   runtimeCacheDetail,
   runtimeCacheItemCount,
@@ -122,7 +125,8 @@ export function ContextRail({
   onListOllamaModels,
   onSummarizeThread,
   onSuggestThreadSplit,
-  onApplySuggestedSplit
+  onApplySuggestedSplit,
+  onApplyLocalRuleSplit
 }: ContextRailProps) {
   const summary = snapshot?.queueSummary ?? {
     pending: 0,
@@ -202,6 +206,31 @@ export function ContextRail({
             <span>Sync now</span>
             <RefreshCcw className="h-3.5 w-3.5" />
           </Button>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-accent" />
+          <p className="text-sm font-medium text-foreground">Daily brief</p>
+        </div>
+        <div className="space-y-2">
+          <Metric label="Action needed" value={String(dailyBrief.actionNeededCount)} />
+          <Metric
+            label="Important unread"
+            value={String(dailyBrief.importantUnreadCount)}
+          />
+          <Metric label="Waiting" value={String(dailyBrief.waitingCount)} />
+          <Metric label="Drafts" value={String(dailyBrief.draftCount)} />
+          <Metric label="Failed sends" value={String(dailyBrief.failedSendCount)} />
+        </div>
+        <div className="mt-4 rounded-xl border border-accent/20 bg-accent/10 px-3 py-3">
+          <p className="text-sm font-medium text-foreground">
+            {dailyBrief.topActionLabel}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted">
+            {dailyBrief.topActionDetail}
+          </p>
         </div>
       </div>
 
@@ -577,6 +606,26 @@ export function ContextRail({
                 adding Gmail clutter.
               </p>
             )}
+            {selectedThread?.localRuleSplit &&
+            selectedThread.localRuleSplit !== selectedThread.thread.split ? (
+              <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-accent">
+                  Local rule
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  {selectedThread.localRuleReason}
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="mt-3 w-full justify-between"
+                  onClick={() => void onApplyLocalRuleSplit()}
+                >
+                  <span>Apply {selectedThread.localRuleSplit}</span>
+                  <span className="text-xs text-muted">manual</span>
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

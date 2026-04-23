@@ -1,4 +1,4 @@
-import type { ThreadProjection } from "@shared/mail/models";
+import type { DraftSummary, ThreadProjection } from "@shared/mail/models";
 import type { MailboxSectionId } from "../state/inbox-ui-store";
 
 export interface MailboxNavItem {
@@ -21,6 +21,16 @@ export interface CalendarContext {
   detail: string;
 }
 
+export interface DailyBrief {
+  actionNeededCount: number;
+  importantUnreadCount: number;
+  waitingCount: number;
+  draftCount: number;
+  failedSendCount: number;
+  topActionLabel: string;
+  topActionDetail: string;
+}
+
 export function isThreadActivelySnoozed(
   thread: Pick<ThreadProjection["thread"], "snoozedUntil">
 ): boolean {
@@ -40,6 +50,7 @@ export function getMailboxNavItems(threads: ThreadProjection[]): MailboxNavItem[
     createNavItem("inbox", "Inbox", threads),
     createNavItem("important", "Important", threads),
     createNavItem("vip", "VIP", threads),
+    createNavItem("waiting", "Waiting", threads),
     createNavItem("other", "Other", threads),
     createNavItem("starred", "Starred", threads),
     createNavItem("snoozed", "Snoozed", threads),
@@ -69,6 +80,13 @@ export function filterThreadsBySection(
           !thread.thread.archived &&
           !isThreadActivelySnoozed(thread.thread) &&
           thread.thread.split === "vip"
+      );
+    case "waiting":
+      return threads.filter(
+        (thread) =>
+          !thread.thread.archived &&
+          !isThreadActivelySnoozed(thread.thread) &&
+          isThreadWaitingForReply(thread)
       );
     case "other":
       return threads.filter(
@@ -103,6 +121,8 @@ export function getSectionHeadline(section: MailboxSectionId): string {
       return "Important split";
     case "vip":
       return "VIP split";
+    case "waiting":
+      return "Waiting for reply";
     case "other":
       return "Other split";
     case "starred":
@@ -124,6 +144,8 @@ export function getSectionDescription(section: MailboxSectionId): string {
       return "High-priority threads that should land above the fold.";
     case "vip":
       return "People you want to answer fast, with extra context in the right rail.";
+    case "waiting":
+      return "Sent threads where your last message is still the newest committed mail.";
     case "other":
       return "Lower-pressure conversations kept nearby, but not in the primary lane.";
     case "starred":
@@ -135,6 +157,75 @@ export function getSectionDescription(section: MailboxSectionId): string {
     default:
       return "";
   }
+}
+
+export function isThreadWaitingForReply(thread: ThreadProjection): boolean {
+  return Boolean(thread.waitingForReply && thread.waitingSince);
+}
+
+export function buildDailyBrief(
+  threads: ThreadProjection[],
+  draftSummary: DraftSummary
+): DailyBrief {
+  const activeThreads = threads.filter(
+    (thread) => !thread.thread.archived && !isThreadActivelySnoozed(thread.thread)
+  );
+  const actionNeededThreads = activeThreads.filter(
+    (thread) => thread.actionNeeded || thread.thread.unread
+  );
+  const importantUnreadCount = activeThreads.filter(
+    (thread) =>
+      thread.thread.unread &&
+      (thread.thread.split === "vip" || thread.thread.split === "important")
+  ).length;
+  const waitingCount = activeThreads.filter(isThreadWaitingForReply).length;
+
+  if (draftSummary.failed > 0) {
+    return {
+      actionNeededCount: actionNeededThreads.length,
+      importantUnreadCount,
+      waitingCount,
+      draftCount: draftSummary.draft,
+      failedSendCount: draftSummary.failed,
+      topActionLabel: "Fix failed sends",
+      topActionDetail: `${draftSummary.failed} local outbox item${draftSummary.failed === 1 ? "" : "s"} need attention before more triage.`
+    };
+  }
+
+  if (importantUnreadCount > 0) {
+    return {
+      actionNeededCount: actionNeededThreads.length,
+      importantUnreadCount,
+      waitingCount,
+      draftCount: draftSummary.draft,
+      failedSendCount: draftSummary.failed,
+      topActionLabel: "Clear important unread",
+      topActionDetail: `${importantUnreadCount} VIP or Important thread${importantUnreadCount === 1 ? "" : "s"} are unread in the working set.`
+    };
+  }
+
+  if (waitingCount > 0) {
+    return {
+      actionNeededCount: actionNeededThreads.length,
+      importantUnreadCount,
+      waitingCount,
+      draftCount: draftSummary.draft,
+      failedSendCount: draftSummary.failed,
+      topActionLabel: "Review waiting replies",
+      topActionDetail: `${waitingCount} sent thread${waitingCount === 1 ? "" : "s"} have not received a newer reply.`
+    };
+  }
+
+  return {
+    actionNeededCount: actionNeededThreads.length,
+    importantUnreadCount,
+    waitingCount,
+    draftCount: draftSummary.draft,
+    failedSendCount: draftSummary.failed,
+    topActionLabel: "Working set is calm",
+    topActionDetail:
+      "No failed sends, important unread, or waiting follow-ups stand out."
+  };
 }
 
 export function formatThreadTimestamp(timestamp: number): string {

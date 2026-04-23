@@ -9,6 +9,8 @@ export type CommandIntent =
   | "snooze"
   | "unsnooze"
   | "unsubscribe"
+  | "follow-up"
+  | "handled"
   | "archive"
   | "restore"
   | "star"
@@ -48,6 +50,8 @@ const intentAliases: Record<CommandIntent, string[]> = {
   snooze: ["snooze", "later", "pause"],
   unsnooze: ["unsnooze", "resume"],
   unsubscribe: ["unsubscribe", "opt out", "stop emails", "remove"],
+  "follow-up": ["follow up", "follow-up", "waiting", "nudge"],
+  handled: ["handled", "done", "clear"],
   archive: ["archive", "done", "clear"],
   restore: ["restore", "unarchive"],
   star: ["star", "favorite", "pin"],

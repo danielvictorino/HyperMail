@@ -138,6 +138,22 @@ export function ThreadView({
                   {thread.queueDepth} queued
                 </Badge>
               ) : null}
+              {thread.actionNeeded ? (
+                <Badge className="border-accent/25 bg-accent/10 text-accent">
+                  Action needed
+                </Badge>
+              ) : null}
+              {thread.waitingForReply ? (
+                <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
+                  Waiting for reply
+                </Badge>
+              ) : null}
+              {thread.localRuleSplit &&
+              thread.localRuleSplit !== thread.thread.split ? (
+                <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                  Rule suggests {thread.localRuleSplit}
+                </Badge>
+              ) : null}
               {activelySnoozed && thread.thread.snoozedUntil ? (
                 <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
                   Until {formatSnoozedUntil(thread.thread.snoozedUntil)}

@@ -249,6 +249,22 @@ function buildCommands({
         ]
       : []),
     {
+      id: "follow-up-current",
+      group: "Actions",
+      label: "Draft follow-up for current thread",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Generate a concise follow-up for the selected thread",
+      hint: "D",
+      intent: "follow-up",
+      keywords: ["follow up", "waiting", "nudge", "draft", "current thread"],
+      execute: async () => {
+        if (selectedThread) {
+          await mailbox.generateVoiceDraft(selectedThread);
+        }
+      }
+    },
+    {
       id: "archive-current",
       group: "Actions",
       label: selectedThread?.thread.archived
@@ -262,6 +278,22 @@ function buildCommands({
       keywords: ["archive", "restore", "current thread", "done", "clear"],
       execute: async () => {
         if (selectedThread) {
+          await mailbox.toggleArchive(selectedThread);
+        }
+      }
+    },
+    {
+      id: "handled-current",
+      group: "Actions",
+      label: "Mark current thread handled",
+      subtitle:
+        selectedThread?.thread.subject ??
+        "Archive the selected thread when it no longer needs attention",
+      hint: "E",
+      intent: "handled",
+      keywords: ["handled", "done", "clear", "archive", "current thread"],
+      execute: async () => {
+        if (selectedThread && !selectedThread.thread.archived) {
           await mailbox.toggleArchive(selectedThread);
         }
       }
@@ -340,10 +372,11 @@ function buildSectionCommands(
     { id: "inbox", label: "Inbox", hint: "1" },
     { id: "important", label: "Important", hint: "2" },
     { id: "vip", label: "VIP", hint: "3" },
-    { id: "other", label: "Other", hint: "4" },
-    { id: "starred", label: "Starred", hint: "5" },
-    { id: "snoozed", label: "Snoozed", hint: "6" },
-    { id: "archive", label: "Archive", hint: "7" }
+    { id: "waiting", label: "Waiting", hint: "4" },
+    { id: "other", label: "Other", hint: "5" },
+    { id: "starred", label: "Starred", hint: "6" },
+    { id: "snoozed", label: "Snoozed", hint: "7" },
+    { id: "archive", label: "Archive", hint: "8" }
   ];
 
   return sections.map((section) => ({
@@ -411,6 +444,20 @@ function buildThreadCommands(
       intent: "draft",
       threadId: thread.thread.id,
       keywords: [...keywords, "draft", "voice", "ai", "reply"],
+      execute: async () => {
+        mailbox.selectThread(thread.thread.id);
+        await mailbox.generateVoiceDraft(thread);
+      }
+    },
+    {
+      id: `thread-follow-up-${thread.thread.id}`,
+      group: "Threads",
+      label: `Draft follow-up: ${labelBase}`,
+      subtitle: thread.thread.subject,
+      hint: "D",
+      intent: "follow-up",
+      threadId: thread.thread.id,
+      keywords: [...keywords, "follow up", "waiting", "nudge", "draft"],
       execute: async () => {
         mailbox.selectThread(thread.thread.id);
         await mailbox.generateVoiceDraft(thread);

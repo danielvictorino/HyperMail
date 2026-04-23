@@ -6,6 +6,7 @@ import type {
 } from "@shared/ai/mail-assistant";
 import { selectVoiceExamples } from "@shared/ai/mail-assistant";
 import type { InboxSplit } from "@shared/mail/models";
+import type { ThreadProjection } from "@shared/mail/models";
 import { hypermailDb, type HypermailDatabase } from "../db/hypermail-db";
 
 const SUMMARY_KEY_PREFIX = "assistant:summary:";
@@ -22,9 +23,14 @@ function getSplitKey(accountId: string, threadId: string): string {
 export async function loadThreadSummaryRecord(
   accountId: string,
   threadId: string,
+  sourceFingerprint?: string,
   database = hypermailDb
 ): Promise<MailAssistantArtifactRecord<MailThreadSummary> | null> {
-  return loadArtifactRecord(getSummaryKey(accountId, threadId), database);
+  return loadArtifactRecord(
+    getSummaryKey(accountId, threadId),
+    sourceFingerprint,
+    database
+  );
 }
 
 export async function saveThreadSummaryRecord(
@@ -39,9 +45,14 @@ export async function saveThreadSummaryRecord(
 export async function loadSplitSuggestionRecord(
   accountId: string,
   threadId: string,
+  sourceFingerprint?: string,
   database = hypermailDb
 ): Promise<MailAssistantArtifactRecord<MailSplitSuggestion> | null> {
-  return loadArtifactRecord(getSplitKey(accountId, threadId), database);
+  return loadArtifactRecord(
+    getSplitKey(accountId, threadId),
+    sourceFingerprint,
+    database
+  );
 }
 
 export async function saveSplitSuggestionRecord(
@@ -83,8 +94,19 @@ export async function applyThreadSplitLocally(
   });
 }
 
-async function loadArtifactRecord<TRecord>(
+export function buildThreadAssistantFingerprint(thread: ThreadProjection): string {
+  const latestMessage = thread.messages[thread.messages.length - 1] ?? null;
+  return [
+    thread.thread.lastMessageAt,
+    thread.messages.length,
+    latestMessage?.id ?? "none",
+    latestMessage?.sentAt ?? 0
+  ].join(":");
+}
+
+async function loadArtifactRecord<TRecord extends { sourceFingerprint?: string }>(
   key: string,
+  sourceFingerprint: string | undefined,
   database: HypermailDatabase
 ): Promise<TRecord | null> {
   const record = await database.metadata.get(key);
@@ -94,7 +116,13 @@ async function loadArtifactRecord<TRecord>(
   }
 
   try {
-    return JSON.parse(record.value) as TRecord;
+    const parsed = JSON.parse(record.value) as TRecord;
+
+    if (sourceFingerprint && parsed.sourceFingerprint !== sourceFingerprint) {
+      return null;
+    }
+
+    return parsed;
   } catch {
     return null;
   }

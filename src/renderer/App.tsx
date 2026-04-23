@@ -210,6 +210,7 @@ export default function App() {
             draftSummary={mailbox.draftSummary}
             attachmentCacheSummary={mailbox.attachmentCacheSummary}
             performanceSummary={mailbox.performanceSummary}
+            dailyBrief={mailbox.dailyBrief}
             runtimeCacheStatus={runtimeCacheStatus}
             runtimeCacheDetail={runtimeCacheDetail}
             runtimeCacheItemCount={runtimeCacheItemCount}
@@ -237,6 +238,7 @@ export default function App() {
             onSummarizeThread={mailbox.generateThreadSummary}
             onSuggestThreadSplit={mailbox.suggestThreadSplit}
             onApplySuggestedSplit={mailbox.applySuggestedSplit}
+            onApplyLocalRuleSplit={mailbox.applyLocalRuleSplit}
           />
         }
       />

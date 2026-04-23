@@ -187,6 +187,11 @@ export interface ThreadProjection extends ThreadSnapshot {
   queueDepth: number;
   pendingModifierIds: string[];
   pendingModifierTypes: ModifierType[];
+  waitingForReply?: boolean;
+  waitingSince?: number | null;
+  actionNeeded?: boolean;
+  localRuleSplit?: InboxSplit | null;
+  localRuleReason?: string | null;
 }
 
 export interface QueueSummary {

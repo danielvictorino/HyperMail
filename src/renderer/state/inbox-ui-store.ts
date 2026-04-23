@@ -4,6 +4,7 @@ export type MailboxSectionId =
   | "inbox"
   | "important"
   | "vip"
+  | "waiting"
   | "other"
   | "starred"
   | "snoozed"

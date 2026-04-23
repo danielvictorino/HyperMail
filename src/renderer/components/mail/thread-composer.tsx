@@ -100,7 +100,7 @@ export function ThreadComposer({
     return () => {
       cancelled = true;
     };
-  }, [editor, loadDraft, open, thread.thread.id]);
+  }, [editor, loadDraft, open, thread]);
 
   useEffect(() => {
     if (!editor || !open || !draftSeed || draftSeed.threadId !== thread.thread.id) {
@@ -110,7 +110,7 @@ export function ThreadComposer({
     editor.commands.setContent(draftSeed.bodyHtml);
     setStatusLabel("Voice draft inserted");
     onConsumeDraftSeed();
-  }, [draftSeed, editor, onConsumeDraftSeed, open, thread.thread.id]);
+  }, [draftSeed, editor, onConsumeDraftSeed, open, thread]);
 
   useEffect(() => {
     if (!editor || !open) {
@@ -147,7 +147,7 @@ export function ThreadComposer({
 
       editor.off("update", handleUpdate);
     };
-  }, [editor, open, saveDraft, thread.thread.id]);
+  }, [editor, open, saveDraft, thread]);
 
   if (!open) {
     return null;

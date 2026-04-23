@@ -17,7 +17,7 @@ title: HyperMail
 - **Offline-first.** Dexie-backed local cache, modifier queue survives app kills and flushes when you reconnect.
 - **Keyboard-first.** `Ctrl+K` palette, single-key shortcuts (j/k move, e archive, s star, z snooze, u unsubscribe, a summarize, d voice draft, l split).
 - **Secure by default.** Electron sandbox + context isolation, CSP, IPC zod validation, `https:`/`mailto:`-only external links.
-- **Optional AI.** Per-thread summaries, split suggestions, and voice drafts via OpenAI (requires your own key).
+- **Optional AI.** Per-thread summaries, split suggestions, and voice drafts via OpenAI, Anthropic, or Ollama with primary/fallback routing.
 
 ## Docs
 
