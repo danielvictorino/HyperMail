@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from "electron";
-import electronUpdater, {
+import {
+  NsisUpdater,
   type AppUpdater,
   type ProgressInfo,
   type UpdateDownloadedEvent,
@@ -7,8 +8,6 @@ import electronUpdater, {
 } from "electron-updater";
 import type { AutoUpdateStatus } from "../../src/shared/contracts";
 import { getMainLogger } from "../observability/app-observability";
-
-const { NsisUpdater } = electronUpdater;
 
 let updater: AppUpdater | null = null;
 let autoCheckScheduled = false;
