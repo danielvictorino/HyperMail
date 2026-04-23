@@ -8,6 +8,18 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.1.4](https://github.com/danielvictorino/HyperMail/compare/v0.1.3...v0.1.4) (2026-04-23)
+
+
+### Features
+
+* **ai:** multi-provider mail assistant with fallback routing ([11100cd](https://github.com/danielvictorino/HyperMail/commit/11100cdb5304682223f304ae274bc06a85b011ff))
+
+
+### Bug Fixes
+
+* **build:** unblock packaged app startup from tsup CJS transpile ([77ac247](https://github.com/danielvictorino/HyperMail/commit/77ac24724d4209f9fb17cbe31e0e7484eaffbc80))
+
 ## [0.1.3](https://github.com/danielvictorino/HyperMail/compare/v0.1.2...v0.1.3) (2026-04-21)
 
 
