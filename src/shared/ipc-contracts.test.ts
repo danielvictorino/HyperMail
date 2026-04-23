@@ -3,9 +3,12 @@ import {
   IpcValidationError,
   gmailMailboxSyncRequestSchema,
   isAllowedExternalUrl,
+  listOllamaModelsRequestSchema,
   parseIpcPayload,
+  saveMailAssistantSettingsRequestSchema,
   sendDraftRequestSchema,
   setThreadStarredRequestSchema,
+  testMailAssistantProviderConnectionRequestSchema,
   unsubscribeThreadRequestSchema
 } from "./ipc-contracts";
 
@@ -105,6 +108,95 @@ describe("ipc-contracts", () => {
           bodyHtml: "<p>hi</p>"
         })
       ).toThrow(IpcValidationError);
+    });
+  });
+
+  describe("mail assistant settings", () => {
+    it("accepts an http Ollama base url", () => {
+      const parsed = parseIpcPayload(
+        "ai:list-ollama-models",
+        listOllamaModelsRequestSchema,
+        {
+          baseUrl: "http://127.0.0.1:11434"
+        }
+      );
+
+      expect(parsed.baseUrl).toBe("http://127.0.0.1:11434");
+    });
+
+    it("rejects fallback provider matching the primary provider", () => {
+      expect(() =>
+        parseIpcPayload("ai:save-settings", saveMailAssistantSettingsRequestSchema, {
+          settings: {
+            primaryProvider: "openai",
+            fallbackProvider: "openai",
+            providers: {
+              openai: {
+                model: "gpt-5.4-mini",
+                presetId: "balanced",
+                temperature: null,
+                maxOutputTokens: null,
+                baseUrl: null
+              },
+              anthropic: {
+                model: "claude-sonnet-4-20250514",
+                presetId: "balanced",
+                temperature: null,
+                maxOutputTokens: null,
+                baseUrl: null
+              },
+              ollama: {
+                model: "llama3.2",
+                presetId: "balanced",
+                temperature: null,
+                maxOutputTokens: null,
+                baseUrl: "http://127.0.0.1:11434"
+              }
+            }
+          }
+        })
+      ).toThrow(IpcValidationError);
+    });
+
+    it("accepts a provider connection test payload", () => {
+      const parsed = parseIpcPayload(
+        "ai:test-provider-connection",
+        testMailAssistantProviderConnectionRequestSchema,
+        {
+          provider: "anthropic",
+          settings: {
+            primaryProvider: "anthropic",
+            fallbackProvider: "ollama",
+            providers: {
+              openai: {
+                model: "gpt-5.4-mini",
+                presetId: "balanced",
+                temperature: null,
+                maxOutputTokens: null,
+                baseUrl: null
+              },
+              anthropic: {
+                model: "claude-sonnet-4-20250514",
+                presetId: "quality",
+                temperature: 0.3,
+                maxOutputTokens: 512,
+                baseUrl: null,
+                apiKey: "sk-ant-test"
+              },
+              ollama: {
+                model: "llama3.2",
+                presetId: "balanced",
+                temperature: null,
+                maxOutputTokens: null,
+                baseUrl: "http://127.0.0.1:11434"
+              }
+            }
+          }
+        }
+      );
+
+      expect(parsed.provider).toBe("anthropic");
+      expect(parsed.settings.providers.anthropic.presetId).toBe("quality");
     });
   });
 

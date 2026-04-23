@@ -9,7 +9,12 @@ const desktopApi: HypermailDesktopApi = {
     signOut: () => ipcRenderer.invoke("auth:sign-out")
   },
   ai: {
+    getSettings: () => ipcRenderer.invoke("ai:get-settings"),
     getRuntimeConfig: () => ipcRenderer.invoke("ai:get-runtime-config"),
+    saveSettings: (input) => ipcRenderer.invoke("ai:save-settings", input),
+    testProviderConnection: (input) =>
+      ipcRenderer.invoke("ai:test-provider-connection", input),
+    listOllamaModels: (input) => ipcRenderer.invoke("ai:list-ollama-models", input),
     summarizeThread: (input) => ipcRenderer.invoke("ai:summarize-thread", input),
     suggestSplit: (input) => ipcRenderer.invoke("ai:suggest-split", input),
     generateDraftReply: (input) => ipcRenderer.invoke("ai:generate-draft-reply", input)

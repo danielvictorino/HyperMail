@@ -1,6 +1,6 @@
 # HyperMail Security Model
 
-Last updated: 2026-04-21 (v0.1.1-hardened)
+Last updated: 2026-04-21 (v0.1.3)
 
 ## Threat model
 
@@ -9,7 +9,7 @@ HyperMail is a local desktop Electron app that holds long-lived OAuth refresh to
 1. **Compromised web content rendered inside the renderer** — a malicious email body or a hijacked third-party resource attempting script execution or data exfiltration.
 2. **Compromised IPC payloads** — a bug or malicious page attempting to invoke main-process handlers with malformed input to crash the app or trigger unintended server calls.
 3. **Navigation / URL handling** — malicious mail links (`javascript:`, `file:`) that could open local resources or execute script.
-4. **Token theft via local file read** — access tokens must never land in plaintext on disk; refresh tokens live in OS keychain via keytar.
+4. **Token theft via local file read** — access tokens and AI provider secrets must never land in plaintext on disk; refresh tokens and OpenAI/Anthropic keys live in OS keychain via keytar.
 
 We explicitly do **not** target defense against a local attacker with code execution inside the user's OS session.
 
@@ -23,7 +23,7 @@ We explicitly do **not** target defense against a local attacker with code execu
 ### Content-Security-Policy
 - Meta tag in `index.html` for a defense-in-depth baseline (applies under file:// loads).
 - Runtime header via `session.defaultSession.webRequest.onHeadersReceived` in `installContentSecurityPolicy`.
-- Policy: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://gmail.googleapis.com https://graph.microsoft.com https://login.microsoftonline.com https://api.openai.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'none'`.
+- Policy: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://gmail.googleapis.com https://graph.microsoft.com https://login.microsoftonline.com https://api.openai.com https://api.anthropic.com http://127.0.0.1:11434 http://localhost:11434; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'none'`.
 - In dev the policy adds `unsafe-eval` and the Vite dev origin for HMR. This is removed in production bundles.
 
 ### IPC boundary
@@ -38,6 +38,12 @@ We explicitly do **not** target defense against a local attacker with code execu
 - Transient refresh errors (5xx / 429 / 400 with unknown code / network) retry with jittered exponential backoff (1s / 2s / 4s).
 - Only terminal OAuth errors (`invalid_grant`, `invalid_client`, `unauthorized_client`, `invalid_request`, `unsupported_grant_type`, `invalid_scope`) clear the stored session — a transient network failure does not log the user out.
 - Tokens are stored via `keytar` in the OS credential manager. Access tokens expire on Google's schedule; the local store is not intended to outlive a refresh cycle.
+
+### AI providers
+- OpenAI and Anthropic requests originate from the Electron main process, not the renderer.
+- OpenAI and Anthropic API keys are stored via `keytar` and can also be bootstrapped from `.env`.
+- Provider selection, fallback routing, model ids, presets, and Ollama base URL are stored in a local app-owned settings file under Electron `userData`.
+- Ollama requests default to `http://127.0.0.1:11434` and can be redirected to another `http` or `https` endpoint from the in-app AI settings panel.
 
 ### Gmail API
 - `gmailJson` and `gmailModify` retry on 429 / 5xx / fetch TypeError / network error codes with `Retry-After` honored.

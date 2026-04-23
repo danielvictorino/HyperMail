@@ -25,7 +25,7 @@ HyperMail puts your Gmail inbox behind a keyboard-driven, offline-capable deskto
 - **Offline-first** — Dexie-backed local cache, modifier queue survives app kills and flushes when you reconnect.
 - **Keyboard-first** — `Ctrl+K` palette, single-key shortcuts (j/k to move, e archive, s star, z snooze, u unsubscribe, a summarize, d voice draft, l split).
 - **Secure by default** — Electron sandbox + context isolation, CSP, IPC zod validation, `https:`/`mailto:`-only external links.
-- **Optional AI** — per-thread summaries, split suggestions, and voice drafts via OpenAI (requires your own key).
+- **Optional AI** — per-thread summaries, split suggestions, and voice drafts via OpenAI, Anthropic, or Ollama with primary/fallback routing.
 
 ## Install
 
@@ -48,7 +48,7 @@ Get-FileHash HyperMail-*.exe -Algorithm SHA256
 # Prerequisites: Node 20, Git, Python + C++ build tools for keytar on Windows
 git clone https://github.com/danielvictorino/HyperMail.git
 cd HyperMail
-cp .env.example .env   # fill GOOGLE_OAUTH_CLIENT_ID
+cp .env.example .env   # fill GOOGLE_OAUTH_CLIENT_ID and optional AI defaults
 npm install
 npm run dev
 ```
@@ -65,12 +65,21 @@ npm run verify   # typecheck + test + build
 |---|---|---|
 | `GOOGLE_OAUTH_CLIENT_ID` | ✅ | Google desktop OAuth client ID (PKCE, installed-app flow) |
 | `MICROSOFT_OAUTH_CLIENT_ID` | — | Microsoft desktop OAuth client ID (optional) |
-| `OPENAI_API_KEY` | — | Enables thread summary, voice draft, split |
+| `OPENAI_API_KEY` | — | Optional default OpenAI API key |
+| `OPENAI_MODEL` | — | Optional default OpenAI model |
+| `ANTHROPIC_API_KEY` | — | Optional default Anthropic API key |
+| `ANTHROPIC_MODEL` | — | Optional default Anthropic model |
+| `OLLAMA_BASE_URL` | — | Optional default Ollama base URL (`http://127.0.0.1:11434`) |
+| `OLLAMA_MODEL` | — | Optional default Ollama model |
+| `HYPERMAIL_AI_PRIMARY_PROVIDER` | — | Optional default primary AI provider (`openai`, `anthropic`, `ollama`) |
+| `HYPERMAIL_AI_FALLBACK_PROVIDER` | — | Optional default fallback AI provider (`openai`, `anthropic`, `ollama`, `none`) |
 | `HYPERMAIL_UPDATES_URL` | — | Windows auto-update feed; disables auto-update if unset |
 | `HYPERMAIL_UPDATE_CHANNEL` | — | Defaults to `latest` |
 | `HYPERMAIL_CRASH_REPORT_URL` | — | Optional remote crash upload |
 
 **Config file locations** — `./.env` in dev; `%APPDATA%\HyperMail\.env` in packaged builds. If no config is found, the runtime UI reports the preferred path.
+
+**AI settings precedence** — HyperMail saves provider selection, fallback routing, models, and non-secret AI settings locally in the app data directory. OpenAI and Anthropic API keys are stored in OS secure storage via `keytar`. `.env` values still work as defaults and bootstrap values.
 
 ## Architecture at a glance
 

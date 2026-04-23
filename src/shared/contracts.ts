@@ -1,8 +1,13 @@
 export const HYPERMAIL_APP_NAME = "HyperMail";
 
 import type {
+  MailAssistantProvider,
+  MailAssistantProviderConnectionResult,
   MailAssistantRuntimeConfig,
+  MailAssistantSettings,
+  MailAssistantSettingsInput,
   MailDraftSuggestion,
+  OllamaModelListResult,
   MailSplitSuggestion,
   MailThreadSummary,
   MailVoiceExample,
@@ -46,6 +51,8 @@ export interface RuntimeConfigSummary {
   googleOAuthReady: boolean;
   microsoftOAuthReady: boolean;
   openAiReady: boolean;
+  anthropicReady: boolean;
+  ollamaReady: boolean;
   updatesUrlConfigured: boolean;
   crashReportUploadConfigured: boolean;
 }
@@ -221,6 +228,7 @@ export interface SummarizeThreadResult {
   provider: MailAssistantRuntimeConfig["provider"];
   model: string;
   generatedAt: number;
+  fallbackUsed: boolean;
 }
 
 export interface SuggestSplitRequest {
@@ -232,6 +240,7 @@ export interface SuggestSplitResult {
   provider: MailAssistantRuntimeConfig["provider"];
   model: string;
   generatedAt: number;
+  fallbackUsed: boolean;
 }
 
 export interface GenerateDraftReplyRequest {
@@ -246,6 +255,25 @@ export interface GenerateDraftReplyResult {
   provider: MailAssistantRuntimeConfig["provider"];
   model: string;
   generatedAt: number;
+  fallbackUsed: boolean;
+}
+
+export interface SaveMailAssistantSettingsRequest {
+  settings: MailAssistantSettingsInput;
+}
+
+export interface SaveMailAssistantSettingsResult {
+  settings: MailAssistantSettings;
+  runtimeConfig: MailAssistantRuntimeConfig;
+}
+
+export interface TestMailAssistantProviderConnectionRequest {
+  provider: MailAssistantProvider;
+  settings: MailAssistantSettingsInput;
+}
+
+export interface ListOllamaModelsRequest {
+  baseUrl?: string | null;
 }
 
 export interface ElectronMailApi {
@@ -265,7 +293,15 @@ export interface ElectronMailApi {
 }
 
 export interface ElectronAiApi {
+  getSettings: () => Promise<MailAssistantSettings>;
   getRuntimeConfig: () => Promise<MailAssistantRuntimeConfig>;
+  saveSettings: (
+    input: SaveMailAssistantSettingsRequest
+  ) => Promise<SaveMailAssistantSettingsResult>;
+  testProviderConnection: (
+    input: TestMailAssistantProviderConnectionRequest
+  ) => Promise<MailAssistantProviderConnectionResult>;
+  listOllamaModels: (input?: ListOllamaModelsRequest) => Promise<OllamaModelListResult>;
   summarizeThread: (input: SummarizeThreadRequest) => Promise<SummarizeThreadResult>;
   suggestSplit: (input: SuggestSplitRequest) => Promise<SuggestSplitResult>;
   generateDraftReply: (

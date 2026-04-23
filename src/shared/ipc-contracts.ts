@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  MAIL_ASSISTANT_MODEL_PRESETS,
+  MAIL_ASSISTANT_PROVIDERS
+} from "./ai/mail-assistant";
 
 const nonEmptyString = z.string().trim().min(1).max(512);
 const idString = z.string().trim().min(1).max(256);
@@ -15,6 +19,18 @@ const safeHttpsUrl = z
       return false;
     }
   }, "Only https and mailto URLs are allowed");
+const safeHttpUrl = z
+  .string()
+  .trim()
+  .max(2048)
+  .refine((value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }, "Only http and https URLs are allowed");
 
 export const gmailMailboxSyncRequestSchema = z.object({
   accountId: idString,
@@ -123,6 +139,50 @@ export const generateDraftReplyRequestSchema = z.object({
   voiceExamples: z.array(z.object({}).passthrough()).max(50),
   accountName: z.string().max(256),
   signature: z.string().max(4096)
+});
+
+const mailAssistantProviderSchema = z.enum(MAIL_ASSISTANT_PROVIDERS);
+const mailAssistantPresetSchema = z.enum(MAIL_ASSISTANT_MODEL_PRESETS);
+const assistantProviderInputConfigSchema = z.object({
+  model: z.string().trim().max(256),
+  presetId: mailAssistantPresetSchema.nullable(),
+  temperature: z.number().min(0).max(2).nullable(),
+  maxOutputTokens: z.number().int().positive().max(65_536).nullable(),
+  baseUrl: z.union([safeHttpUrl, z.null()]).default(null),
+  apiKey: z.string().max(4096).optional(),
+  clearApiKey: z.boolean().optional()
+});
+
+export const mailAssistantSettingsInputSchema = z
+  .object({
+    primaryProvider: mailAssistantProviderSchema,
+    fallbackProvider: mailAssistantProviderSchema.nullable(),
+    providers: z
+      .object({
+        openai: assistantProviderInputConfigSchema,
+        anthropic: assistantProviderInputConfigSchema,
+        ollama: assistantProviderInputConfigSchema
+      })
+      .strict()
+  })
+  .refine(
+    (value) =>
+      value.fallbackProvider === null ||
+      value.fallbackProvider !== value.primaryProvider,
+    "Fallback provider must be different from the primary provider."
+  );
+
+export const saveMailAssistantSettingsRequestSchema = z.object({
+  settings: mailAssistantSettingsInputSchema
+});
+
+export const testMailAssistantProviderConnectionRequestSchema = z.object({
+  provider: mailAssistantProviderSchema,
+  settings: mailAssistantSettingsInputSchema
+});
+
+export const listOllamaModelsRequestSchema = z.object({
+  baseUrl: safeHttpUrl.nullable().optional()
 });
 
 export const rendererErrorPayloadSchema = z.object({

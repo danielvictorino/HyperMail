@@ -7,21 +7,28 @@ import {
   generateDraftReplyRequestSchema,
   gmailMailboxSyncRequestSchema,
   isAllowedExternalUrl,
+  listOllamaModelsRequestSchema,
   parseIpcPayload,
   rendererErrorPayloadSchema,
+  saveMailAssistantSettingsRequestSchema,
   sendDraftRequestSchema,
   setThreadArchivedRequestSchema,
   setThreadStarredRequestSchema,
   suggestSplitRequestSchema,
   summarizeThreadRequestSchema,
+  testMailAssistantProviderConnectionRequestSchema,
   unsubscribeThreadRequestSchema
 } from "../src/shared/ipc-contracts";
 import {
   generateDraftReply,
+  getMailAssistantSettings,
   getMailAssistantRuntimeConfig,
+  listOllamaModels,
+  saveMailAssistantSettings,
   suggestSplit,
-  summarizeThread
-} from "./ai/openai-mail-assistant";
+  summarizeThread,
+  testMailAssistantProviderConnection
+} from "./ai/mail-assistant-service";
 import {
   downloadGmailAttachment,
   persistThreadArchivedState,
@@ -74,7 +81,7 @@ function buildContentSecurityPolicy(): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data:",
-    `connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://gmail.googleapis.com https://graph.microsoft.com https://login.microsoftonline.com https://api.openai.com${devConnect}`,
+    `connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://gmail.googleapis.com https://graph.microsoft.com https://login.microsoftonline.com https://api.openai.com https://api.anthropic.com http://127.0.0.1:11434 http://localhost:11434${devConnect}`,
     "frame-ancestors 'none'",
     "object-src 'none'",
     "base-uri 'self'",
@@ -316,7 +323,44 @@ function registerIpcHandlers(): void {
     }
   });
 
+  ipcMain.handle("ai:get-settings", async () => getMailAssistantSettings());
   ipcMain.handle("ai:get-runtime-config", async () => getMailAssistantRuntimeConfig());
+  ipcMain.handle("ai:save-settings", async (_event, input) => {
+    try {
+      const parsed = parseIpcPayload(
+        "ai:save-settings",
+        saveMailAssistantSettingsRequestSchema,
+        input
+      );
+      return await saveMailAssistantSettings(parsed.settings);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  });
+  ipcMain.handle("ai:test-provider-connection", async (_event, input) => {
+    try {
+      const parsed = parseIpcPayload(
+        "ai:test-provider-connection",
+        testMailAssistantProviderConnectionRequestSchema,
+        input
+      );
+      return await testMailAssistantProviderConnection(parsed);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  });
+  ipcMain.handle("ai:list-ollama-models", async (_event, input) => {
+    try {
+      const parsed = parseIpcPayload(
+        "ai:list-ollama-models",
+        listOllamaModelsRequestSchema,
+        input ?? {}
+      );
+      return await listOllamaModels(parsed);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  });
 
   ipcMain.handle("ai:summarize-thread", async (_event, input) => {
     try {

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { LocalMailMessage } from "../mail/models";
 import {
+  createDefaultMailAssistantSettings,
   createReplySignature,
+  mergeMailAssistantSettings,
+  normalizeOllamaBaseUrl,
   renderDraftSuggestionHtml,
   selectVoiceExamples
 } from "./mail-assistant";
@@ -90,5 +93,34 @@ describe("mail-assistant helpers", () => {
   it("creates a compact reply signature from the display name", () => {
     expect(createReplySignature("Daniel Victorino")).toBe("Daniel");
     expect(createReplySignature(" HyperMail ")).toBe("HyperMail");
+  });
+
+  it("merges environment-like settings over the defaults", () => {
+    const merged = mergeMailAssistantSettings(createDefaultMailAssistantSettings(), {
+      primaryProvider: "anthropic",
+      fallbackProvider: "ollama",
+      providers: {
+        anthropic: {
+          model: "claude-opus-4-1-20250805"
+        },
+        ollama: {
+          baseUrl: "http://localhost:11434/"
+        }
+      }
+    });
+
+    expect(merged.primaryProvider).toBe("anthropic");
+    expect(merged.fallbackProvider).toBe("ollama");
+    expect(merged.providers.anthropic.model).toBe("claude-opus-4-1-20250805");
+    expect(merged.providers.ollama.baseUrl).toBe("http://localhost:11434");
+  });
+
+  it("normalizes an Ollama base url before storing it", () => {
+    expect(normalizeOllamaBaseUrl("http://127.0.0.1:11434/")).toBe(
+      "http://127.0.0.1:11434"
+    );
+    expect(normalizeOllamaBaseUrl("https://ollama.example.com/api/")).toBe(
+      "https://ollama.example.com/api"
+    );
   });
 });

@@ -33,6 +33,8 @@ function createSummary(loadedConfigPath: string | null): RuntimeConfigSummary {
     googleOAuthReady: Boolean(process.env.GOOGLE_OAUTH_CLIENT_ID?.trim()),
     microsoftOAuthReady: Boolean(process.env.MICROSOFT_OAUTH_CLIENT_ID?.trim()),
     openAiReady: Boolean(process.env.OPENAI_API_KEY?.trim()),
+    anthropicReady: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
+    ollamaReady: Boolean(process.env.OLLAMA_MODEL?.trim()),
     updatesUrlConfigured: Boolean(process.env.HYPERMAIL_UPDATES_URL?.trim()),
     crashReportUploadConfigured: Boolean(process.env.HYPERMAIL_CRASH_REPORT_URL?.trim())
   };

@@ -2,14 +2,18 @@ import { liveQuery } from "dexie";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import type {
   MailAssistantArtifactRecord,
+  MailAssistantProvider,
+  MailAssistantProviderConnectionResult,
   MailAssistantRuntimeConfig,
+  MailAssistantSettingsInput,
   MailSplitSuggestion,
-  MailThreadSummary
+  MailThreadSummary,
+  OllamaModelListResult
 } from "@shared/ai/mail-assistant";
 import {
   buildAssistantThreadContext,
+  createDefaultMailAssistantSettings,
   createReplySignature,
-  DEFAULT_OPENAI_MODEL,
   renderDraftSuggestionHtml
 } from "@shared/ai/mail-assistant";
 import type { AuthSessionSummary } from "@shared/contracts";
@@ -142,6 +146,12 @@ interface MailboxLabState {
     message: LocalMailMessage,
     attachment: LocalMailAttachment
   ) => Promise<void>;
+  saveAssistantSettings: (settings: MailAssistantSettingsInput) => Promise<void>;
+  testAssistantProviderConnection: (
+    provider: MailAssistantProvider,
+    settings: MailAssistantSettingsInput
+  ) => Promise<MailAssistantProviderConnectionResult>;
+  listOllamaModels: (baseUrl?: string | null) => Promise<OllamaModelListResult>;
   clearAssistantDraftSeed: () => void;
   generateThreadSummary: (thread?: ThreadProjection | null) => Promise<void>;
   generateVoiceDraft: (thread?: ThreadProjection | null) => Promise<void>;
@@ -206,12 +216,9 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
   const [syncError, setSyncError] = useState<string | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [assistantError, setAssistantError] = useState<string | null>(null);
-  const [assistantConfig, setAssistantConfig] = useState<MailAssistantRuntimeConfig>({
-    enabled: false,
-    provider: "openai",
-    model: DEFAULT_OPENAI_MODEL,
-    reason: "Loading AI runtime..."
-  });
+  const [assistantConfig, setAssistantConfig] = useState<MailAssistantRuntimeConfig>(
+    createLoadingAssistantConfig()
+  );
   const [threadSummaryRecord, setThreadSummaryRecord] =
     useState<MailAssistantArtifactRecord<MailThreadSummary> | null>(null);
   const [splitSuggestionRecord, setSplitSuggestionRecord] =
@@ -290,15 +297,13 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
       })
       .catch((runtimeError) => {
         if (!cancelled) {
-          setAssistantConfig({
-            enabled: false,
-            provider: "openai",
-            model: DEFAULT_OPENAI_MODEL,
-            reason:
+          setAssistantConfig(
+            createLoadingAssistantConfig(
               runtimeError instanceof Error
                 ? runtimeError.message
                 : "HyperMail could not load AI runtime settings."
-          });
+            )
+          );
         }
       });
 
@@ -388,7 +393,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
     };
   }, [account.id, effectiveOnline, session]);
 
-  const threads = snapshot?.threads ?? [];
+  const threads = useMemo(() => snapshot?.threads ?? [], [snapshot?.threads]);
   const navItems = useMemo(() => getMailboxNavItems(threads), [threads]);
   const activeThreads = useMemo(
     () => filterThreadsBySection(threads, selectedSection),
@@ -683,6 +688,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
         provider: result.provider,
         model: result.model,
         generatedAt: result.generatedAt,
+        fallbackUsed: result.fallbackUsed,
         data: result.summary
       };
 
@@ -771,6 +777,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
         provider: result.provider,
         model: result.model,
         generatedAt: result.generatedAt,
+        fallbackUsed: result.fallbackUsed,
         data: result.suggestion
       };
 
@@ -799,6 +806,41 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
       selectedThread.thread.id,
       splitSuggestionRecord.data.split
     );
+  }
+
+  async function saveAssistantSettings(
+    settings: MailAssistantSettingsInput
+  ): Promise<void> {
+    try {
+      const result = await getDesktopApi().ai.saveSettings({ settings });
+      setAssistantConfig(result.runtimeConfig);
+      setAssistantError(null);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "HyperMail could not save AI provider settings.";
+      setAssistantError(message);
+      throw error;
+    }
+  }
+
+  async function testAssistantProviderConnection(
+    provider: MailAssistantProvider,
+    settings: MailAssistantSettingsInput
+  ): Promise<MailAssistantProviderConnectionResult> {
+    return await getDesktopApi().ai.testProviderConnection({
+      provider,
+      settings
+    });
+  }
+
+  async function listOllamaModels(
+    baseUrl?: string | null
+  ): Promise<OllamaModelListResult> {
+    return await getDesktopApi().ai.listOllamaModels({
+      baseUrl: baseUrl ?? null
+    });
   }
 
   return {
@@ -886,6 +928,9 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
     queueReplyAt,
     queueReplyLater,
     cacheAttachment,
+    saveAssistantSettings,
+    testAssistantProviderConnection,
+    listOllamaModels,
     clearAssistantDraftSeed: () => setAssistantDraftSeed(null),
     generateThreadSummary,
     generateVoiceDraft,
@@ -915,4 +960,47 @@ function getAssistantDisabledReason(
   }
 
   return null;
+}
+
+function createLoadingAssistantConfig(
+  reason = "Loading AI runtime..."
+): MailAssistantRuntimeConfig {
+  const settings = createDefaultMailAssistantSettings();
+
+  return {
+    enabled: false,
+    provider: settings.primaryProvider,
+    model: settings.providers[settings.primaryProvider].model,
+    fallbackProvider: settings.fallbackProvider,
+    fallbackModel: settings.fallbackProvider
+      ? settings.providers[settings.fallbackProvider].model
+      : null,
+    activeProvider: null,
+    activeModel: null,
+    reason,
+    settings,
+    providerStatuses: {
+      openai: {
+        provider: "openai",
+        label: "OpenAI",
+        available: false,
+        hasSecret: false,
+        reason
+      },
+      anthropic: {
+        provider: "anthropic",
+        label: "Anthropic",
+        available: false,
+        hasSecret: false,
+        reason
+      },
+      ollama: {
+        provider: "ollama",
+        label: "Ollama",
+        available: false,
+        hasSecret: true,
+        reason
+      }
+    }
+  };
 }

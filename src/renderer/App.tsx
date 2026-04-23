@@ -231,6 +231,9 @@ export default function App() {
             onDownloadUpdate={auth.downloadUpdate}
             onInstallUpdate={auth.installDownloadedUpdate}
             onOpenLogsDirectory={auth.openLogsDirectory}
+            onSaveAssistantSettings={mailbox.saveAssistantSettings}
+            onTestAssistantProviderConnection={mailbox.testAssistantProviderConnection}
+            onListOllamaModels={mailbox.listOllamaModels}
             onSummarizeThread={mailbox.generateThreadSummary}
             onSuggestThreadSplit={mailbox.suggestThreadSplit}
             onApplySuggestedSplit={mailbox.applySuggestedSplit}

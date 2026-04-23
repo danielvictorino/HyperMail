@@ -13,9 +13,13 @@ import {
   WifiOff
 } from "lucide-react";
 import type {
+  MailAssistantProvider,
+  MailAssistantProviderConnectionResult,
   MailAssistantRuntimeConfig,
   MailSplitSuggestion,
-  MailThreadSummary
+  MailThreadSummary,
+  MailAssistantSettingsInput,
+  OllamaModelListResult
 } from "@shared/ai/mail-assistant";
 import type {
   AutoUpdateStatus,
@@ -26,6 +30,7 @@ import type { InboxSnapshot, ThreadProjection } from "@shared/mail/models";
 import type { GmailSyncTelemetry } from "@/offline/sync/gmail-sync";
 import type { RuntimeCacheStatus } from "@/state/runtime-cache-store";
 import type { CalendarContext, SenderInsight } from "@/lib/mailbox-view";
+import { AiSettingsPanel } from "./ai-settings-panel";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -65,6 +70,12 @@ interface ContextRailProps {
   onDownloadUpdate: () => Promise<unknown>;
   onInstallUpdate: () => Promise<unknown>;
   onOpenLogsDirectory: () => Promise<unknown>;
+  onSaveAssistantSettings: (settings: MailAssistantSettingsInput) => Promise<void>;
+  onTestAssistantProviderConnection: (
+    provider: MailAssistantProvider,
+    settings: MailAssistantSettingsInput
+  ) => Promise<MailAssistantProviderConnectionResult>;
+  onListOllamaModels: (baseUrl?: string | null) => Promise<OllamaModelListResult>;
   onSummarizeThread: (thread?: ThreadProjection | null) => Promise<void>;
   onSuggestThreadSplit: (thread?: ThreadProjection | null) => Promise<void>;
   onApplySuggestedSplit: () => Promise<void>;
@@ -106,6 +117,9 @@ export function ContextRail({
   onDownloadUpdate,
   onInstallUpdate,
   onOpenLogsDirectory,
+  onSaveAssistantSettings,
+  onTestAssistantProviderConnection,
+  onListOllamaModels,
   onSummarizeThread,
   onSuggestThreadSplit,
   onApplySuggestedSplit
@@ -230,6 +244,14 @@ export function ContextRail({
               <Metric
                 label="OpenAI"
                 value={runtimeConfig.openAiReady ? "ready" : "missing"}
+              />
+              <Metric
+                label="Anthropic"
+                value={runtimeConfig.anthropicReady ? "ready" : "missing"}
+              />
+              <Metric
+                label="Ollama"
+                value={runtimeConfig.ollamaReady ? "ready" : "missing"}
               />
               <Metric
                 label="Updates"
@@ -374,27 +396,13 @@ export function ContextRail({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-accent" />
-          <p className="text-sm font-medium text-foreground">AI copilot</p>
-        </div>
-        <div className="grid gap-2">
-          <Metric label="Provider" value={assistantConfig.provider} />
-          <Metric
-            label="Model"
-            value={assistantConfig.enabled ? assistantConfig.model : "offline"}
-          />
-        </div>
-        <p className="mt-3 text-xs leading-5 text-muted">
-          {assistantConfig.enabled
-            ? "Voice drafts use local sent mail as examples and keep results cached on-device."
-            : (assistantConfig.reason ?? "AI assistance is disabled.")}
-        </p>
-        {assistantError ? (
-          <p className="mt-3 text-xs leading-5 text-amber-100">{assistantError}</p>
-        ) : null}
-      </div>
+      <AiSettingsPanel
+        assistantConfig={assistantConfig}
+        assistantError={assistantError}
+        onSaveSettings={onSaveAssistantSettings}
+        onTestProviderConnection={onTestAssistantProviderConnection}
+        onListOllamaModels={onListOllamaModels}
+      />
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="mb-3 flex items-center gap-2">

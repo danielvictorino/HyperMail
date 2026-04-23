@@ -1,16 +1,75 @@
 import type { InboxSplit, LocalMailMessage, ThreadProjection } from "../mail/models";
 
 export const DEFAULT_OPENAI_MODEL = "gpt-5.4-mini";
+export const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
+export const DEFAULT_OLLAMA_MODEL = "llama3.2";
+export const DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434";
 export const MAX_VOICE_EXAMPLES = 4;
 
-export type MailAssistantProvider = "openai";
+export const MAIL_ASSISTANT_PROVIDERS = ["openai", "anthropic", "ollama"] as const;
+export const MAIL_ASSISTANT_MODEL_PRESETS = [
+  "balanced",
+  "quality",
+  "fast",
+  "cheap"
+] as const;
+
+export type MailAssistantProvider = (typeof MAIL_ASSISTANT_PROVIDERS)[number];
+export type MailAssistantModelPresetId = (typeof MAIL_ASSISTANT_MODEL_PRESETS)[number];
 export type MailAssistantConfidence = "low" | "medium" | "high";
+
+export interface MailAssistantProviderConfig {
+  model: string;
+  presetId: MailAssistantModelPresetId | null;
+  temperature: number | null;
+  maxOutputTokens: number | null;
+  baseUrl: string | null;
+}
+
+export interface MailAssistantProviderInputConfig extends MailAssistantProviderConfig {
+  apiKey?: string;
+  clearApiKey?: boolean;
+}
+
+export interface MailAssistantSettings {
+  primaryProvider: MailAssistantProvider;
+  fallbackProvider: MailAssistantProvider | null;
+  providers: Record<MailAssistantProvider, MailAssistantProviderConfig>;
+}
+
+export interface MailAssistantSettingsSeed {
+  primaryProvider?: MailAssistantProvider;
+  fallbackProvider?: MailAssistantProvider | null;
+  providers?: Partial<
+    Record<MailAssistantProvider, Partial<MailAssistantProviderConfig>>
+  >;
+}
+
+export interface MailAssistantSettingsInput {
+  primaryProvider: MailAssistantProvider;
+  fallbackProvider: MailAssistantProvider | null;
+  providers: Record<MailAssistantProvider, MailAssistantProviderInputConfig>;
+}
+
+export interface MailAssistantProviderStatus {
+  provider: MailAssistantProvider;
+  label: string;
+  available: boolean;
+  hasSecret: boolean;
+  reason?: string;
+}
 
 export interface MailAssistantRuntimeConfig {
   enabled: boolean;
   provider: MailAssistantProvider;
   model: string;
+  fallbackProvider: MailAssistantProvider | null;
+  fallbackModel: string | null;
+  activeProvider: MailAssistantProvider | null;
+  activeModel: string | null;
   reason?: string;
+  settings: MailAssistantSettings;
+  providerStatuses: Record<MailAssistantProvider, MailAssistantProviderStatus>;
 }
 
 export interface MailAssistantThreadMessage {
@@ -70,8 +129,39 @@ export interface MailAssistantArtifactRecord<TData> {
   provider: MailAssistantProvider;
   model: string;
   generatedAt: number;
+  fallbackUsed: boolean;
   data: TData;
 }
+
+export interface MailAssistantPresetDefaults {
+  temperature: number | null;
+  maxOutputTokens: number | null;
+}
+
+export interface OllamaModelListResult {
+  baseUrl: string;
+  models: string[];
+}
+
+export interface MailAssistantProviderConnectionResult {
+  provider: MailAssistantProvider;
+  ok: boolean;
+  message: string;
+  model: string;
+  baseUrl?: string | null;
+}
+
+export const OPENAI_MODEL_SUGGESTIONS = [
+  DEFAULT_OPENAI_MODEL,
+  "gpt-5.4",
+  "gpt-4.1-mini"
+] as const;
+
+export const ANTHROPIC_MODEL_SUGGESTIONS = [
+  DEFAULT_ANTHROPIC_MODEL,
+  "claude-opus-4-1-20250805",
+  "claude-haiku-3-5-20241022"
+] as const;
 
 export const MAIL_THREAD_SUMMARY_SCHEMA = {
   type: "json_schema",
@@ -158,6 +248,257 @@ export const MAIL_DRAFT_SUGGESTION_SCHEMA = {
     ]
   }
 } as const;
+
+export function getProviderLabel(provider: MailAssistantProvider): string {
+  switch (provider) {
+    case "openai":
+      return "OpenAI";
+    case "anthropic":
+      return "Anthropic";
+    case "ollama":
+      return "Ollama";
+    default:
+      return provider;
+  }
+}
+
+export function providerUsesApiKey(
+  provider: MailAssistantProvider
+): provider is Extract<MailAssistantProvider, "openai" | "anthropic"> {
+  return provider === "openai" || provider === "anthropic";
+}
+
+export function getDefaultMailAssistantProviderConfig(
+  provider: MailAssistantProvider
+): MailAssistantProviderConfig {
+  switch (provider) {
+    case "openai":
+      return {
+        model: DEFAULT_OPENAI_MODEL,
+        presetId: "balanced",
+        temperature: null,
+        maxOutputTokens: null,
+        baseUrl: null
+      };
+    case "anthropic":
+      return {
+        model: DEFAULT_ANTHROPIC_MODEL,
+        presetId: "balanced",
+        temperature: null,
+        maxOutputTokens: null,
+        baseUrl: null
+      };
+    case "ollama":
+      return {
+        model: DEFAULT_OLLAMA_MODEL,
+        presetId: "balanced",
+        temperature: null,
+        maxOutputTokens: null,
+        baseUrl: DEFAULT_OLLAMA_BASE_URL
+      };
+    default:
+      return {
+        model: "",
+        presetId: "balanced",
+        temperature: null,
+        maxOutputTokens: null,
+        baseUrl: null
+      };
+  }
+}
+
+export function createDefaultMailAssistantSettings(): MailAssistantSettings {
+  return {
+    primaryProvider: "openai",
+    fallbackProvider: "anthropic",
+    providers: {
+      openai: getDefaultMailAssistantProviderConfig("openai"),
+      anthropic: getDefaultMailAssistantProviderConfig("anthropic"),
+      ollama: getDefaultMailAssistantProviderConfig("ollama")
+    }
+  };
+}
+
+export function createDefaultMailAssistantSettingsInput(): MailAssistantSettingsInput {
+  const defaults = createDefaultMailAssistantSettings();
+
+  return {
+    primaryProvider: defaults.primaryProvider,
+    fallbackProvider: defaults.fallbackProvider,
+    providers: {
+      openai: { ...defaults.providers.openai },
+      anthropic: { ...defaults.providers.anthropic },
+      ollama: { ...defaults.providers.ollama }
+    }
+  };
+}
+
+export function mergeMailAssistantSettings(
+  ...sources: Array<MailAssistantSettingsSeed | null | undefined>
+): MailAssistantSettings {
+  const merged = createDefaultMailAssistantSettings();
+
+  for (const source of sources) {
+    if (!source) {
+      continue;
+    }
+
+    if (source.primaryProvider && isMailAssistantProvider(source.primaryProvider)) {
+      merged.primaryProvider = source.primaryProvider;
+    }
+
+    if (
+      source.fallbackProvider === null ||
+      (source.fallbackProvider && isMailAssistantProvider(source.fallbackProvider))
+    ) {
+      merged.fallbackProvider = source.fallbackProvider ?? null;
+    }
+
+    if (!source.providers) {
+      continue;
+    }
+
+    for (const provider of MAIL_ASSISTANT_PROVIDERS) {
+      const incoming = source.providers[provider];
+
+      if (!incoming) {
+        continue;
+      }
+
+      merged.providers[provider] = normalizeMailAssistantProviderConfig(
+        provider,
+        incoming
+      );
+    }
+  }
+
+  if (merged.fallbackProvider === merged.primaryProvider) {
+    merged.fallbackProvider = null;
+  }
+
+  return merged;
+}
+
+export function normalizeMailAssistantProviderConfig(
+  provider: MailAssistantProvider,
+  config:
+    | Partial<MailAssistantProviderConfig>
+    | Partial<MailAssistantProviderInputConfig>
+): MailAssistantProviderConfig {
+  const defaults = getDefaultMailAssistantProviderConfig(provider);
+  const model = config.model?.trim();
+  const baseUrl = config.baseUrl?.trim();
+
+  return {
+    model: model && model.length > 0 ? model : defaults.model,
+    presetId: config.presetId ?? defaults.presetId,
+    temperature:
+      typeof config.temperature === "number"
+        ? config.temperature
+        : defaults.temperature,
+    maxOutputTokens:
+      typeof config.maxOutputTokens === "number"
+        ? config.maxOutputTokens
+        : defaults.maxOutputTokens,
+    baseUrl:
+      provider === "ollama"
+        ? baseUrl && baseUrl.length > 0
+          ? normalizeOllamaBaseUrl(baseUrl)
+          : defaults.baseUrl
+        : null
+  };
+}
+
+export function sanitizeMailAssistantSettingsInput(
+  input: MailAssistantSettingsInput
+): MailAssistantSettings {
+  return mergeMailAssistantSettings({
+    primaryProvider: input.primaryProvider,
+    fallbackProvider: input.fallbackProvider,
+    providers: {
+      openai: normalizeMailAssistantProviderConfig("openai", input.providers.openai),
+      anthropic: normalizeMailAssistantProviderConfig(
+        "anthropic",
+        input.providers.anthropic
+      ),
+      ollama: normalizeMailAssistantProviderConfig("ollama", input.providers.ollama)
+    }
+  });
+}
+
+export function getMailAssistantPresetDefaults(
+  provider: MailAssistantProvider,
+  presetId: MailAssistantModelPresetId | null
+): MailAssistantPresetDefaults {
+  switch (presetId) {
+    case "quality":
+      return {
+        temperature: provider === "ollama" ? 0.2 : 0.35,
+        maxOutputTokens: null
+      };
+    case "fast":
+      return {
+        temperature: 0.1,
+        maxOutputTokens: 450
+      };
+    case "cheap":
+      return {
+        temperature: 0.05,
+        maxOutputTokens: 320
+      };
+    case "balanced":
+    default:
+      return {
+        temperature: 0.2,
+        maxOutputTokens: null
+      };
+  }
+}
+
+export function resolveMailAssistantTemperature(
+  provider: MailAssistantProvider,
+  config: MailAssistantProviderConfig
+): number | null {
+  if (typeof config.temperature === "number") {
+    return config.temperature;
+  }
+
+  return getMailAssistantPresetDefaults(provider, config.presetId).temperature;
+}
+
+export function resolveMailAssistantMaxOutputTokens(
+  provider: MailAssistantProvider,
+  config: MailAssistantProviderConfig,
+  fallbackValue: number
+): number {
+  if (typeof config.maxOutputTokens === "number") {
+    return config.maxOutputTokens;
+  }
+
+  return (
+    getMailAssistantPresetDefaults(provider, config.presetId).maxOutputTokens ??
+    fallbackValue
+  );
+}
+
+export function normalizeOllamaBaseUrl(baseUrl: string): string {
+  const parsed = new URL(baseUrl);
+  const normalizedPath = parsed.pathname.replace(/\/+$/, "");
+
+  parsed.pathname = normalizedPath.length > 0 ? normalizedPath : "";
+  parsed.hash = "";
+  parsed.search = "";
+
+  return parsed.toString().replace(/\/$/, "");
+}
+
+export function getOllamaTagsUrl(baseUrl: string): string {
+  return `${normalizeOllamaBaseUrl(baseUrl)}/api/tags`;
+}
+
+export function getOllamaChatUrl(baseUrl: string): string {
+  return `${normalizeOllamaBaseUrl(baseUrl)}/api/chat`;
+}
 
 export function buildAssistantThreadContext(
   thread: ThreadProjection,
@@ -369,4 +710,8 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function isMailAssistantProvider(value: string): value is MailAssistantProvider {
+  return (MAIL_ASSISTANT_PROVIDERS as readonly string[]).includes(value);
 }
