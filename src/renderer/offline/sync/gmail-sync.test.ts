@@ -21,13 +21,13 @@ describe("applyGmailSyncPayload", () => {
   });
 
   it("prunes stale Gmail threads and queue records during full sync", async () => {
-    const accountId = "google:daniel@example.com";
+    const accountId = "google:alex@example.com";
     const staleThreadId = `${accountId}:thread:stale-thread`;
 
     await database.accounts.put({
       id: accountId,
-      email: "daniel@example.com",
-      displayName: "Daniel",
+      email: "alex@example.com",
+      displayName: "Alex",
       provider: "google",
       connectedAt: 1,
       updatedAt: 1
@@ -59,7 +59,7 @@ describe("applyGmailSyncPayload", () => {
       subject: "Stale",
       fromName: "Stale Contact",
       fromEmail: "stale@example.com",
-      to: ["daniel@example.com"],
+      to: ["alex@example.com"],
       cc: [],
       bodyPlain: "This should disappear after the full sync.",
       unread: false,
@@ -107,8 +107,8 @@ describe("applyGmailSyncPayload", () => {
     const payload: GmailMailboxSyncPayload = {
       account: {
         id: accountId,
-        email: "daniel@example.com",
-        displayName: "Daniel Victorino",
+        email: "alex@example.com",
+        displayName: "Alex Example",
         provider: "google",
         connectedAt: 10,
         updatedAt: 10
@@ -150,7 +150,7 @@ describe("applyGmailSyncPayload", () => {
               subject: "Fresh Gmail thread",
               fromName: "Maya Chen",
               fromEmail: "maya@example.com",
-              to: ["daniel@example.com"],
+              to: ["alex@example.com"],
               cc: [],
               bodyPlain:
                 "The Gmail sync writer should keep only the current thread set.",
@@ -191,7 +191,7 @@ describe("applyGmailSyncPayload", () => {
   });
 
   it("removes only explicitly deleted Gmail threads during incremental sync", async () => {
-    const accountId = "google:daniel@example.com";
+    const accountId = "google:alex@example.com";
     const removedThreadId = `${accountId}:thread:removed`;
     const preservedThreadId = `${accountId}:thread:preserved`;
 
@@ -238,8 +238,8 @@ describe("applyGmailSyncPayload", () => {
       {
         account: {
           id: accountId,
-          email: "daniel@example.com",
-          displayName: "Daniel Victorino",
+          email: "alex@example.com",
+          displayName: "Alex Example",
           provider: "google",
           connectedAt: 10,
           updatedAt: 10
@@ -261,7 +261,7 @@ describe("applyGmailSyncPayload", () => {
   });
 
   it("preserves an active local snooze when Gmail sync refreshes a thread", async () => {
-    const accountId = "google:daniel@example.com";
+    const accountId = "google:alex@example.com";
     const threadId = `${accountId}:thread:live-thread`;
     const snoozedUntil = Date.now() + 3 * 60 * 60 * 1000;
 
@@ -297,8 +297,8 @@ describe("applyGmailSyncPayload", () => {
       {
         account: {
           id: accountId,
-          email: "daniel@example.com",
-          displayName: "Daniel Victorino",
+          email: "alex@example.com",
+          displayName: "Alex Example",
           provider: "google",
           connectedAt: 10,
           updatedAt: 10
@@ -332,7 +332,7 @@ describe("applyGmailSyncPayload", () => {
                 subject: "Fresh Gmail thread",
                 fromName: "Maya Chen",
                 fromEmail: "maya@example.com",
-                to: ["daniel@example.com"],
+                to: ["alex@example.com"],
                 cc: [],
                 bodyPlain: "Keep the local snooze until it expires.",
                 unread: true,
@@ -362,7 +362,7 @@ describe("applyGmailSyncPayload", () => {
   });
 
   it("removes cached attachments for stale messages when a Gmail thread refreshes", async () => {
-    const accountId = "google:daniel@example.com";
+    const accountId = "google:alex@example.com";
     const threadId = `${accountId}:thread:live-thread`;
     const staleMessageId = `${accountId}:message:stale-message`;
 
@@ -392,7 +392,7 @@ describe("applyGmailSyncPayload", () => {
       subject: "Existing thread",
       fromName: "Maya Chen",
       fromEmail: "maya@example.com",
-      to: ["daniel@example.com"],
+      to: ["alex@example.com"],
       cc: [],
       bodyPlain: "This message should be replaced by the refreshed snapshot.",
       unread: false,
@@ -431,8 +431,8 @@ describe("applyGmailSyncPayload", () => {
       {
         account: {
           id: accountId,
-          email: "daniel@example.com",
-          displayName: "Daniel Victorino",
+          email: "alex@example.com",
+          displayName: "Alex Example",
           provider: "google",
           connectedAt: 10,
           updatedAt: 10
@@ -466,7 +466,7 @@ describe("applyGmailSyncPayload", () => {
                 subject: "Refreshed thread",
                 fromName: "Maya Chen",
                 fromEmail: "maya@example.com",
-                to: ["daniel@example.com"],
+                to: ["alex@example.com"],
                 cc: [],
                 bodyPlain: "Only the fresh Gmail message should remain cached.",
                 unread: true,

@@ -36,7 +36,7 @@ function createThreadProjection(
         subject: thread.subject,
         fromName: thread.participantNames[0] ?? "Ada",
         fromEmail: thread.participantEmails[0] ?? "ada@example.com",
-        to: ["daniel@example.com"],
+        to: ["alex@example.com"],
         cc: [],
         bodyPlain,
         unread: thread.unread,

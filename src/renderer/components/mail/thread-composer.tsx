@@ -35,7 +35,7 @@ interface ThreadComposerProps {
 function createInitialReply(thread: ThreadProjection): string {
   const firstName = thread.thread.participantNames[0]?.split(" ")[0] ?? "there";
 
-  return `<p>Hi ${firstName},</p><p></p><p></p><p>Best,<br />Daniel</p>`;
+  return `<p>Hi ${firstName},</p><p></p><p></p><p>Best,</p>`;
 }
 
 export function ThreadComposer({

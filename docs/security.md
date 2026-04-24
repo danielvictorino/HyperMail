@@ -61,4 +61,4 @@ We explicitly do **not** target defense against a local attacker with code execu
 
 ## Reporting
 
-Open a private issue or email danielvictorino@galaxies.gg. Do not post proof-of-concept email payloads in public channels — sanitize before sharing.
+Report suspected vulnerabilities via GitHub's [private security advisory flow](https://github.com/danielvictorino/HyperMail/security/advisories/new). See [`SECURITY.md`](../SECURITY.md) at the repo root for scope, severity expectations, and sanitization guidance. Do not post proof-of-concept email payloads in public channels — sanitize before sharing.

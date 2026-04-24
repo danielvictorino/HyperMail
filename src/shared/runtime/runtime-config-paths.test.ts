@@ -7,7 +7,7 @@ import {
 
 describe("runtime-config-paths", () => {
   const cwd = path.resolve("/workspace/hypermail");
-  const userDataPath = path.resolve("/users/Daniel/AppData/Roaming/HyperMail");
+  const userDataPath = path.resolve("/users/alex/AppData/Roaming/HyperMail");
   const appPath = path.resolve("/workspace/hypermail");
   const execDir = path.resolve("/Program Files/HyperMail");
   const resourcesPath = path.resolve("/Program Files/HyperMail/resources");

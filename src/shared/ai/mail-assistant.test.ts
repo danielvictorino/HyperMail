@@ -17,8 +17,8 @@ function createMessage(
     accountId: overrides.accountId ?? "demo:hypermail",
     threadId: overrides.threadId ?? "demo:thread",
     subject: overrides.subject ?? "Re: Launch review",
-    fromName: overrides.fromName ?? "Daniel Victorino",
-    fromEmail: overrides.fromEmail ?? "daniel@example.com",
+    fromName: overrides.fromName ?? "Alex Example",
+    fromEmail: overrides.fromEmail ?? "alex@example.com",
     to: overrides.to ?? ["maya@example.com"],
     cc: overrides.cc ?? [],
     bodyPlain:
@@ -63,7 +63,7 @@ describe("mail-assistant helpers", () => {
           bodyPlain: "Can you send the latest version?"
         })
       ],
-      "daniel@example.com"
+      "alex@example.com"
     );
 
     expect(voiceExamples.map((example) => example.id)).toEqual(["sent-1", "sent-2"]);
@@ -80,18 +80,18 @@ describe("mail-assistant helpers", () => {
         "I will send the tightened version this afternoon."
       ],
       closing: "Best,",
-      signoff: "Daniel <script>",
+      signoff: "Alex <script>",
       tone: "direct"
     });
 
     expect(html).toContain("<p>Hi Maya,</p>");
     expect(html).toContain("one proof point");
-    expect(html).toContain("Daniel &lt;script&gt;");
+    expect(html).toContain("Alex &lt;script&gt;");
     expect(html).not.toContain("<script>");
   });
 
   it("creates a compact reply signature from the display name", () => {
-    expect(createReplySignature("Daniel Victorino")).toBe("Daniel");
+    expect(createReplySignature("Alex Example")).toBe("Alex");
     expect(createReplySignature(" HyperMail ")).toBe("HyperMail");
   });
 

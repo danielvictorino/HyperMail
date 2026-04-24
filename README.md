@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <b>A keyboard-first, offline-first Gmail client that feels like Superhuman — running as a native Windows app.</b>
+  <b>A keyboard-first, offline-first Gmail client for Windows — open source, vim-inspired, and built for people who live in their inbox.</b>
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
   <a href="https://github.com/danielvictorino/HyperMail/actions/workflows/verify.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/danielvictorino/HyperMail/verify.yml?style=flat-square&label=ci" /></a>
   <a href="https://github.com/danielvictorino/HyperMail/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/danielvictorino/HyperMail?style=flat-square&include_prereleases" /></a>
   <img alt="Platform" src="https://img.shields.io/badge/platform-Windows-blue?style=flat-square" />
-  <img alt="License" src="https://img.shields.io/badge/license-Proprietary-red?style=flat-square" />
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" />
 </p>
 
 <p align="center">
@@ -321,8 +321,19 @@ Fallback routing: when the primary provider fails, the optional fallback retries
 
 * * *
 
+## Contributing
+
+HyperMail welcomes issues and pull requests. Start with [`CONTRIBUTING.md`](CONTRIBUTING.md) for the workflow (fork → branch → PR, conventional commits, `npm run verify` before push), then read [`AGENTS.md`](AGENTS.md) for the deeper technical briefing.
+
+* * *
+
+## Community
+
+- [Code of Conduct](CODE_OF_CONDUCT.md) — Contributor Covenant v2.1
+- [Security policy](SECURITY.md) — how to report vulnerabilities (GitHub private advisory flow, not a public issue)
+
+* * *
+
 ## License
 
-Proprietary. See [LICENSE](LICENSE). Viewing the source on GitHub is permitted for evaluation. Redistribution, modification, and commercial use require written permission.
-
-Contact: [danielvictorino@galaxies.gg](mailto:danielvictorino@galaxies.gg)
+[MIT](LICENSE) — Copyright (c) 2026 HyperMail contributors.
