@@ -8,6 +8,22 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.2.0](https://github.com/danielvictorino/HyperMail/compare/v0.1.4...v0.2.0) (2026-04-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* project is now MIT-licensed. Prior releases shipped under a proprietary all-rights-reserved license. Contributors should review LICENSE, CONTRIBUTING.md, and CODE_OF_CONDUCT.md before their next PR.
+
+### Bug Fixes
+
+* **ci:** auto-enable Pages so docs workflow unblocks on first run ([#9](https://github.com/danielvictorino/HyperMail/issues/9)) ([4f5c040](https://github.com/danielvictorino/HyperMail/commit/4f5c0406d937ca32b1a58bab6a5bbf59b64ab8db))
+
+
+### Miscellaneous Chores
+
+* relicense under MIT and reposition as open-source project ([#11](https://github.com/danielvictorino/HyperMail/issues/11)) ([f0532af](https://github.com/danielvictorino/HyperMail/commit/f0532afbb8350330d68e45f00a76dbfce3ff078c))
+
 ## [0.1.4](https://github.com/danielvictorino/HyperMail/compare/v0.1.3...v0.1.4) (2026-04-23)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "hypermail",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": true,
   "description": "Keyboard-first, offline-first Gmail desktop client for Windows.",
   "main": "dist-electron/main.js",
