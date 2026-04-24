@@ -8,6 +8,32 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.3.0](https://github.com/danielvictorino/HyperMail/compare/v0.2.0...v0.3.0) (2026-04-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* project is now MIT-licensed. Prior releases shipped under a proprietary all-rights-reserved license. Contributors should review LICENSE, CONTRIBUTING.md, and CODE_OF_CONDUCT.md before their next PR.
+
+### Features
+
+* **ai:** multi-provider mail assistant with fallback routing ([11100cd](https://github.com/danielvictorino/HyperMail/commit/11100cdb5304682223f304ae274bc06a85b011ff))
+* attachment overload cleanup, Dexie migration fixtures, Windows release workflow ([6224961](https://github.com/danielvictorino/HyperMail/commit/62249617b25ba80de03ba5592dcd640f735a4564))
+* **oauth:** harden Microsoft refresh with backoff, single-flight, and state-tampering guard ([5efc3b1](https://github.com/danielvictorino/HyperMail/commit/5efc3b14d02f3362b8ef1cc9d6b8782699b8bd70))
+
+
+### Bug Fixes
+
+* **build:** unblock packaged app startup from tsup CJS transpile ([77ac247](https://github.com/danielvictorino/HyperMail/commit/77ac24724d4209f9fb17cbe31e0e7484eaffbc80))
+* **ci:** auto-enable Pages so docs workflow unblocks on first run ([#9](https://github.com/danielvictorino/HyperMail/issues/9)) ([4f5c040](https://github.com/danielvictorino/HyperMail/commit/4f5c0406d937ca32b1a58bab6a5bbf59b64ab8db))
+* **ci:** release-please job must always run to create the release tag ([c4035d4](https://github.com/danielvictorino/HyperMail/commit/c4035d41088b0f696e174e4d4db9702196ba09fc))
+* **ci:** release-please package job checks out merged commit, not unpushed tag ([971ab70](https://github.com/danielvictorino/HyperMail/commit/971ab70d041fc5d9483d82d027f1c70bd0f0748d))
+
+
+### Miscellaneous Chores
+
+* relicense under MIT and reposition as open-source project ([#11](https://github.com/danielvictorino/HyperMail/issues/11)) ([f0532af](https://github.com/danielvictorino/HyperMail/commit/f0532afbb8350330d68e45f00a76dbfce3ff078c))
+
 ## [0.2.0](https://github.com/danielvictorino/HyperMail/compare/v0.1.4...v0.2.0) (2026-04-24)
 
 
