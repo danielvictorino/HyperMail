@@ -33,7 +33,7 @@ function createBaseSnapshot(): ThreadSnapshot {
         subject: "Modifier ordering",
         fromName: "Ada",
         fromEmail: "ada@example.com",
-        to: ["daniel@example.com"],
+        to: ["alex@example.com"],
         cc: [],
         bodyPlain: "Replay should stay deterministic.",
         unread: true,

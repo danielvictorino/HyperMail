@@ -22,7 +22,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../runtime/runtime-config", () => ({
   getRuntimeConfigSummary: () => ({
     packaged: false,
-    preferredConfigPath: "C:\\Users\\Daniel Victorino\\HyperMail\\.env",
+    preferredConfigPath: "C:\\Users\\alex\\HyperMail\\.env",
     loadedConfigPath: null,
     searchPaths: [],
     googleOAuthReady: false,
@@ -90,14 +90,14 @@ describe("mail-assistant-service", () => {
 
     const result = await summarizeThread({
       thread: {
-        accountId: "google:daniel@example.com",
-        accountEmail: "daniel@example.com",
+        accountId: "google:alex@example.com",
+        accountEmail: "alex@example.com",
         threadId: "thread-1",
         subject: "Launch review",
         snippet: "Can you tighten the narrative?",
         split: "important",
-        participantNames: ["Daniel", "Maya"],
-        participantEmails: ["daniel@example.com", "maya@example.com"],
+        participantNames: ["Alex", "Maya"],
+        participantEmails: ["alex@example.com", "maya@example.com"],
         messages: []
       }
     });
@@ -129,14 +129,14 @@ describe("mail-assistant-service", () => {
 
     const result = await summarizeThread({
       thread: {
-        accountId: "google:daniel@example.com",
-        accountEmail: "daniel@example.com",
+        accountId: "google:alex@example.com",
+        accountEmail: "alex@example.com",
         threadId: "thread-1",
         subject: "Launch review",
         snippet: "Can you tighten the narrative?",
         split: "important",
-        participantNames: ["Daniel", "Maya"],
-        participantEmails: ["daniel@example.com", "maya@example.com"],
+        participantNames: ["Alex", "Maya"],
+        participantEmails: ["alex@example.com", "maya@example.com"],
         messages: []
       }
     });
@@ -159,14 +159,14 @@ describe("mail-assistant-service", () => {
     await expect(
       summarizeThread({
         thread: {
-          accountId: "google:daniel@example.com",
-          accountEmail: "daniel@example.com",
+          accountId: "google:alex@example.com",
+          accountEmail: "alex@example.com",
           threadId: "thread-1",
           subject: "Launch review",
           snippet: "Can you tighten the narrative?",
           split: "important",
-          participantNames: ["Daniel", "Maya"],
-          participantEmails: ["daniel@example.com", "maya@example.com"],
+          participantNames: ["Alex", "Maya"],
+          participantEmails: ["alex@example.com", "maya@example.com"],
           messages: []
         }
       })

@@ -18,8 +18,8 @@ describe("google-transformers", () => {
   it("maps Gmail labels and threads into local mailbox records", () => {
     const account = createGoogleLocalAccount({
       profile: {
-        email: "daniel@example.com",
-        name: "Daniel Victorino",
+        email: "alex@example.com",
+        name: "Alex Example",
         picture: "https://example.com/avatar.png",
         messagesTotal: 20,
         threadsTotal: 8,
@@ -54,7 +54,7 @@ describe("google-transformers", () => {
           payload: {
             headers: [
               { name: "From", value: "Maya Chen <maya@example.com>" },
-              { name: "To", value: "Daniel Victorino <daniel@example.com>" },
+              { name: "To", value: "Alex Example <alex@example.com>" },
               { name: "Subject", value: "Launch narrative" },
               { name: "Date", value: "Mon, 20 Apr 2026 12:15:00 +0000" },
               {
@@ -90,7 +90,7 @@ describe("google-transformers", () => {
           internalDate: String(Date.UTC(2026, 3, 20, 12, 32, 0)),
           payload: {
             headers: [
-              { name: "From", value: "Daniel Victorino <daniel@example.com>" },
+              { name: "From", value: "Alex Example <alex@example.com>" },
               { name: "To", value: "Maya Chen <maya@example.com>" },
               { name: "Subject", value: "Re: Launch narrative" },
               { name: "Date", value: "Mon, 20 Apr 2026 12:32:00 +0000" }
@@ -112,7 +112,7 @@ describe("google-transformers", () => {
 
     expect(labels).toHaveLength(2);
     expect(labels[1]?.color).toBe("#f97316");
-    expect(thread?.thread.id).toBe("google:daniel@example.com:thread:thread-1");
+    expect(thread?.thread.id).toBe("google:alex@example.com:thread:thread-1");
     expect(thread?.thread.split).toBe("vip");
     expect(thread?.thread.unread).toBe(true);
     expect(thread?.thread.starred).toBe(true);
@@ -129,8 +129,8 @@ describe("google-transformers", () => {
   it("drops spam and trash threads from the local cache", () => {
     const account = createGoogleLocalAccount({
       profile: {
-        email: "daniel@example.com",
-        name: "Daniel Victorino",
+        email: "alex@example.com",
+        name: "Alex Example",
         picture: undefined,
         messagesTotal: 2,
         threadsTotal: 1,
@@ -165,8 +165,8 @@ describe("google-transformers", () => {
   it("promotes direct action-oriented threads into the important split even without Gmail IMPORTANT", () => {
     const account = createGoogleLocalAccount({
       profile: {
-        email: "daniel@example.com",
-        name: "Daniel Victorino",
+        email: "alex@example.com",
+        name: "Alex Example",
         picture: undefined,
         messagesTotal: 2,
         threadsTotal: 1,
@@ -187,7 +187,7 @@ describe("google-transformers", () => {
           payload: {
             headers: [
               { name: "From", value: "Maya Chen <maya@example.com>" },
-              { name: "To", value: "Daniel Victorino <daniel@example.com>" },
+              { name: "To", value: "Alex Example <alex@example.com>" },
               { name: "Subject", value: "Can you review the launch note?" },
               { name: "Date", value: "Mon, 20 Apr 2026 13:15:00 +0000" }
             ],
@@ -207,8 +207,8 @@ describe("google-transformers", () => {
   it("prefers RFC 8058 one-click unsubscribe when present", () => {
     const account = createGoogleLocalAccount({
       profile: {
-        email: "daniel@example.com",
-        name: "Daniel Victorino",
+        email: "alex@example.com",
+        name: "Alex Example",
         picture: undefined,
         messagesTotal: 1,
         threadsTotal: 1,
@@ -228,7 +228,7 @@ describe("google-transformers", () => {
           payload: {
             headers: [
               { name: "From", value: "Orbit News <digest@example.com>" },
-              { name: "To", value: "Daniel Victorino <daniel@example.com>" },
+              { name: "To", value: "Alex Example <alex@example.com>" },
               { name: "Subject", value: "Orbit digest" },
               { name: "Date", value: "Mon, 20 Apr 2026 14:00:00 +0000" },
               {
@@ -253,7 +253,7 @@ describe("google-transformers", () => {
       method: "http-post",
       endpoint: "https://example.com/unsubscribe/opaque",
       oneClick: true,
-      sourceMessageId: "google:daniel@example.com:message:message-unsubscribe"
+      sourceMessageId: "google:alex@example.com:message:message-unsubscribe"
     });
   });
 });

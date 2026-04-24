@@ -605,7 +605,7 @@ export function buildThreadSummaryInput(thread: MailAssistantThreadContext): str
 
 export function buildSplitSuggestionInstructions(): string {
   return [
-    "You classify threads for a Superhuman-style split inbox.",
+    "You classify threads for a priority-split inbox.",
     "Use vip for high-leverage humans, decision makers, close collaborators, or relationships the user should never miss.",
     "Use important for threads that likely need a timely response or careful follow-up.",
     "Use other for ambient updates, low-urgency operational chatter, and non-critical threads.",

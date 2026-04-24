@@ -2,10 +2,9 @@
   "name": "hypermail",
   "version": "0.1.4",
   "private": true,
-  "description": "A keyboard-first, offline-first email client inspired by Superhuman.",
+  "description": "Keyboard-first, offline-first Gmail desktop client for Windows.",
   "main": "dist-electron/main.js",
-  "author": "Daniel Victorino",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "scripts": {
     "dev": "concurrently -k \"npm:dev:renderer\" \"npm:dev:electron:bundle\" \"npm:dev:electron\"",
     "dev:renderer": "vite",

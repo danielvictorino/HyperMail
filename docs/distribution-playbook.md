@@ -63,7 +63,7 @@ For the generic provider flow, upload those files to the same HTTP(S) location r
 3. Run `npm run package:dir`.
 4. Run `npm run dist`.
 5. Launch `release/win-unpacked/HyperMail.exe`.
-6. Run [release-smoke-test.md](/C:/Users/Daniel Victorino/Vaults/daniel_victorino/Projects/HyperMail/docs/release-smoke-test.md).
+6. Run [release-smoke-test.md](release-smoke-test.md).
 7. If the smoke test passes, distribute either:
    - the NSIS installer for normal team installs
    - the portable executable for fast internal evaluation

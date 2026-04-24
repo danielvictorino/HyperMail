@@ -141,7 +141,7 @@ export async function ensureSeededMailbox(
       snippet:
         "The deck is tight. I only need the short version of the narrative for slide five.",
       participantNames: ["Maya Chen", descriptor.displayName],
-      participantEmails: ["maya@galaxies.ai", descriptor.email],
+      participantEmails: ["maya@example.com", descriptor.email],
       split: "important" as const,
       unread: true,
       starred: true,
@@ -207,7 +207,7 @@ export async function ensureSeededMailbox(
       threadId: createThreadId(descriptor.id, "launch"),
       subject: "Launch review before tomorrow’s customer demo",
       fromName: "Maya Chen",
-      fromEmail: "maya@galaxies.ai",
+      fromEmail: "maya@example.com",
       to: [descriptor.email],
       cc: [],
       bodyPlain:
@@ -234,7 +234,7 @@ export async function ensureSeededMailbox(
       subject: "Re: Launch review before tomorrow’s customer demo",
       fromName: descriptor.displayName,
       fromEmail: descriptor.email,
-      to: ["maya@galaxies.ai"],
+      to: ["maya@example.com"],
       cc: [],
       bodyPlain:
         "I’ll condense slide five into a single problem frame, one metric, and one proof point. HyperMail’s offline queue can be the architecture example.",

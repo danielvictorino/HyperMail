@@ -34,7 +34,7 @@ function createThread(
         subject: thread.subject,
         fromName: "Ada",
         fromEmail: "ada@example.com",
-        to: ["daniel@example.com"],
+        to: ["alex@example.com"],
         cc: [],
         bodyPlain: "Hello",
         unread: thread.unread,

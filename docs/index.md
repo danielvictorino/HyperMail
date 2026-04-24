@@ -4,7 +4,7 @@ title: HyperMail
 
 # HyperMail
 
-**Keyboard-first, offline-first Gmail client that feels like Superhuman — running as a native Windows app.**
+**Keyboard-first, offline-first Gmail client for Windows — open source, vim-inspired, and built for people who live in their inbox.**
 
 [⬇ Download latest release](https://github.com/danielvictorino/HyperMail/releases/latest) ·
 [Source on GitHub](https://github.com/danielvictorino/HyperMail) ·
@@ -59,6 +59,10 @@ Full verification:
 npm run verify
 ```
 
+## Contributing
+
+HyperMail is open source. Start with [CONTRIBUTING.md](https://github.com/danielvictorino/HyperMail/blob/main/CONTRIBUTING.md), the [Code of Conduct](https://github.com/danielvictorino/HyperMail/blob/main/CODE_OF_CONDUCT.md), and the [Security policy](https://github.com/danielvictorino/HyperMail/blob/main/SECURITY.md).
+
 ## License
 
-Proprietary — see [LICENSE](https://github.com/danielvictorino/HyperMail/blob/main/LICENSE). Viewing source is permitted for evaluation. Redistribution or modification requires written permission from Daniel Victorino.
+[MIT](https://github.com/danielvictorino/HyperMail/blob/main/LICENSE) — Copyright (c) 2026 HyperMail contributors.

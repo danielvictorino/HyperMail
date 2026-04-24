@@ -167,7 +167,7 @@ describe("ModifierQueueEngine", () => {
       subject: "Queue engine",
       fromName: "Queue Test",
       fromEmail: "queue@test.dev",
-      to: ["daniel@example.com"],
+      to: ["alex@example.com"],
       cc: [],
       bodyPlain: "Local cache should stay deterministic.",
       unread: true,

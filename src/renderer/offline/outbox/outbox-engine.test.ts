@@ -102,8 +102,8 @@ describe("OutboxEngine", () => {
 
     await database.accounts.put({
       id: accountId,
-      email: "daniel@example.com",
-      displayName: "Daniel",
+      email: "alex@example.com",
+      displayName: "Alex",
       provider: "demo",
       connectedAt: Date.now(),
       updatedAt: Date.now()
@@ -114,8 +114,8 @@ describe("OutboxEngine", () => {
       accountId,
       subject: "Reply foundation",
       snippet: "Initial thread",
-      participantNames: ["Maya Chen", "Daniel"],
-      participantEmails: ["maya@example.com", "daniel@example.com"],
+      participantNames: ["Maya Chen", "Alex"],
+      participantEmails: ["maya@example.com", "alex@example.com"],
       split: "important",
       unread: true,
       starred: false,
@@ -135,7 +135,7 @@ describe("OutboxEngine", () => {
       subject: "Reply foundation",
       fromName: "Maya Chen",
       fromEmail: "maya@example.com",
-      to: ["daniel@example.com"],
+      to: ["alex@example.com"],
       cc: [],
       bodyPlain: "Can you send the updated narrative?",
       unread: true,

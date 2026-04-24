@@ -102,7 +102,7 @@ describe("hypermail-db migration v1 -> v3", () => {
     const v1 = new V1Database(dbName);
     await v1.accounts.put({
       id: "acc",
-      email: "daniel@example.com",
+      email: "alex@example.com",
       provider: "google",
       updatedAt: 42
     });
@@ -126,7 +126,7 @@ describe("hypermail-db migration v1 -> v3", () => {
     await upgraded.open();
 
     const account = await upgraded.accounts.get("acc");
-    expect(account?.email).toBe("daniel@example.com");
+    expect(account?.email).toBe("alex@example.com");
 
     const mod = await upgraded.queuedModifiers.get("mod-1");
     expect(mod?.status).toBe("pending");
