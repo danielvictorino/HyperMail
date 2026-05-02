@@ -45,6 +45,18 @@ The HyperMail file now includes `QA / Source Coverage Matrix` and
 `Components / Curated State Variants` frames. These document what was adopted,
 what is active in this tranche, and what is deferred.
 
+## Brand identity
+
+HyperMail's app mark is intentionally simpler than the in-product UI palette:
+`public/hypermail-mark.svg` uses a black / near-black square field and a white
+geometric `H`. The same geometry is mirrored by `scripts/build-brand-assets.ps1`
+for the Windows launcher icon, favicon, sidebar, and GitHub-facing repo
+surfaces.
+
+Violet-blue remains a product command accent for focus, selection, AI, and
+primary action moments. It should not return to the app logo/avatar unless the
+brand system is intentionally revised.
+
 ## Token contract
 
 The initial Figma library mirrors these repo-backed token groups:

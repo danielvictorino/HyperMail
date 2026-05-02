@@ -10,6 +10,8 @@
 ## Brand assets
 
 - Source mark: `public/hypermail-mark.svg`
+  - Black / near-black square field with a white geometric `H`.
+  - The mark should stay minimal: no gradients, glow, shadows, or accent color.
 - Generated Windows build assets:
   - `build/icon.ico`
   - `build/icon.png`

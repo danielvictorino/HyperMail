@@ -4,7 +4,11 @@ title: HyperMail
 
 # HyperMail
 
-**Keyboard-first, offline-first Gmail client for Windows — open source, vim-inspired, and built for people who live in their inbox.**
+**Keyboard-first, offline-first desktop email for Windows.**
+
+Gmail and Microsoft mail, local Dexie cache, resilient modifier queue, secure
+OAuth, command palette navigation, and optional OpenAI / Anthropic / Ollama
+assistance.
 
 [⬇ Download latest release](https://github.com/danielvictorino/HyperMail/releases/latest) ·
 [Source on GitHub](https://github.com/danielvictorino/HyperMail) ·
@@ -18,10 +22,12 @@ title: HyperMail
 - **Keyboard-first.** `Ctrl+K` palette, single-key shortcuts (j/k move, e archive, s star, z snooze, u unsubscribe, a summarize, d voice draft, l split).
 - **Secure by default.** Electron sandbox + context isolation, CSP, IPC zod validation, `https:`/`mailto:`-only external links.
 - **Optional AI.** Per-thread summaries, split suggestions, and voice drafts via OpenAI, Anthropic, or Ollama with primary/fallback routing.
+- **Minimal identity.** Black-and-white `H` mark for the app icon, favicon, sidebar, and GitHub repo surfaces.
 
 ## Docs
 
 - [Security model](security.md) — threat model, hardening inventory, known gaps
+- [Design system](design-system.md) — repo-backed tokens, Figma workflow, and brand direction
 - [Dependency cadence](dependency-cadence.md) — dependency upgrade buckets and verification gates
 - [Smoke test checklist](smoke-test-checklist.md) — runtime verification before tagging a release
 - [Release notes](release-notes/)
@@ -50,7 +56,7 @@ Quickstart:
 git clone https://github.com/danielvictorino/HyperMail.git
 cd HyperMail
 cp .env.example .env
-npm install
+npm ci
 npm run dev
 ```
 

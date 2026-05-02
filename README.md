@@ -1,15 +1,15 @@
 <h1 align="center">HyperMail</h1>
 
 <p align="center">
-  <img src="build/icon.png" alt="HyperMail" width="128" />
+  <img src="public/hypermail-mark.svg" alt="HyperMail" width="128" />
 </p>
 
 <p align="center">
-  <b>A keyboard-first, offline-first Gmail client for Windows — open source, vim-inspired, and built for people who live in their inbox.</b>
+  <b>Keyboard-first, offline-first desktop email for Windows.</b>
 </p>
 
 <p align="center">
-  Optimistic sync, a modifier queue that survives app kills, and a command palette that keeps your hands off the mouse.
+  Gmail and Microsoft mail, local Dexie cache, resilient modifier queue, secure OAuth, command palette navigation, and optional OpenAI / Anthropic / Ollama assistance.
 </p>
 
 <p align="center">
@@ -21,6 +21,7 @@
 
 <p align="center">
   <a href="https://github.com/danielvictorino/HyperMail/releases/latest">Download</a> ·
+  <a href="docs/design-system.md">Design system</a> ·
   <a href="docs/security.md">Security</a> ·
   <a href="docs/smoke-test-checklist.md">Smoke test</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
@@ -42,6 +43,20 @@
 | AI providers with fallback routing | 3 (OpenAI · Anthropic · Ollama) |
 | Dexie schema versions shipped | 3 (v1 → v2 → v3 with `.upgrade()` backfill) |
 | CI matrix | Ubuntu + Windows, Node 20 |
+
+* * *
+
+## Brand / product direction
+
+HyperMail now uses a black-and-white app identity: a near-black square field
+with a white geometric `H` mark. The mark is intentionally minimal so it stays
+legible in the Windows launcher, favicon, sidebar, and GitHub repo avatar-sized
+surfaces.
+
+The product UI remains a dense, calm desktop control surface. Violet-blue stays
+inside the app as a command/status accent, not as the brand mark. See
+[`docs/design-system.md`](docs/design-system.md) for the repo-backed token and
+Figma workflow.
 
 * * *
 
@@ -70,7 +85,7 @@ Prerequisites: Node 20, Git, Python + C++ build tools for `keytar` on Windows.
 git clone https://github.com/danielvictorino/HyperMail.git
 cd HyperMail
 cp .env.example .env   # fill GOOGLE_OAUTH_CLIENT_ID and optional AI defaults
-npm install
+npm ci
 npm run dev
 ```
 
@@ -270,7 +285,7 @@ Fallback routing: when the primary provider fails, the optional fallback retries
 `npm ci` → `lint` → `format:check` → `typecheck` → `test` → `build`.
 
 **Release** — [`.github/workflows/release.yml`](.github/workflows/release.yml) fires on tag `v*.*.*` (or `v*.*.*-*`) or `workflow_dispatch` with a tag input:
-`npm ci` → `typecheck` → `test` → `build` → `electron-builder --win --x64 --publish=never` → emits `HyperMail-*-win-x64.exe` (NSIS) + `HyperMail-*-portable-x64.exe`, generates `SHA256SUMS.txt` via PowerShell, and attaches every asset to the GitHub release via `gh release upload --clobber`.
+`npm ci` → `typecheck` → `test` → `build` → `release:assert-windows-signing` → `electron-builder --win --x64 --publish=never` → `package:check` → packaged startup smoke test. It emits `HyperMail-*-win-x64.exe` (NSIS) + `HyperMail-*-portable-x64.exe`, generates `SHA256SUMS.txt` via PowerShell, and attaches every asset to the GitHub release via `gh release upload --clobber`.
 
 * * *
 
@@ -286,22 +301,22 @@ Fallback routing: when the primary provider fails, the optional fallback retries
 | TypeScript | 5.7.2 |
 | Tailwind CSS | 3.4.17 |
 | Dexie | 4.4.2 |
-| zod | 4.3.6 |
+| zod | 4.4.2 |
 | zustand | 5.0.3 |
 | keytar | 7.9.0 |
 | electron-updater | 6.8.3 |
-| electron-builder | 25.1.8 |
+| electron-builder | 26.8.1 |
 | electron-log | 5.4.3 |
 | ESLint | 9.39.4 |
 | Prettier | 3.8.3 |
-| TipTap | 3.22.4 |
-| TanStack Query / Virtual | 5.68.0 / 3.13.24 |
+| TipTap | 3.22.5 |
+| TanStack Query / Virtual | 5.100.8 / 3.13.24 |
 
 * * *
 
 ## Roadmap / known gaps
 
-- Executable code signing not yet enabled (`signAndEditExecutable: false` in `package.json`).
+- Windows release signing is enforced for `npm run dist`; unsigned local work should use `npm run package:dir` for smoke testing.
 - Auto-update only fires when `HYPERMAIL_UPDATES_URL` is set **and** the app is packaged **and** the platform is Windows.
 - Microsoft OAuth refresh is hardened end-to-end; first-class UI surfacing is not yet at Google parity.
 - Dexie v1 → v3 upgrade path lacks a seeded-fixture test.
@@ -315,6 +330,7 @@ Fallback routing: when the primary provider fails, the optional fallback retries
 - [Security model](docs/security.md) — threat model, hardening inventory, known gaps
 - [Smoke test checklist](docs/smoke-test-checklist.md) — runtime verification before tagging
 - [Distribution playbook](docs/distribution-playbook.md)
+- [Design system](docs/design-system.md) — repo-backed visual tokens, Figma file, and brand direction
 - [Release notes](docs/release-notes/)
 - [Changelog](CHANGELOG.md)
 - [Agent briefing](AGENTS.md) — for agentic coding tools working in this repo

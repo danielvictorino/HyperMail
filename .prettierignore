@@ -8,4 +8,5 @@ _site
 .agents
 package-lock.json
 *.md
+*.svg
 CHANGELOG.md
