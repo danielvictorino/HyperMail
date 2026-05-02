@@ -263,13 +263,10 @@ export function ThreadView({
       <div className="flex-1 overflow-y-auto px-6 py-5">
         <div className="space-y-4">
           {thread.messages.map((message, index) => (
-            <article
-              key={message.id}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
-            >
+            <article key={message.id} className="hm-section p-5">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-black/15 text-muted">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-black/15 text-muted">
                     <UserRound className="h-4 w-4" />
                   </div>
                   <div>
@@ -310,7 +307,7 @@ export function ThreadView({
                       type="button"
                       disabled={activeAttachmentId === attachment.id}
                       onClick={() => void onCacheAttachment(message, attachment)}
-                      className="rounded-xl border border-white/10 bg-black/10 px-3 py-2 text-left transition-colors duration-150 hover:bg-black/20"
+                      className="rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-left transition-colors duration-150 hover:bg-black/20"
                     >
                       <div className="flex items-center gap-2 text-sm text-foreground">
                         {activeAttachmentId === attachment.id ? (

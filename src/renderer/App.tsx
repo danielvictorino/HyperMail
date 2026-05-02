@@ -1,5 +1,4 @@
 import { AppShell } from "./components/shell/app-shell";
-import { Badge } from "./components/ui/badge";
 import { CommandPalette } from "./components/mail/command-palette";
 import { ContextRail } from "./components/mail/context-rail";
 import { MailSidebar } from "./components/mail/mail-sidebar";
@@ -9,6 +8,7 @@ import { useAuthSession } from "./hooks/use-auth-session";
 import { useCommandPalette } from "./hooks/use-command-palette";
 import { useKeyboardEngine } from "./hooks/use-keyboard-engine";
 import { useMailboxLab } from "./hooks/use-mailbox-lab";
+import { ProductHeader } from "./components/shell/product-header";
 import { isMacLike } from "./lib/utils";
 import { useRuntimeCacheStore } from "./state/runtime-cache-store";
 
@@ -99,29 +99,28 @@ export default function App() {
         }
         main={
           <main className="flex h-full min-h-0 flex-col">
-            <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
-              <div>
-                <p className="text-[11px] uppercase text-muted">{workspaceLabel}</p>
-                <h1 className="mt-1 text-[28px] font-semibold text-foreground">
-                  {headerTitle}
-                </h1>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge className="border-white/10 bg-white/[0.03] text-muted">
-                  {syncBadgeLabel}
-                </Badge>
-                <Badge className="border-white/10 bg-white/[0.03] text-muted">
-                  {mailbox.effectiveOnline ? "Online" : "Offline simulation"}
-                </Badge>
-                <button
-                  type="button"
-                  onClick={() => commandPalette.openPalette()}
-                  className="rounded-full border border-accent/25 bg-accent/10 px-3 py-1.5 text-sm text-accent transition-all duration-150 ease-hyper hover:brightness-110"
-                >
-                  {commandHint}
-                </button>
-              </div>
-            </div>
+            <ProductHeader
+              accountEmail={mailbox.account.email}
+              accountName={mailbox.account.displayName}
+              connectedProvider={connectedProvider}
+              isDemo={mailbox.isDemo}
+              title={headerTitle}
+              workspaceLabel={workspaceLabel}
+              syncBadgeLabel={syncBadgeLabel}
+              effectiveOnline={mailbox.effectiveOnline}
+              commandHint={commandHint}
+              selectedThreadSubject={mailbox.selectedThread?.thread.subject ?? null}
+              composerOpen={mailbox.composerOpen}
+              onOpenPalette={() => commandPalette.openPalette()}
+              onPrimaryAction={() => {
+                if (mailbox.selectedThread) {
+                  mailbox.openComposer();
+                  return;
+                }
+
+                commandPalette.openPalette();
+              }}
+            />
 
             {mailbox.error ? (
               <div className="border-b border-red-400/20 bg-red-400/10 px-6 py-4 text-sm text-red-100">

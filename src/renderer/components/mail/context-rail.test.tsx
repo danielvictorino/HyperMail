@@ -7,7 +7,7 @@ import {
   createDraftSummary,
   createPerformanceSummary
 } from "@/test/mail-fixtures";
-import { clickElement, renderReact } from "@/test/render";
+import { clickElement, findButton, renderReact } from "@/test/render";
 import { ContextRail } from "./context-rail";
 
 let view: ReturnType<typeof renderReact> | null = null;
@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 describe("ContextRail", () => {
-  it("keeps release, cache, and AI controls behind the disclosure", async () => {
+  it("switches between brief, system, and AI tab panels", async () => {
     view = renderReact(
       <ContextRail
         senderInsight={null}
@@ -76,19 +76,17 @@ describe("ContextRail", () => {
     );
 
     expect(view.container.textContent).toContain("Daily brief");
-    expect(view.container.textContent).toContain("System, cache, and AI settings");
+    expect(view.container.textContent).toContain("Context rail");
+    expect(view.container.textContent).not.toContain("Offline cache");
 
-    const disclosure = view.container.querySelector("details");
-    const summary = disclosure?.querySelector("summary");
+    await clickElement(findButton(view.container, "System"));
 
-    expect(disclosure).toBeInstanceOf(HTMLDetailsElement);
-    expect(summary).toBeInstanceOf(HTMLElement);
-    expect((disclosure as HTMLDetailsElement).open).toBe(false);
-
-    await clickElement(summary as HTMLElement);
-
-    expect((disclosure as HTMLDetailsElement).open).toBe(true);
     expect(view.container.textContent).toContain("Offline cache");
+    expect(view.container.textContent).toContain("Runtime config");
+    expect(view.container.textContent).not.toContain("AI providers");
+
+    await clickElement(findButton(view.container, "AI"));
+
     expect(view.container.textContent).toContain("AI providers");
   });
 });

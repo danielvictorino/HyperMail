@@ -21,10 +21,10 @@ We explicitly do **not** target defense against a local attacker with code execu
 - Navigation: `setWindowOpenHandler` + `will-navigate` use `isAllowedExternalUrl` (https/mailto only).
 
 ### Content-Security-Policy
-- Meta tag in `index.html` for a defense-in-depth baseline (applies under file:// loads).
-- Runtime header via `session.defaultSession.webRequest.onHeadersReceived` in `installContentSecurityPolicy`.
-- Policy: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://gmail.googleapis.com https://graph.microsoft.com https://login.microsoftonline.com https://api.openai.com https://api.anthropic.com http://127.0.0.1:11434 http://localhost:11434; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'none'`.
-- In dev the policy adds `unsafe-eval` and the Vite dev origin for HMR. This is removed in production bundles.
+- Shared policy builder used by the `index.html` meta tag and Electron's runtime header.
+- Meta tag baseline omits `frame-ancestors` because browsers ignore that directive in meta CSP.
+- Runtime header via `session.defaultSession.webRequest.onHeadersReceived` in `installContentSecurityPolicy` adds `frame-ancestors 'none'`.
+- Production policy keeps `script-src 'self'`. In dev the policy adds the Vite dev origin plus `unsafe-eval` and `unsafe-inline` for Vite HMR and the React refresh preamble. These script relaxations are removed from production bundles.
 
 ### IPC boundary
 - All mutating main-process handlers (10 channels) validate input via zod schemas in `src/shared/ipc-contracts.ts`.

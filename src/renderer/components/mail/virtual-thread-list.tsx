@@ -86,7 +86,7 @@ export function VirtualThreadList({
           </Badge>
         </div>
         <p className="mt-2 text-sm leading-6 text-muted">{sectionDescription}</p>
-        <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5">
+        <div className="hm-input-shell mt-4 flex items-center gap-3 px-3 py-2.5">
           <Search className="h-4 w-4 shrink-0 text-muted" />
           <input
             ref={searchInputRef}
@@ -191,10 +191,10 @@ const ThreadRow = memo(function ThreadRow({
       type="button"
       onClick={() => onSelect(thread.thread.id)}
       className={cn(
-        "mb-2 w-full rounded-2xl border px-4 py-3 text-left transition-all duration-150 ease-hyper",
+        "mb-2 w-full px-4 py-3 text-left transition-all duration-150 ease-hyper",
         selected
-          ? "border-accent/35 bg-accent/10 shadow-focus"
-          : "border-transparent bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.05]"
+          ? "hm-list-row-selected"
+          : "hm-list-row hover:border-white/10 hover:bg-white/[0.05]"
       )}
     >
       <div className="flex items-start justify-between gap-3">

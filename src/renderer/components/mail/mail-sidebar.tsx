@@ -63,10 +63,10 @@ export function MailSidebar({
   const providerLabel = connectedProvider === "microsoft" ? "Microsoft" : "Gmail";
 
   return (
-    <aside className="flex h-full flex-col p-5">
-      <div className="space-y-5">
+    <aside className="hm-density-compact flex h-full flex-col p-4">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl border border-accent/25 bg-accent/10 text-accent">
+          <div className="grid h-11 w-11 place-items-center rounded-lg border border-accent/25 bg-accent/10 text-accent">
             <img
               src="/hypermail-mark.svg"
               alt=""
@@ -80,7 +80,7 @@ export function MailSidebar({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="hm-section p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-foreground">{accountName}</p>
@@ -114,7 +114,7 @@ export function MailSidebar({
           </Button>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
+        <div className="hm-list-surface p-2">
           {navItems.map((item) => {
             const active = item.id === selectedSection;
 
@@ -124,7 +124,7 @@ export function MailSidebar({
                 type="button"
                 onClick={() => onSelectSection(item.id)}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-all duration-150 ease-hyper",
+                  "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all duration-150 ease-hyper",
                   active
                     ? "bg-accent/12 text-foreground"
                     : "text-muted hover:bg-white/[0.04] hover:text-foreground"
@@ -149,7 +149,7 @@ export function MailSidebar({
           })}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="hm-section p-4">
           <div className="mb-3 flex items-center gap-2 text-foreground">
             <Command className="h-4 w-4 text-accent" />
             <span className="text-sm font-medium">Keyboard-first shell</span>
@@ -183,7 +183,7 @@ export function MailSidebar({
 
 function ShortcutRow({ label, hint }: { label: string; hint: string }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/10 px-3 py-2">
+    <div className="hm-list-row flex items-center justify-between px-3 py-2">
       <span>{label}</span>
       <Badge className="border-white/10 bg-white/[0.03] text-muted">{hint}</Badge>
     </div>
