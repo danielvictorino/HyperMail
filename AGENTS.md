@@ -66,12 +66,19 @@ This runs typecheck → test → build. CI runs the same sequence on `ubuntu-lat
 ## Figma / design system rules
 
 HyperMail is code-led. The repo is the source of truth for tokens, component
-APIs, behavior, and verification. The HyperMail Figma file mirrors the repo for
-design QA: `https://www.figma.com/design/BmRFSlVeEDf2yJTMi4X1VI`.
+APIs, behavior, and verification. The HyperMail Figma project organizes the
+canonical design assets: `https://www.figma.com/files/project/595441469`.
+
+The HyperMail Figma file mirrors the repo for design QA:
+`https://www.figma.com/design/BmRFSlVeEDf2yJTMi4X1VI`.
 
 - Use `docs/design-system.md` before Figma-driven renderer work.
-- Treat the Linear community file as reference only; do not import its naming,
-  variables, or components as production authority.
+- Treat the Linear community design system file as component/state reference
+  only; do not import its naming, variables, or components as production
+  authority.
+- Treat the Linear UI file as interaction and product-craft reference only; do
+  not use its marketing pages or generic screen frames as HyperMail production
+  library components.
 - Fetch Figma design context and screenshot for the exact node being
   implemented, then translate the result into existing React/Tailwind/CSS
   patterns instead of pasting generated code.
@@ -83,6 +90,9 @@ design QA: `https://www.figma.com/design/BmRFSlVeEDf2yJTMi4X1VI`.
   `src/renderer/components/shell/`.
 - If a new repeated visual value is required, add the repo token first, then
   update the Figma variables and `docs/design-system.md` in the same PR.
+- Future visual PRs should compare local app screenshots against HyperMail-owned
+  Figma screens first. Use the original Linear files only to resolve missing
+  state coverage or craft details.
 - Keep visual PRs behavior-preserving unless the user explicitly asks for
   product behavior changes. Do not touch Electron, IPC, OAuth, Gmail, Dexie, or
   assistant runtime code for visual-only tranches.

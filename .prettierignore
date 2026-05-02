@@ -5,6 +5,7 @@ release
 build
 coverage
 _site
+.agents
 package-lock.json
 *.md
 CHANGELOG.md
