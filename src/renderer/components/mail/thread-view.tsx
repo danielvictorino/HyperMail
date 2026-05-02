@@ -1,16 +1,17 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import {
-  Archive,
-  ArchiveRestore,
-  Clock3,
-  LoaderCircle,
-  MailX,
-  Paperclip,
-  Reply,
-  Sparkles,
-  Star,
-  UserRound
-} from "lucide-react";
+  ArchiveIcon,
+  ChatBubbleIcon,
+  ClockIcon,
+  EnvelopeClosedIcon,
+  FileTextIcon,
+  MagicWandIcon,
+  PersonIcon,
+  ResetIcon,
+  StarFilledIcon,
+  StarIcon
+} from "@radix-ui/react-icons";
+import { LoaderCircle } from "lucide-react";
 import type { MailThreadSummary } from "@shared/ai/mail-assistant";
 import type {
   LocalMailAttachment,
@@ -134,7 +135,7 @@ export function ThreadView({
                 {thread.thread.split}
               </Badge>
               {thread.queueDepth > 0 ? (
-                <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
+                <Badge className="border-info/25 bg-info/10 text-info">
                   {thread.queueDepth} queued
                 </Badge>
               ) : null}
@@ -144,7 +145,7 @@ export function ThreadView({
                 </Badge>
               ) : null}
               {thread.waitingForReply ? (
-                <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
+                <Badge className="border-info/25 bg-info/10 text-info">
                   Waiting for reply
                 </Badge>
               ) : null}
@@ -155,20 +156,20 @@ export function ThreadView({
                 </Badge>
               ) : null}
               {activelySnoozed && thread.thread.snoozedUntil ? (
-                <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
+                <Badge className="border-info/25 bg-info/10 text-info">
                   Until {formatSnoozedUntil(thread.thread.snoozedUntil)}
                 </Badge>
               ) : null}
               {thread.thread.unsubscribedAt ? (
-                <Badge className="border-emerald-400/20 bg-emerald-400/10 text-emerald-100">
+                <Badge className="border-positive/25 bg-positive/10 text-positive">
                   Unsubscribed
                 </Badge>
               ) : null}
               <Badge
                 className={
                   effectiveOnline
-                    ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                    : "border-amber-400/20 bg-amber-400/10 text-amber-100"
+                    ? "border-positive/25 bg-positive/10 text-positive"
+                    : "border-warning/25 bg-warning/10 text-warning"
                 }
               >
                 {effectiveOnline ? "Syncing live" : "Offline hold"}
@@ -191,7 +192,7 @@ export function ThreadView({
                 isSummarizing ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Sparkles className="h-4 w-4" />
+                  <MagicWandIcon className="h-4 w-4" />
                 )
               }
               disabled={!assistantEnabled || isSummarizing}
@@ -201,7 +202,13 @@ export function ThreadView({
               label={thread.thread.starred ? "Unstar" : "Star"}
               hint="S"
               active={thread.thread.starred}
-              icon={<Star className="h-4 w-4" />}
+              icon={
+                thread.thread.starred ? (
+                  <StarFilledIcon className="h-4 w-4" />
+                ) : (
+                  <StarIcon className="h-4 w-4" />
+                )
+              }
               onClick={() => void onToggleStar(thread)}
             />
             <ActionButton
@@ -211,7 +218,7 @@ export function ThreadView({
                 isGeneratingDraft ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Reply className="h-4 w-4" />
+                  <ChatBubbleIcon className="h-4 w-4" />
                 )
               }
               disabled={!assistantEnabled || isGeneratingDraft}
@@ -220,7 +227,7 @@ export function ThreadView({
             <ActionButton
               label={activelySnoozed ? "Unsnooze" : "Snooze"}
               hint="Z"
-              icon={<Clock3 className="h-4 w-4" />}
+              icon={<ClockIcon className="h-4 w-4" />}
               onClick={() =>
                 void (activelySnoozed
                   ? onUnsnoozeThread(thread)
@@ -230,7 +237,7 @@ export function ThreadView({
             <ActionButton
               label={thread.thread.unsubscribedAt ? "Unsubscribed" : "Unsubscribe"}
               hint="U"
-              icon={<MailX className="h-4 w-4" />}
+              icon={<EnvelopeClosedIcon className="h-4 w-4" />}
               active={Boolean(thread.thread.unsubscribedAt)}
               disabled={!canUnsubscribe}
               onClick={() => void onUnsubscribeThread(thread)}
@@ -240,9 +247,9 @@ export function ThreadView({
               hint="E"
               icon={
                 thread.thread.archived ? (
-                  <ArchiveRestore className="h-4 w-4" />
+                  <ResetIcon className="h-4 w-4" />
                 ) : (
-                  <Archive className="h-4 w-4" />
+                  <ArchiveIcon className="h-4 w-4" />
                 )
               }
               onClick={() => void onToggleArchive(thread)}
@@ -250,7 +257,7 @@ export function ThreadView({
             <ActionButton
               label="Reply"
               hint="R"
-              icon={<Reply className="h-4 w-4" />}
+              icon={<ChatBubbleIcon className="h-4 w-4" />}
               onClick={onOpenComposer}
             />
           </div>
@@ -267,7 +274,7 @@ export function ThreadView({
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-black/15 text-muted">
-                    <UserRound className="h-4 w-4" />
+                    <PersonIcon className="h-4 w-4" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
@@ -277,7 +284,7 @@ export function ThreadView({
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted">
-                  <Clock3 className="h-3.5 w-3.5" />
+                  <ClockIcon className="h-3.5 w-3.5" />
                   <span>{formatLongDate(message.sentAt)}</span>
                   {message.deliveryState && message.deliveryState !== "sent" ? (
                     <Badge className="border-white/10 bg-white/[0.03] text-muted">
@@ -313,7 +320,7 @@ export function ThreadView({
                         {activeAttachmentId === attachment.id ? (
                           <LoaderCircle className="h-3.5 w-3.5 animate-spin text-accent" />
                         ) : (
-                          <Paperclip className="h-3.5 w-3.5 text-accent" />
+                          <FileTextIcon className="h-3.5 w-3.5 text-accent" />
                         )}
                         <span>{attachment.filename}</span>
                       </div>

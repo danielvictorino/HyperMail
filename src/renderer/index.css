@@ -4,26 +4,12 @@
 
 :root {
   color-scheme: dark;
-  --hm-bg: 7 10 11;
-  --hm-panel: 14 17 19;
-  --hm-panel-strong: 19 23 26;
-  --hm-surface: 24 29 32;
-  --hm-surface-muted: 32 38 42;
-  --hm-border: 148 163 184;
-  --hm-foreground: 238 242 244;
-  --hm-muted: 139 151 160;
-  --hm-accent: 45 212 191;
-  --hm-accent-soft: 20 184 166;
-  --hm-positive: 52 211 153;
-  --hm-warning: 251 191 36;
-  --hm-danger: 248 113 113;
-  --hm-info: 56 189 248;
   --hm-radius-panel: 8px;
   --hm-radius-control: 8px;
   --hm-radius-row: 8px;
-  --hm-shadow-shell: 0 18px 52px rgba(0, 0, 0, 0.34);
+  --hm-shadow-shell: 0 18px 52px rgba(0, 0, 0, 0.32);
   --hm-shadow-focus:
-    0 0 0 1px rgba(45, 212, 191, 0.48), 0 0 0 5px rgba(45, 212, 191, 0.12);
+    0 0 0 1px rgb(var(--hm-accent) / 0.5), 0 0 0 5px rgb(var(--hm-accent) / 0.12);
 }
 
 * {
@@ -40,8 +26,8 @@ body {
   margin: 0;
   font-family: Inter, sans-serif;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 18%),
-    linear-gradient(90deg, rgba(45, 212, 191, 0.045), transparent 30%),
+    linear-gradient(180deg, rgb(var(--hm-foreground) / 0.035), transparent 18%),
+    linear-gradient(90deg, rgb(var(--hm-accent) / 0.055), transparent 34%),
     rgb(var(--hm-bg));
   color: rgb(var(--hm-foreground));
   text-rendering: optimizeLegibility;
@@ -60,7 +46,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(45, 212, 191, 0.24);
+  background: rgb(var(--hm-accent) / 0.24);
 }
 
 ::-webkit-scrollbar {
@@ -81,7 +67,7 @@ textarea {
 
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: rgba(255, 255, 255, 0.34);
+  color: rgb(var(--hm-muted) / 0.72);
   float: left;
   height: 0;
   pointer-events: none;
@@ -157,6 +143,7 @@ textarea {
     height: 32px;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     border-radius: 6px;
     border: 1px solid transparent;
     padding: 0 10px;

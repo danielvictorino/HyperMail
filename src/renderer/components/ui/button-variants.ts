@@ -5,10 +5,12 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "border-accent/60 bg-accent text-slate-950 hover:brightness-110",
-        secondary: "border-white/10 bg-white/5 text-foreground hover:bg-white/10",
+        primary:
+          "border-accent/[0.65] bg-accent text-background shadow-[inset_0_1px_0_rgb(255_255_255/0.22)] hover:brightness-110",
+        secondary:
+          "border-border/[0.45] bg-surface-muted/[0.48] text-foreground hover:border-border/70 hover:bg-surface-muted/70",
         ghost:
-          "border-transparent bg-transparent text-muted hover:border-white/10 hover:bg-white/5 hover:text-foreground"
+          "border-transparent bg-transparent text-muted hover:border-border/[0.45] hover:bg-surface-muted/[0.45] hover:text-foreground"
       },
       size: {
         sm: "h-9 px-3.5",

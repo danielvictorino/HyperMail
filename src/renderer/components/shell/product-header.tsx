@@ -1,4 +1,10 @@
-import { Command, Mail, Reply, Wifi, WifiOff } from "lucide-react";
+import {
+  ChatBubbleIcon,
+  CircleBackslashIcon,
+  EnvelopeClosedIcon,
+  GlobeIcon,
+  KeyboardIcon
+} from "@radix-ui/react-icons";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -44,7 +50,7 @@ export function ProductHeader({
       ? "Composer open"
       : "Reply"
     : "Command";
-  const PrimaryIcon = selectedThreadSubject ? Reply : Command;
+  const PrimaryIcon = selectedThreadSubject ? ChatBubbleIcon : KeyboardIcon;
 
   return (
     <header className="border-b border-white/10 px-5 py-4">
@@ -70,7 +76,7 @@ export function ProductHeader({
         <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
           <div className="hm-section flex w-[280px] flex-none items-center gap-3 px-3 py-2">
             <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-accent/25 bg-accent/10 text-accent">
-              <Mail className="h-4 w-4" />
+              <EnvelopeClosedIcon className="h-4 w-4" />
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-foreground">
@@ -87,14 +93,14 @@ export function ProductHeader({
             <Badge
               className={
                 effectiveOnline
-                  ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                  : "border-amber-400/20 bg-amber-400/10 text-amber-100"
+                  ? "border-positive/25 bg-positive/10 text-positive"
+                  : "border-warning/25 bg-warning/10 text-warning"
               }
             >
               {effectiveOnline ? (
-                <Wifi className="mr-1 h-3 w-3" />
+                <GlobeIcon className="mr-1 h-3 w-3" />
               ) : (
-                <WifiOff className="mr-1 h-3 w-3" />
+                <CircleBackslashIcon className="mr-1 h-3 w-3" />
               )}
               {effectiveOnline ? "Online" : "Offline"}
             </Badge>
@@ -127,7 +133,7 @@ export function ProductHeader({
             className="hidden shrink-0 gap-2 border border-white/10 bg-white/[0.03] 2xl:inline-flex"
             onClick={onOpenPalette}
           >
-            <Command className="h-4 w-4" />
+            <KeyboardIcon className="h-4 w-4" />
             {commandHint}
           </Button>
         </div>

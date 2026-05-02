@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+import { GearIcon, MagicWandIcon, PersonIcon, ReaderIcon } from "@radix-ui/react-icons";
 import {
   Bug,
   CalendarClock,
@@ -38,11 +40,15 @@ import { Button } from "../ui/button";
 
 type RailTabId = "brief" | "intel" | "system" | "ai";
 
-const railTabs: Array<{ id: RailTabId; label: string }> = [
-  { id: "brief", label: "Brief" },
-  { id: "intel", label: "Intel" },
-  { id: "system", label: "System" },
-  { id: "ai", label: "AI" }
+const railTabs: Array<{
+  id: RailTabId;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+}> = [
+  { id: "brief", label: "Brief", icon: ReaderIcon },
+  { id: "intel", label: "Intel", icon: PersonIcon },
+  { id: "system", label: "System", icon: GearIcon },
+  { id: "ai", label: "AI", icon: MagicWandIcon }
 ];
 
 interface ContextRailProps {
@@ -160,8 +166,8 @@ export function ContextRail({
           <Badge
             className={
               effectiveOnline
-                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                : "border-amber-400/20 bg-amber-400/10 text-amber-100"
+                ? "border-positive/25 bg-positive/10 text-positive"
+                : "border-warning/25 bg-warning/10 text-warning"
             }
           >
             {effectiveOnline ? (
@@ -181,6 +187,7 @@ export function ContextRail({
       >
         {railTabs.map((tab) => {
           const active = activeTab === tab.id;
+          const TabIcon = tab.icon;
 
           return (
             <button
@@ -191,6 +198,7 @@ export function ContextRail({
               className={cn("hm-tab", active ? "hm-tab-active" : "")}
               onClick={() => setActiveTab(tab.id)}
             >
+              <TabIcon className="h-3.5 w-3.5" />
               {tab.label}
             </button>
           );
@@ -207,8 +215,8 @@ export function ContextRail({
                   <Badge
                     className={
                       effectiveOnline
-                        ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                        : "border-amber-400/20 bg-amber-400/10 text-amber-100"
+                        ? "border-positive/25 bg-positive/10 text-positive"
+                        : "border-warning/25 bg-warning/10 text-warning"
                     }
                   >
                     {effectiveOnline ? (
