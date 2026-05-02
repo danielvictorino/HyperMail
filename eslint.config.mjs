@@ -14,7 +14,8 @@ export default tseslint.config(
       "release/**",
       "build/**",
       "coverage/**",
-      "_site/**"
+      "_site/**",
+      ".agents/**"
     ]
   },
   js.configs.recommended,

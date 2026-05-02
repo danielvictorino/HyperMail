@@ -12,7 +12,7 @@ function toRgbChannel(value: string): string {
   ].join(" ");
 }
 
-const linearHypermailTokens: Record<string, string> = {
+const hypermailTokens: Record<string, string> = {
   "--hm-bg": toRgbChannel("#050614"),
   "--hm-panel": toRgbChannel("#0b0d1a"),
   "--hm-panel-strong": toRgbChannel("#101322"),
@@ -71,7 +71,7 @@ const config: Config = {
   plugins: [
     plugin(({ addBase }) => {
       addBase({
-        ":root": linearHypermailTokens
+        ":root": hypermailTokens
       });
     })
   ]

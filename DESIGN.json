@@ -1,0 +1,427 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-02T15:59:08Z",
+  "title": "Design System: HyperMail",
+  "extensions": {
+    "colorMeta": {
+      "void-bg": {
+        "role": "neutral",
+        "displayName": "Void Background",
+        "canonical": "#050614",
+        "source": "--hm-bg",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "ink-panel": {
+        "role": "neutral",
+        "displayName": "Ink Panel",
+        "canonical": "#0b0d1a",
+        "source": "--hm-panel",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "raised-panel": {
+        "role": "neutral",
+        "displayName": "Raised Panel",
+        "canonical": "#101322",
+        "source": "--hm-panel-strong",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "work-surface": {
+        "role": "neutral",
+        "displayName": "Work Surface",
+        "canonical": "#171a2b",
+        "source": "--hm-surface",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "muted-surface": {
+        "role": "neutral",
+        "displayName": "Muted Surface",
+        "canonical": "#202438",
+        "source": "--hm-surface-muted",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "canonical": "#f7f8f8",
+        "source": "--hm-foreground",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "muted-text": {
+        "role": "neutral",
+        "displayName": "Muted Text",
+        "canonical": "#b4bcd0",
+        "source": "--hm-muted",
+        "tonalRamp": [
+          "#050614",
+          "#0b0d1a",
+          "#101322",
+          "#171a2b",
+          "#202438",
+          "#596076",
+          "#b4bcd0",
+          "#f7f8f8"
+        ]
+      },
+      "command-violet": {
+        "role": "primary",
+        "displayName": "Command Violet",
+        "canonical": "#673fd7",
+        "source": "--hm-accent",
+        "tonalRamp": [
+          "#120a2d",
+          "#25125d",
+          "#38208a",
+          "#4b2fb7",
+          "#673fd7",
+          "#8462f4",
+          "#b9a6ff",
+          "#ede7ff"
+        ]
+      },
+      "signal-blue": {
+        "role": "primary",
+        "displayName": "Signal Blue",
+        "canonical": "#455eb5",
+        "source": "--hm-accent-soft",
+        "tonalRamp": [
+          "#081230",
+          "#142456",
+          "#25387b",
+          "#334aa0",
+          "#455eb5",
+          "#7288dc",
+          "#aebcf5",
+          "#edf1ff"
+        ]
+      },
+      "positive": {
+        "role": "status",
+        "displayName": "Positive Green",
+        "canonical": "#4dab76",
+        "source": "--hm-positive",
+        "tonalRamp": [
+          "#071f13",
+          "#123a25",
+          "#1f5738",
+          "#32794f",
+          "#4dab76",
+          "#7dcea0",
+          "#b8e7cb",
+          "#ecfbf1"
+        ]
+      },
+      "warning": {
+        "role": "status",
+        "displayName": "Warning Amber",
+        "canonical": "#e6a94c",
+        "source": "--hm-warning",
+        "tonalRamp": [
+          "#2a1700",
+          "#593000",
+          "#8a4c0b",
+          "#b97825",
+          "#e6a94c",
+          "#f1c77e",
+          "#f8deb1",
+          "#fff7e8"
+        ]
+      },
+      "danger": {
+        "role": "status",
+        "displayName": "Danger Red",
+        "canonical": "#ef5d5d",
+        "source": "--hm-danger",
+        "tonalRamp": [
+          "#310707",
+          "#601313",
+          "#902424",
+          "#bf3c3c",
+          "#ef5d5d",
+          "#ff8d8d",
+          "#ffc1c1",
+          "#fff0f0"
+        ]
+      },
+      "info": {
+        "role": "status",
+        "displayName": "Info Blue",
+        "canonical": "#63b3ed",
+        "source": "--hm-info",
+        "tonalRamp": [
+          "#071b2d",
+          "#12385a",
+          "#215985",
+          "#367fb3",
+          "#63b3ed",
+          "#92cdf6",
+          "#c2e6fb",
+          "#eff9ff"
+        ]
+      },
+      "vip": {
+        "role": "status",
+        "displayName": "VIP Pink",
+        "canonical": "#e76bb0",
+        "source": "--hm-vip",
+        "tonalRamp": [
+          "#2c071b",
+          "#5a1439",
+          "#882658",
+          "#ba3f7d",
+          "#e76bb0",
+          "#f49acc",
+          "#fac7e2",
+          "#fff0f8"
+        ]
+      },
+      "ai": {
+        "role": "status",
+        "displayName": "AI Violet",
+        "canonical": "#8462f4",
+        "source": "--hm-ai",
+        "tonalRamp": [
+          "#13082f",
+          "#281063",
+          "#3e2196",
+          "#5d3bd0",
+          "#8462f4",
+          "#a892ff",
+          "#cec2ff",
+          "#f2eeff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "OAuth setup and rare onboarding headlines only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Mailbox titles, thread counts, and active workspace labels."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Product identity, account names, card titles, and selected-thread controls."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Thread snippets, descriptions, metrics, and rail content."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Badges, shortcuts, timestamps, section labels, and compact state."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shell",
+        "value": "0 24px 80px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.04) inset",
+        "purpose": "Outer app frame and major floating panels."
+      },
+      {
+        "name": "command",
+        "value": "0 7px 32px rgba(0, 0, 0, 0.35)",
+        "purpose": "Command palette and keyboard-first overlays."
+      },
+      {
+        "name": "focus",
+        "value": "0 0 0 1px rgb(var(--hm-accent) / 0.55), 0 0 0 4px rgb(var(--hm-accent) / 0.13)",
+        "purpose": "Keyboard focus and active controls."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-hyper",
+        "value": "cubic-bezier(0.2, 0.9, 0.2, 1)",
+        "purpose": "Default state transition easing for dense controls."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Hover, active, tab, and row transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Command-gradient action button for primary workflow moves.",
+      "html": "<button class=\"ds-btn-primary\">Queue send</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08); background: linear-gradient(97deg, #455eb5 9%, #5643cc 44%, #673fd7 65%); color: #f7f8f8; font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 18px rgba(47, 35, 120, 0.22); transition: filter 150ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 150ms cubic-bezier(0.2, 0.9, 0.2, 1); } .ds-btn-primary:hover { filter: brightness(1.1); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(103, 63, 215, 0.55), 0 0 0 4px rgba(103, 63, 215, 0.13); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Low-emphasis action button for secondary controls and safe alternatives.",
+      "html": "<button class=\"ds-btn-secondary\">Sync now</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.10); background: rgba(247, 248, 248, 0.06); color: #f7f8f8; font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0; transition: background 150ms cubic-bezier(0.2, 0.9, 0.2, 1), border-color 150ms cubic-bezier(0.2, 0.9, 0.2, 1); } .ds-btn-secondary:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(247, 248, 248, 0.09); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(103, 63, 215, 0.55), 0 0 0 4px rgba(103, 63, 215, 0.13); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-status",
+      "description": "Compact semantic pill for queue, sync, provider, mailbox, and AI state.",
+      "html": "<span class=\"ds-badge-status\">Live</span>",
+      "css": ".ds-badge-status { display: inline-flex; align-items: center; min-height: 22px; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(77, 171, 118, 0.25); background: rgba(77, 171, 118, 0.10); color: #4dab76; font-family: Inter, sans-serif; font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: 0; }"
+    },
+    {
+      "name": "Input Shell",
+      "kind": "input",
+      "refersTo": "input-shell",
+      "description": "Embedded search or command field for cached mail and palette entry.",
+      "html": "<label class=\"ds-input-shell\"><span>Search</span><input placeholder=\"Search cached mail\" /></label>",
+      "css": ".ds-input-shell { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.10); background: rgba(32, 36, 56, 0.34); box-shadow: 0 1px 0 rgba(247, 248, 248, 0.03) inset; color: #b4bcd0; font-family: Inter, sans-serif; font-size: 13px; letter-spacing: 0; } .ds-input-shell input { width: 100%; border: 0; outline: 0; background: transparent; color: #f7f8f8; font: inherit; } .ds-input-shell input::placeholder { color: #b4bcd0; } .ds-input-shell:focus-within { box-shadow: 0 0 0 1px rgba(103, 63, 215, 0.55), 0 0 0 4px rgba(103, 63, 215, 0.13); }"
+    },
+    {
+      "name": "Thread Row Selected",
+      "kind": "custom",
+      "refersTo": "thread-row-selected",
+      "description": "Selected mailbox row with accent wash, inset command marker, and dense message metadata.",
+      "html": "<button class=\"ds-thread-row\"><span class=\"ds-thread-from\">Avery Chen</span><span class=\"ds-thread-time\">10:42</span><strong>Partnership follow-up</strong><p>Can you send the revised agreement and confirm the timeline?</p></button>",
+      "css": ".ds-thread-row { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: linear-gradient(90deg, rgba(69, 94, 181, 0.18), transparent 68%), rgba(32, 36, 56, 0.50); box-shadow: inset 2px 0 0 #673fd7; color: #f7f8f8; font-family: Inter, sans-serif; text-align: left; letter-spacing: 0; } .ds-thread-row strong { grid-column: 1 / -1; font-size: 14px; font-weight: 500; } .ds-thread-row p { grid-column: 1 / -1; margin: 0; color: #b4bcd0; font-size: 14px; line-height: 1.45; } .ds-thread-from { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; } .ds-thread-time { color: #b4bcd0; font-size: 11px; text-transform: uppercase; }"
+    },
+    {
+      "name": "Command Palette",
+      "kind": "custom",
+      "refersTo": "command-palette",
+      "description": "Signature keyboard overlay for command search and direct action execution.",
+      "html": "<div class=\"ds-command-palette\"><div class=\"ds-command-label\">HyperMail command line</div><div class=\"ds-command-input\">Type a command or search...</div><div class=\"ds-command-row\">Reply<span>R</span></div></div>",
+      "css": ".ds-command-palette { width: 704px; max-width: calc(100vw - 32px); overflow: hidden; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.10); background: linear-gradient(180deg, rgba(247, 248, 248, 0.07), transparent 112px), rgba(16, 19, 34, 0.94); box-shadow: 0 7px 32px rgba(0, 0, 0, 0.35); color: #f7f8f8; font-family: Inter, sans-serif; letter-spacing: 0; } .ds-command-label { display: inline-flex; height: 24px; align-items: center; margin: 12px 16px; padding: 0 8px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); color: #b4bcd0; font-size: 12px; } .ds-command-input { padding: 0 16px 16px; color: #b4bcd0; font-size: 18px; } .ds-command-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.13); font-size: 14px; font-weight: 500; } .ds-command-row span { display: inline-flex; min-width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 5px; border: 1px solid rgba(255, 255, 255, 0.10); background: rgba(247, 248, 248, 0.05); color: #b4bcd0; font-size: 11px; }"
+    },
+    {
+      "name": "Navigation Row",
+      "kind": "nav",
+      "refersTo": "nav-row",
+      "description": "Sidebar mailbox row with icon, label, count, and compact active state.",
+      "html": "<button class=\"ds-nav-row\"><span>Inbox</span><strong>42</strong></button>",
+      "css": ".ds-nav-row { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 36px; padding: 8px 10px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, 0.08); box-shadow: inset 2px 0 0 #673fd7; color: #f7f8f8; font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0; } .ds-nav-row strong { border-radius: 999px; background: rgba(103, 63, 215, 0.15); color: #673fd7; padding: 2px 8px; font-size: 10px; font-weight: 600; } .ds-nav-row:hover { background: rgba(255, 255, 255, 0.10); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Inbox Flight Deck",
+    "overview": "HyperMail is a dense desktop control surface for people who operate from their inbox. The interface should feel like a quiet flight deck: dark enough for long sessions, bright enough to read at speed, and structured enough that every status signal has a place. The system uses a restrained dark palette, compact Inter typography, tight radius values, and layered panels to separate navigation, thread work, and context without turning the app into a pile of cards.",
+    "keyCharacteristics": [
+      "Dense but calm desktop information architecture.",
+      "Keyboard-first actions with visible shortcut affordances.",
+      "Local-first trust signals for offline, queue, sync, and provider state.",
+      "Restrained dark theme with violet-blue command emphasis.",
+      "Flat tonal layering first, ambient shadow only for shell and command focus."
+    ],
+    "rules": [
+      {
+        "name": "The Command Accent Rule",
+        "body": "Violet is reserved for focus, selected state, primary action, and AI affordance. If every panel uses violet, nothing is important.",
+        "section": "colors"
+      },
+      {
+        "name": "The Status Color Rule",
+        "body": "Green, amber, red, blue, pink, and AI violet belong to mailbox or runtime semantics. Do not use them as arbitrary decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dense Type Rule",
+        "body": "Product chrome stays in the 11px to 15px range unless a screen is onboarding or authentication. Do not use hero-scale type inside the mail shell.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Letterspacing Rule",
+        "body": "Letter spacing is zero by default. Avoid stretched uppercase labels unless the surrounding UI already uses that exact pattern.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Layer Rule",
+        "body": "Prefer panel tint and 1px alpha borders before adding shadow. If a row needs depth, it probably needs clearer hierarchy instead.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Blur Discipline Rule",
+        "body": "Backdrop blur is allowed for the app frame, command surface, and existing panel primitives. Do not introduce decorative glass cards.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the existing `--hm-*` CSS variables and Tailwind token aliases before introducing new visual values.",
+      "Do keep product shell typography compact and scannable.",
+      "Do make queue, sync, offline, provider, and AI status visible when those states affect user trust.",
+      "Do use semantic status colors only for actual mailbox or runtime meaning.",
+      "Do preserve keyboard affordances with visible shortcut hints and focus states."
+    ],
+    "donts": [
+      "Don't use generic SaaS hero UI with oversized marketing claims, decorative stat blocks, or productivity cliches.",
+      "Don't create decorative card-heavy layouts where every concept is framed inside another box.",
+      "Don't use glassmorphism as a default aesthetic. Blur must support shell depth or command focus.",
+      "Don't add noisy consumer-mail chrome, playful gradients, social feed patterns, or advertising-style hierarchy.",
+      "Don't use vague AI-assistant aesthetics where sparkles and purple glow replace clear workflow value.",
+      "Don't hide queue, sync, offline, provider, or AI state when it affects user trust.",
+      "Don't use `border-left` or `border-right` wider than 1px as a decorative stripe on cards, rows, callouts, or alerts."
+    ]
+  }
+}
