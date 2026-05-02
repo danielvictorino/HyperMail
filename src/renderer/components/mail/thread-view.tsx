@@ -175,7 +175,7 @@ export function ThreadView({
               </Badge>
             </div>
 
-            <h2 className="text-[27px] font-semibold tracking-hyper text-foreground">
+            <h2 className="text-[27px] font-semibold text-foreground">
               {thread.thread.subject}
             </h2>
             <p className="text-sm text-muted">

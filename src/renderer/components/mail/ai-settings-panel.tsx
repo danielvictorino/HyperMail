@@ -224,9 +224,7 @@ export function AiSettingsPanel({
 
         <div className="mt-3 grid gap-3">
           <label className="grid gap-2">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted">
-              Model
-            </span>
+            <span className="text-[11px] uppercase text-muted">Model</span>
             <select
               value={options.includes(config.model) ? config.model : "__custom__"}
               onChange={(event) => {
@@ -258,9 +256,7 @@ export function AiSettingsPanel({
 
           {provider !== "ollama" ? (
             <label className="grid gap-2">
-              <span className="text-[11px] uppercase tracking-[0.18em] text-muted">
-                API key
-              </span>
+              <span className="text-[11px] uppercase text-muted">API key</span>
               <input
                 type="password"
                 value={config.apiKey ?? ""}
@@ -302,9 +298,7 @@ export function AiSettingsPanel({
           {provider === "ollama" ? (
             <>
               <label className="grid gap-2">
-                <span className="text-[11px] uppercase tracking-[0.18em] text-muted">
-                  Base URL
-                </span>
+                <span className="text-[11px] uppercase text-muted">Base URL</span>
                 <input
                   type="text"
                   value={config.baseUrl ?? ""}
@@ -359,9 +353,7 @@ export function AiSettingsPanel({
           ) : null}
 
           <label className="grid gap-2">
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted">
-              Preset
-            </span>
+            <span className="text-[11px] uppercase text-muted">Preset</span>
             <select
               value={config.presetId ?? "balanced"}
               onChange={(event) =>
@@ -429,9 +421,7 @@ export function AiSettingsPanel({
 
       <div className="grid gap-3">
         <label className="grid gap-2">
-          <span className="text-[11px] uppercase tracking-[0.18em] text-muted">
-            Primary provider
-          </span>
+          <span className="text-[11px] uppercase text-muted">Primary provider</span>
           <select
             value={draft.primaryProvider}
             onChange={(event) =>
@@ -448,9 +438,7 @@ export function AiSettingsPanel({
         </label>
 
         <label className="grid gap-2">
-          <span className="text-[11px] uppercase tracking-[0.18em] text-muted">
-            Fallback provider
-          </span>
+          <span className="text-[11px] uppercase text-muted">Fallback provider</span>
           <select
             value={draft.fallbackProvider ?? "none"}
             onChange={(event) => updateFallbackProvider(event.target.value)}

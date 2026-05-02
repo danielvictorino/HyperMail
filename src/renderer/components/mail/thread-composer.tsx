@@ -225,9 +225,7 @@ export function ThreadComposer({
             </Badge>
           </div>
           <div className="mt-3 rounded-2xl border border-white/10 bg-black/10 px-3 py-2">
-            <label className="text-[11px] uppercase tracking-[0.18em] text-muted">
-              Schedule
-            </label>
+            <label className="text-[11px] uppercase text-muted">Schedule</label>
             <input
               value={scheduleInput}
               onChange={(event) => setScheduleInput(event.target.value)}

@@ -75,9 +75,7 @@ export function MailSidebar({
             />
           </div>
           <div>
-            <p className="text-lg font-semibold tracking-hyper text-foreground">
-              HyperMail
-            </p>
+            <p className="text-lg font-semibold text-foreground">HyperMail</p>
             <p className="text-sm text-muted">Desktop alpha · v{appVersion}</p>
           </div>
         </div>
@@ -140,7 +138,7 @@ export function MailSidebar({
                 </div>
                 <div className="flex items-center gap-2">
                   {item.unreadCount > 0 ? (
-                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
+                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
                       {item.unreadCount}
                     </span>
                   ) : null}

@@ -5,7 +5,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return (
     <div
       className={cn(
-        "relative isolate rounded-3xl border border-white/10 bg-panel/80 shadow-[0_28px_90px_rgba(0,0,0,0.34)] backdrop-blur-xl before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-white/[0.03] before:content-['']",
+        "relative isolate rounded-lg border border-white/10 bg-panel/80 shadow-shell backdrop-blur-xl before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-white/[0.03] before:content-['']",
         className
       )}
       {...props}
@@ -25,10 +25,7 @@ export function CardTitle({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3
-      className={cn("text-lg font-semibold tracking-hyper text-foreground", className)}
-      {...props}
-    />
+    <h3 className={cn("text-lg font-semibold text-foreground", className)} {...props} />
   );
 }
 

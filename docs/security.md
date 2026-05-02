@@ -53,9 +53,12 @@ We explicitly do **not** target defense against a local attacker with code execu
 - Disabled unless `HYPERMAIL_UPDATES_URL` is set **and** the app is packaged **and** the platform is Windows.
 - Channel read from `HYPERMAIL_UPDATE_CHANNEL` (defaults to `latest`). Use a staging channel during QA.
 
+### Release artifacts
+- Production builds still emit hidden source maps for local debugging and crash-symbolication workflows.
+- Packaged app artifacts exclude `*.map` files from `app.asar`; upload source maps to a private crash-symbolication store instead of distributing them with update assets.
+
 ## What's *not* yet hardened
 
-- Source maps are `"hidden"` in prod. If you ship the `dist/` directory to an update server, do **not** also ship the `.map` files. Upload them to the crash reporter instead.
 - Packaged release smoke testing now exists in CI, but it only validates Windows startup and the observability log line. It does not exercise OAuth, Gmail sync, or updater install/restart flows.
 - `exactOptionalPropertyTypes` is not enabled because it tends to cascade; revisit when we add a contracts audit task.
 

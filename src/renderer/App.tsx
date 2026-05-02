@@ -32,6 +32,14 @@ export default function App() {
               minute: "2-digit"
             })}`
           : "Awaiting Gmail sync";
+  const workspaceLabel = mailbox.isDemo
+    ? "Offline-first demo"
+    : auth.session?.provider === "microsoft"
+      ? "Microsoft workspace"
+      : "Gmail workspace";
+  const headerTitle = mailbox.isSearching
+    ? "Search cached mail"
+    : `${mailbox.sectionLabel} triage`;
   const commandPalette = useCommandPalette({
     authSession: auth.session,
     connectGmail: auth.connectGoogle,
@@ -93,11 +101,9 @@ export default function App() {
           <main className="flex h-full min-h-0 flex-col">
             <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.22em] text-muted">
-                  Step 15 release hardening
-                </p>
-                <h1 className="mt-1 text-[28px] font-semibold tracking-hyper text-foreground">
-                  Packaged Gmail smoke tests and release ops
+                <p className="text-[11px] uppercase text-muted">{workspaceLabel}</p>
+                <h1 className="mt-1 text-[28px] font-semibold text-foreground">
+                  {headerTitle}
                 </h1>
               </div>
               <div className="flex items-center gap-3">

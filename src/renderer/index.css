@@ -36,7 +36,7 @@ body {
   color: rgb(var(--hm-foreground));
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.013em;
+  letter-spacing: 0;
   font-feature-settings:
     "cv11" 1,
     "ss01" 1,
