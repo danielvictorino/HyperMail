@@ -24,5 +24,7 @@ describe("AppShell", () => {
     expect(view.container.textContent).toContain("Mailbox pane");
     expect(view.container.textContent).toContain("Context rail");
     expect(view.container.querySelector(".hm-app-frame")).not.toBeNull();
+    expect(view.container.querySelector(".hm-linear-sidebar")).not.toBeNull();
+    expect(view.container.querySelector(".hm-linear-content")).not.toBeNull();
   });
 });

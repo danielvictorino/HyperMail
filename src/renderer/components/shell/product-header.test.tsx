@@ -36,6 +36,7 @@ describe("ProductHeader", () => {
     expect(view.container.textContent).toContain("daniel@example.com");
     expect(view.container.textContent).toContain("Gmail");
     expect(view.container.textContent).toContain("Important triage");
+    expect(view.container.querySelector(".hm-linear-topbar")).not.toBeNull();
 
     await clickElement(findButton(view.container, "Reply"));
 
