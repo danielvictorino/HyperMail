@@ -22,6 +22,7 @@ title: HyperMail
 ## Docs
 
 - [Security model](security.md) — threat model, hardening inventory, known gaps
+- [Dependency cadence](dependency-cadence.md) — dependency upgrade buckets and verification gates
 - [Smoke test checklist](smoke-test-checklist.md) — runtime verification before tagging a release
 - [Release notes](release-notes/)
 
