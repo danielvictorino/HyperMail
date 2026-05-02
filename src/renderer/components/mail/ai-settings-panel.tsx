@@ -188,7 +188,7 @@ export function AiSettingsPanel({
       <div
         key={provider}
         className={cn(
-          "rounded-xl border px-3 py-3",
+          "rounded-lg border px-3 py-3",
           isPrimary || isFallback
             ? "border-accent/25 bg-accent/5"
             : "border-white/10 bg-black/10"
@@ -234,7 +234,7 @@ export function AiSettingsPanel({
 
                 updateProviderField(provider, "model", event.target.value);
               }}
-              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
+              className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
             >
               {options.map((option) => (
                 <option key={option} value={option}>
@@ -250,7 +250,7 @@ export function AiSettingsPanel({
                 updateProviderField(provider, "model", event.target.value)
               }
               placeholder="Enter a model id"
-              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-accent/40"
+              className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-accent/40"
             />
           </label>
 
@@ -269,7 +269,7 @@ export function AiSettingsPanel({
                     ? "Stored key will be kept unless replaced"
                     : "Paste API key"
                 }
-                className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-accent/40"
+                className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-accent/40"
               />
               <div className="flex items-center justify-between gap-3 text-xs text-muted">
                 <span>
@@ -306,7 +306,7 @@ export function AiSettingsPanel({
                     updateProviderField(provider, "baseUrl", event.target.value)
                   }
                   placeholder="http://127.0.0.1:11434"
-                  className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-accent/40"
+                  className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-accent/40"
                 />
               </label>
               <div className="flex flex-col gap-2">
@@ -338,7 +338,7 @@ export function AiSettingsPanel({
 
                       updateProviderField(provider, "model", event.target.value);
                     }}
-                    className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
+                    className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
                   >
                     {ollamaModelOptions.map((option) => (
                       <option key={option} value={option}>
@@ -363,7 +363,7 @@ export function AiSettingsPanel({
                   event.target.value as "balanced" | "quality" | "fast" | "cheap"
                 )
               }
-              className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
+              className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
             >
               <option value="balanced">balanced</option>
               <option value="quality">quality</option>
@@ -413,7 +413,7 @@ export function AiSettingsPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <div className="hm-rail-section">
       <div className="mb-3 flex items-center gap-2">
         <PlugZap className="h-4 w-4 text-accent" />
         <p className="text-sm font-medium text-foreground">AI providers</p>
@@ -457,7 +457,7 @@ export function AiSettingsPanel({
           </select>
         </label>
 
-        <div className="grid gap-2 rounded-xl border border-white/10 bg-black/10 px-3 py-3 text-xs text-muted">
+        <div className="hm-list-surface grid gap-2 px-3 py-3 text-xs text-muted">
           <div className="flex items-center justify-between gap-3">
             <span>Selected route</span>
             <span className="font-medium text-foreground">

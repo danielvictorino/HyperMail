@@ -224,7 +224,7 @@ export function ThreadComposer({
               Natural language send later
             </Badge>
           </div>
-          <div className="mt-3 rounded-2xl border border-white/10 bg-black/10 px-3 py-2">
+          <div className="hm-input-shell mt-3 px-3 py-2">
             <label className="text-[11px] uppercase text-muted">Schedule</label>
             <input
               value={scheduleInput}

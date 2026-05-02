@@ -1,9 +1,26 @@
 import path from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { buildContentSecurityPolicy } from "./src/shared/content-security-policy";
+
+const devServerUrl = "http://127.0.0.1:5173";
+
+function hypermailCspMeta(): Plugin {
+  return {
+    name: "hypermail-csp-meta",
+    transformIndexHtml(html, context) {
+      const csp = buildContentSecurityPolicy({
+        devServerUrl: context.server ? devServerUrl : undefined,
+        includeFrameAncestors: false
+      });
+
+      return html.replace("%HYPERMAIL_CSP%", csp);
+    }
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [hypermailCspMeta(), react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src/renderer"),

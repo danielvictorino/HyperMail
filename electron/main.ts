@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { app, BrowserWindow, ipcMain, nativeTheme, session, shell } from "electron";
+import { buildContentSecurityPolicy } from "../src/shared/content-security-policy";
 import {
   cachedAttachmentPayloadSchema,
   downloadGmailAttachmentRequestSchema,
@@ -71,26 +72,10 @@ import {
 
 let mainWindow: BrowserWindow | null = null;
 
-function buildContentSecurityPolicy(): string {
-  const devServerUrl = process.env.VITE_DEV_SERVER_URL;
-  const devConnect = devServerUrl ? ` ${devServerUrl} ws://127.0.0.1:5173` : "";
-  const devScript = devServerUrl ? ` ${devServerUrl} 'unsafe-eval'` : "";
-  return [
-    "default-src 'self'",
-    `script-src 'self'${devScript}`,
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
-    "font-src 'self' data:",
-    `connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://gmail.googleapis.com https://graph.microsoft.com https://login.microsoftonline.com https://api.openai.com https://api.anthropic.com http://127.0.0.1:11434 http://localhost:11434${devConnect}`,
-    "frame-ancestors 'none'",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'none'"
-  ].join("; ");
-}
-
 function installContentSecurityPolicy(): void {
-  const policy = buildContentSecurityPolicy();
+  const policy = buildContentSecurityPolicy({
+    devServerUrl: process.env.VITE_DEV_SERVER_URL
+  });
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
@@ -176,6 +161,10 @@ async function createMainWindow(): Promise<void> {
   });
   attachWindowObservability(mainWindow);
 
+  mainWindow.once("ready-to-show", () => {
+    mainWindow?.show();
+  });
+
   const devServerUrl = process.env.VITE_DEV_SERVER_URL;
 
   if (devServerUrl) {
@@ -184,9 +173,9 @@ async function createMainWindow(): Promise<void> {
     await mainWindow.loadFile(path.join(app.getAppPath(), "dist", "index.html"));
   }
 
-  mainWindow.once("ready-to-show", () => {
-    mainWindow?.show();
-  });
+  if (!mainWindow.isVisible()) {
+    mainWindow.show();
+  }
 }
 
 function registerIpcHandlers(): void {
