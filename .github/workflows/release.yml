@@ -51,6 +51,47 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --win --x64 --publish=never
 
+      - name: Smoke test packaged app startup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $exe = Resolve-Path "release/win-unpacked/HyperMail.exe"
+          $logPath = Join-Path $env:APPDATA "HyperMail\logs\main.log"
+          $process = Start-Process -FilePath $exe -PassThru
+
+          try {
+            $deadline = (Get-Date).AddSeconds(20)
+            $ready = $false
+
+            while ((Get-Date) -lt $deadline) {
+              if ($process.HasExited) {
+                throw "HyperMail exited during startup with code $($process.ExitCode)."
+              }
+
+              if (Test-Path $logPath) {
+                $log = Get-Content -LiteralPath $logPath -Raw -ErrorAction SilentlyContinue
+                if ($log -match "HyperMail observability ready") {
+                  $ready = $true
+                  break
+                }
+              }
+
+              Start-Sleep -Seconds 1
+              $process.Refresh()
+            }
+
+            if (-not $ready) {
+              throw "HyperMail did not write the startup readiness log within 20 seconds."
+            }
+
+            Write-Host "Packaged app startup smoke test passed."
+          }
+          finally {
+            if (-not $process.HasExited) {
+              Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+            }
+          }
+
       - name: Generate SHA256 checksums
         shell: pwsh
         run: |

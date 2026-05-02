@@ -72,7 +72,7 @@ export function CommandPalette({
           ) : (
             groupedCommands.map((group) => (
               <div key={group.group} className="mb-3 last:mb-0">
-                <p className="px-3 py-2 text-[11px] uppercase tracking-[0.2em] text-muted">
+                <p className="px-3 py-2 text-[11px] uppercase text-muted">
                   {group.group}
                 </p>
                 <div className="space-y-1">

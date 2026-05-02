@@ -76,10 +76,8 @@ export function VirtualThreadList({
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-muted">
-              {sectionLabel}
-            </p>
-            <h2 className="mt-1 text-lg font-semibold tracking-hyper text-foreground">
+            <p className="text-[11px] uppercase text-muted">{sectionLabel}</p>
+            <h2 className="mt-1 text-lg font-semibold text-foreground">
               {threads.length} threads
             </h2>
           </div>
@@ -116,7 +114,7 @@ export function VirtualThreadList({
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
-        <div className="mt-2 flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-muted">
+        <div className="mt-2 flex items-center justify-between text-[11px] uppercase text-muted">
           <span>{isSearching ? "Local search" : "Working set"}</span>
           <span>{isSearching ? "Shortcut /" : "Cached only"}</span>
         </div>
@@ -213,7 +211,7 @@ const ThreadRow = memo(function ThreadRow({
             {thread.thread.subject}
           </p>
         </div>
-        <span className="shrink-0 text-[11px] uppercase tracking-[0.18em] text-muted">
+        <span className="shrink-0 text-[11px] uppercase text-muted">
           {formatThreadTimestamp(thread.thread.lastMessageAt)}
         </span>
       </div>
@@ -227,6 +225,23 @@ const ThreadRow = memo(function ThreadRow({
           <Badge className="border-amber-400/20 bg-amber-400/10 text-amber-100">
             <Star className="mr-1 h-3 w-3" />
             Starred
+          </Badge>
+        ) : null}
+        {thread.actionNeeded ? (
+          <Badge className="border-accent/25 bg-accent/10 text-accent">
+            <Sparkles className="mr-1 h-3 w-3" />
+            Action
+          </Badge>
+        ) : null}
+        {thread.waitingForReply ? (
+          <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
+            <Clock3 className="mr-1 h-3 w-3" />
+            Waiting
+          </Badge>
+        ) : null}
+        {thread.localRuleSplit && thread.localRuleSplit !== thread.thread.split ? (
+          <Badge className="border-white/10 bg-white/[0.03] text-muted">
+            Rule: {thread.localRuleSplit}
           </Badge>
         ) : null}
         {activelySnoozed && thread.thread.snoozedUntil ? (

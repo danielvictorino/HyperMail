@@ -86,6 +86,7 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
+      "!**/*.map",
       "package.json"
     ],
     "extraMetadata": {

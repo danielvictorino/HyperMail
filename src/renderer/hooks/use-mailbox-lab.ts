@@ -1,5 +1,12 @@
 import { liveQuery } from "dexie";
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import {
+  startTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import type {
   MailAssistantArtifactRecord,
   MailAssistantProvider,
@@ -28,16 +35,19 @@ import type {
 } from "@shared/mail/models";
 import {
   buildCalendarContext,
+  buildDailyBrief,
   buildSenderInsight,
   filterThreadsBySection,
   getMailboxNavItems,
   getSectionDescription,
-  getSectionHeadline
+  getSectionHeadline,
+  type DailyBrief
 } from "../lib/mailbox-view";
 import { searchThreads } from "../lib/mailbox-search";
 import { getDesktopApi } from "../lib/desktop-api";
 import {
   applyThreadSplitLocally,
+  buildThreadAssistantFingerprint,
   listVoiceExamplesForAccount,
   loadSplitSuggestionRecord,
   loadThreadSummaryRecord,
@@ -130,6 +140,7 @@ interface MailboxLabState {
   attachmentCacheSummary: InboxSnapshot["attachmentCacheSummary"];
   activeAttachmentId: string | null;
   performanceSummary: InboxSnapshot["performance"];
+  dailyBrief: DailyBrief;
   toggleManualOffline: () => void;
   refreshQueue: () => Promise<void>;
   syncRemote: () => Promise<void>;
@@ -157,6 +168,7 @@ interface MailboxLabState {
   generateVoiceDraft: (thread?: ThreadProjection | null) => Promise<void>;
   suggestThreadSplit: (thread?: ThreadProjection | null) => Promise<void>;
   applySuggestedSplit: () => Promise<void>;
+  applyLocalRuleSplit: () => Promise<void>;
   selectThread: (threadId: string) => void;
   selectNextThread: () => void;
   selectPreviousThread: () => void;
@@ -235,6 +247,10 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
   const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
   const [syncTelemetry, setSyncTelemetry] = useState<GmailSyncTelemetry | null>(null);
   const [activeAttachmentId, setActiveAttachmentId] = useState<string | null>(null);
+  const autoSummaryAttemptKeys = useRef(new Set<string>());
+  const generateThreadSummaryRef = useRef<
+    (thread?: ThreadProjection | null) => Promise<void>
+  >(async () => {});
   const effectiveOnline = actualOnline && !manualOffline;
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
@@ -407,6 +423,20 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
     [activeThreads, deferredSearchQuery, threads]
   );
   const isSearching = deferredSearchQuery.trim().length > 0;
+  const dailyBrief = useMemo(
+    () =>
+      buildDailyBrief(
+        threads,
+        snapshot?.draftSummary ?? {
+          draft: 0,
+          queued: 0,
+          sending: 0,
+          failed: 0,
+          total: 0
+        }
+      ),
+    [snapshot?.draftSummary, threads]
+  );
 
   useEffect(() => {
     const selectedStillExists = visibleThreads.some(
@@ -447,10 +477,20 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
 
     setAssistantError(null);
 
+    const sourceFingerprint = buildThreadAssistantFingerprint(selectedThread);
+
     void (async () => {
       const [summaryRecord, splitRecord] = await Promise.all([
-        loadThreadSummaryRecord(account.id, selectedThread.thread.id),
-        loadSplitSuggestionRecord(account.id, selectedThread.thread.id)
+        loadThreadSummaryRecord(
+          account.id,
+          selectedThread.thread.id,
+          sourceFingerprint
+        ),
+        loadSplitSuggestionRecord(
+          account.id,
+          selectedThread.thread.id,
+          sourceFingerprint
+        )
       ]);
 
       if (!cancelled) {
@@ -689,6 +729,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
         model: result.model,
         generatedAt: result.generatedAt,
         fallbackUsed: result.fallbackUsed,
+        sourceFingerprint: buildThreadAssistantFingerprint(thread),
         data: result.summary
       };
 
@@ -707,6 +748,51 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
       setIsSummarizingThread(false);
     }
   }
+
+  generateThreadSummaryRef.current = generateThreadSummary;
+
+  useEffect(() => {
+    if (
+      !selectedThread ||
+      threadSummaryRecord ||
+      isSummarizingThread ||
+      !assistantConfig.enabled ||
+      !effectiveOnline
+    ) {
+      return;
+    }
+
+    if (
+      !selectedThread.thread.unread &&
+      !selectedThread.actionNeeded &&
+      !selectedThread.waitingForReply
+    ) {
+      return;
+    }
+
+    const sourceFingerprint = buildThreadAssistantFingerprint(selectedThread);
+    const attemptKey = `${selectedThread.thread.id}:${sourceFingerprint}`;
+
+    if (autoSummaryAttemptKeys.current.has(attemptKey)) {
+      return;
+    }
+
+    autoSummaryAttemptKeys.current.add(attemptKey);
+
+    const handle = globalThis.setTimeout(() => {
+      void generateThreadSummaryRef.current(selectedThread);
+    }, 750);
+
+    return () => {
+      globalThis.clearTimeout(handle);
+    };
+  }, [
+    assistantConfig.enabled,
+    effectiveOnline,
+    isSummarizingThread,
+    selectedThread,
+    threadSummaryRecord
+  ]);
 
   async function generateVoiceDraft(thread = selectedThread): Promise<void> {
     if (!thread) {
@@ -778,6 +864,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
         model: result.model,
         generatedAt: result.generatedAt,
         fallbackUsed: result.fallbackUsed,
+        sourceFingerprint: buildThreadAssistantFingerprint(thread),
         data: result.suggestion
       };
 
@@ -805,6 +892,17 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
     await applyThreadSplitLocally(
       selectedThread.thread.id,
       splitSuggestionRecord.data.split
+    );
+  }
+
+  async function applyLocalRuleSplit(): Promise<void> {
+    if (!selectedThread?.localRuleSplit) {
+      return;
+    }
+
+    await applyThreadSplitLocally(
+      selectedThread.thread.id,
+      selectedThread.localRuleSplit
     );
   }
 
@@ -911,6 +1009,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
       cachedAttachmentCount: 0,
       generatedAt: Date.now()
     },
+    dailyBrief,
     toggleManualOffline,
     refreshQueue: async () => {
       await modifierQueueEngine.kick();
@@ -936,6 +1035,7 @@ export function useMailboxLab(session: AuthSessionSummary | null): MailboxLabSta
     generateVoiceDraft,
     suggestThreadSplit,
     applySuggestedSplit,
+    applyLocalRuleSplit,
     selectThread,
     selectNextThread,
     selectPreviousThread,

@@ -130,6 +130,7 @@ export interface MailAssistantArtifactRecord<TData> {
   model: string;
   generatedAt: number;
   fallbackUsed: boolean;
+  sourceFingerprint?: string;
   data: TData;
 }
 

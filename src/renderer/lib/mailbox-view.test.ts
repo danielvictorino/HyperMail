@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { ThreadProjection } from "@shared/mail/models";
-import { filterThreadsBySection, getMailboxNavItems } from "./mailbox-view";
+import {
+  buildDailyBrief,
+  filterThreadsBySection,
+  getMailboxNavItems
+} from "./mailbox-view";
 
 function createThread(
   overrides: Partial<ThreadProjection["thread"]>
@@ -62,19 +66,26 @@ describe("mailbox-view", () => {
       id: "t5",
       split: "other",
       snoozedUntil: Date.now() + 60 * 60 * 1000
-    })
+    }),
+    {
+      ...createThread({ id: "t6", split: "important" }),
+      waitingForReply: true,
+      waitingSince: Date.now() - 48 * 60 * 60 * 1000
+    }
   ];
 
   it("builds navigation counts for sections", () => {
     const navItems = getMailboxNavItems(threads);
     const inbox = navItems.find((item) => item.id === "inbox");
     const starred = navItems.find((item) => item.id === "starred");
+    const waiting = navItems.find((item) => item.id === "waiting");
     const snoozed = navItems.find((item) => item.id === "snoozed");
     const archive = navItems.find((item) => item.id === "archive");
 
-    expect(inbox?.count).toBe(3);
+    expect(inbox?.count).toBe(4);
     expect(inbox?.unreadCount).toBe(1);
     expect(starred?.count).toBe(2);
+    expect(waiting?.count).toBe(1);
     expect(snoozed?.count).toBe(1);
     expect(archive?.count).toBe(1);
   });
@@ -82,7 +93,7 @@ describe("mailbox-view", () => {
   it("filters threads by section without mixing archive into inbox", () => {
     expect(
       filterThreadsBySection(threads, "inbox").map((thread) => thread.thread.id)
-    ).toEqual(["t1", "t2", "t4"]);
+    ).toEqual(["t1", "t2", "t4", "t6"]);
     expect(
       filterThreadsBySection(threads, "snoozed").map((thread) => thread.thread.id)
     ).toEqual(["t5"]);
@@ -92,5 +103,23 @@ describe("mailbox-view", () => {
     expect(
       filterThreadsBySection(threads, "vip").map((thread) => thread.thread.id)
     ).toEqual(["t2"]);
+    expect(
+      filterThreadsBySection(threads, "waiting").map((thread) => thread.thread.id)
+    ).toEqual(["t6"]);
+  });
+
+  it("builds a founder daily brief from local state", () => {
+    const brief = buildDailyBrief(threads, {
+      draft: 1,
+      queued: 0,
+      sending: 0,
+      failed: 0,
+      total: 1
+    });
+
+    expect(brief.actionNeededCount).toBeGreaterThan(0);
+    expect(brief.importantUnreadCount).toBe(1);
+    expect(brief.waitingCount).toBe(1);
+    expect(brief.topActionLabel).toBe("Clear important unread");
   });
 });

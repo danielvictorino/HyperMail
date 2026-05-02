@@ -3,6 +3,7 @@ import {
   Command,
   Inbox,
   Mail,
+  Send,
   Sparkles,
   Star,
   Archive,
@@ -36,6 +37,7 @@ const navIcons: Record<MailboxSectionId, ReactNode> = {
   inbox: <Inbox className="h-4 w-4" />,
   important: <Sparkles className="h-4 w-4" />,
   vip: <ShieldCheck className="h-4 w-4" />,
+  waiting: <Send className="h-4 w-4" />,
   other: <Mail className="h-4 w-4" />,
   starred: <Star className="h-4 w-4" />,
   snoozed: <Clock3 className="h-4 w-4" />,
@@ -73,9 +75,7 @@ export function MailSidebar({
             />
           </div>
           <div>
-            <p className="text-lg font-semibold tracking-hyper text-foreground">
-              HyperMail
-            </p>
+            <p className="text-lg font-semibold text-foreground">HyperMail</p>
             <p className="text-sm text-muted">Desktop alpha · v{appVersion}</p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function MailSidebar({
                 </div>
                 <div className="flex items-center gap-2">
                   {item.unreadCount > 0 ? (
-                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
+                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-accent">
                       {item.unreadCount}
                     </span>
                   ) : null}
@@ -160,6 +160,7 @@ export function MailSidebar({
             <ShortcutRow label="Reply" hint="R" />
             <ShortcutRow label="Voice draft" hint="D" />
             <ShortcutRow label="Summarize" hint="A" />
+            <ShortcutRow label="Waiting" hint="4" />
             <ShortcutRow label="Snooze" hint="Z" />
             <ShortcutRow label="Unsubscribe" hint="U" />
             <ShortcutRow label="Archive" hint="E" />

@@ -1,6 +1,7 @@
 import {
   Bug,
   CalendarClock,
+  ChevronDown,
   Download,
   FolderOpen,
   HardDriveDownload,
@@ -12,6 +13,7 @@ import {
   Wifi,
   WifiOff
 } from "lucide-react";
+import type { ReactNode } from "react";
 import type {
   MailAssistantProvider,
   MailAssistantProviderConnectionResult,
@@ -29,7 +31,7 @@ import type {
 import type { InboxSnapshot, ThreadProjection } from "@shared/mail/models";
 import type { GmailSyncTelemetry } from "@/offline/sync/gmail-sync";
 import type { RuntimeCacheStatus } from "@/state/runtime-cache-store";
-import type { CalendarContext, SenderInsight } from "@/lib/mailbox-view";
+import type { CalendarContext, DailyBrief, SenderInsight } from "@/lib/mailbox-view";
 import { AiSettingsPanel } from "./ai-settings-panel";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -49,6 +51,7 @@ interface ContextRailProps {
   draftSummary: InboxSnapshot["draftSummary"];
   attachmentCacheSummary: InboxSnapshot["attachmentCacheSummary"];
   performanceSummary: InboxSnapshot["performance"];
+  dailyBrief: DailyBrief;
   runtimeCacheStatus: RuntimeCacheStatus;
   runtimeCacheDetail: string;
   runtimeCacheItemCount: number;
@@ -79,6 +82,7 @@ interface ContextRailProps {
   onSummarizeThread: (thread?: ThreadProjection | null) => Promise<void>;
   onSuggestThreadSplit: (thread?: ThreadProjection | null) => Promise<void>;
   onApplySuggestedSplit: () => Promise<void>;
+  onApplyLocalRuleSplit: () => Promise<void>;
 }
 
 export function ContextRail({
@@ -96,6 +100,7 @@ export function ContextRail({
   draftSummary,
   attachmentCacheSummary,
   performanceSummary,
+  dailyBrief,
   runtimeCacheStatus,
   runtimeCacheDetail,
   runtimeCacheItemCount,
@@ -122,7 +127,8 @@ export function ContextRail({
   onListOllamaModels,
   onSummarizeThread,
   onSuggestThreadSplit,
-  onApplySuggestedSplit
+  onApplySuggestedSplit,
+  onApplyLocalRuleSplit
 }: ContextRailProps) {
   const summary = snapshot?.queueSummary ?? {
     pending: 0,
@@ -132,7 +138,7 @@ export function ContextRail({
   };
 
   return (
-    <aside className="flex h-full flex-col gap-4 p-5">
+    <aside className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-4">
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm font-medium text-foreground">Connection</p>
@@ -207,202 +213,28 @@ export function ContextRail({
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="mb-3 flex items-center gap-2">
-          <HardDriveDownload className="h-4 w-4 text-accent" />
-          <p className="text-sm font-medium text-foreground">Offline cache</p>
+          <Sparkles className="h-4 w-4 text-accent" />
+          <p className="text-sm font-medium text-foreground">Daily brief</p>
         </div>
         <div className="space-y-2">
-          <Metric label="Asset cache" value={runtimeCacheStatus} />
-          <Metric label="Cached assets" value={String(runtimeCacheItemCount)} />
+          <Metric label="Action needed" value={String(dailyBrief.actionNeededCount)} />
           <Metric
-            label="Attachments"
-            value={String(attachmentCacheSummary.cachedItems)}
+            label="Important unread"
+            value={String(dailyBrief.importantUnreadCount)}
           />
-          <Metric
-            label="Attachment bytes"
-            value={formatBytes(attachmentCacheSummary.cachedBytes)}
-          />
+          <Metric label="Waiting" value={String(dailyBrief.waitingCount)} />
+          <Metric label="Drafts" value={String(dailyBrief.draftCount)} />
+          <Metric label="Failed sends" value={String(dailyBrief.failedSendCount)} />
         </div>
-        <p className="mt-3 text-xs leading-5 text-muted">{runtimeCacheDetail}</p>
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <RefreshCcw className="h-4 w-4 text-accent" />
-          <p className="text-sm font-medium text-foreground">Runtime config</p>
-        </div>
-        {runtimeConfig ? (
-          <>
-            <div className="space-y-2">
-              <Metric
-                label="Mode"
-                value={runtimeConfig.packaged ? "packaged" : "development"}
-              />
-              <Metric
-                label="Gmail OAuth"
-                value={runtimeConfig.googleOAuthReady ? "ready" : "missing"}
-              />
-              <Metric
-                label="OpenAI"
-                value={runtimeConfig.openAiReady ? "ready" : "missing"}
-              />
-              <Metric
-                label="Anthropic"
-                value={runtimeConfig.anthropicReady ? "ready" : "missing"}
-              />
-              <Metric
-                label="Ollama"
-                value={runtimeConfig.ollamaReady ? "ready" : "missing"}
-              />
-              <Metric
-                label="Updates"
-                value={runtimeConfig.updatesUrlConfigured ? "ready" : "missing"}
-              />
-              <Metric
-                label="Crash upload"
-                value={
-                  runtimeConfig.crashReportUploadConfigured ? "ready" : "local only"
-                }
-              />
-            </div>
-            <p className="mt-3 text-xs leading-5 text-muted">
-              {runtimeConfig.loadedConfigPath
-                ? `Loaded config from ${runtimeConfig.loadedConfigPath}.`
-                : `No config file loaded yet. Preferred path: ${runtimeConfig.preferredConfigPath}.`}
-            </p>
-          </>
-        ) : (
-          <p className="text-sm leading-6 text-muted">
-            Runtime config details will appear once the shell context loads.
+        <div className="mt-4 rounded-xl border border-accent/20 bg-accent/10 px-3 py-3">
+          <p className="text-sm font-medium text-foreground">
+            {dailyBrief.topActionLabel}
           </p>
-        )}
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <Bug className="h-4 w-4 text-accent" />
-          <p className="text-sm font-medium text-foreground">Release ops</p>
-        </div>
-        {autoUpdateStatus ? (
-          <>
-            <div className="space-y-2">
-              <Metric
-                label="Updater"
-                value={formatUpdatePhase(autoUpdateStatus.phase)}
-              />
-              <Metric label="Current build" value={autoUpdateStatus.currentVersion} />
-              <Metric
-                label="Available build"
-                value={autoUpdateStatus.availableVersion ?? "none"}
-              />
-              <Metric
-                label="Progress"
-                value={
-                  autoUpdateStatus.progressPercent === null
-                    ? "n/a"
-                    : `${autoUpdateStatus.progressPercent.toFixed(0)}%`
-                }
-              />
-            </div>
-            <p className="mt-3 text-xs leading-5 text-muted">
-              {autoUpdateStatus.message ??
-                "Packaged update status will appear here once configured."}
-            </p>
-            <div className="mt-4 flex flex-col gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="justify-between"
-                disabled={!autoUpdateStatus.enabled}
-                onClick={() => void onCheckForUpdates()}
-              >
-                <span>Check for updates</span>
-                <RefreshCcw className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="justify-between border border-white/10 bg-white/[0.03]"
-                disabled={autoUpdateStatus.phase !== "available"}
-                onClick={() => void onDownloadUpdate()}
-              >
-                <span>Download update</span>
-                <Download className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="justify-between border border-white/10 bg-white/[0.03]"
-                disabled={autoUpdateStatus.phase !== "downloaded"}
-                onClick={() => void onInstallUpdate()}
-              >
-                <span>Restart to update</span>
-                <Send className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </>
-        ) : (
-          <p className="text-sm leading-6 text-muted">
-            Packaged update controls will appear once the shell context loads.
+          <p className="mt-2 text-sm leading-6 text-muted">
+            {dailyBrief.topActionDetail}
           </p>
-        )}
-        {releaseDiagnostics ? (
-          <>
-            <div className="mt-4 space-y-2">
-              <Metric
-                label="Crash reporter"
-                value={releaseDiagnostics.crashReporterEnabled ? "armed" : "idle"}
-              />
-              <Metric
-                label="Crash upload"
-                value={releaseDiagnostics.crashReportUploadUrl ? "remote" : "local"}
-              />
-            </div>
-            <p className="mt-3 text-xs leading-5 text-muted">
-              Logs: {releaseDiagnostics.logsDirectory}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-muted">
-              Crashes: {releaseDiagnostics.crashDumpsDirectory}
-            </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-4 w-full justify-between border border-white/10 bg-white/[0.03]"
-              onClick={() => void onOpenLogsDirectory()}
-            >
-              <span>Open logs folder</span>
-              <FolderOpen className="h-3.5 w-3.5" />
-            </Button>
-          </>
-        ) : null}
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <RefreshCcw className="h-4 w-4 text-accent" />
-          <p className="text-sm font-medium text-foreground">Local performance</p>
         </div>
-        <div className="space-y-2">
-          <Metric
-            label="Snapshot load"
-            value={`${performanceSummary.snapshotLoadMs.toFixed(1)} ms`}
-          />
-          <Metric label="Threads" value={String(performanceSummary.threadCount)} />
-          <Metric label="Messages" value={String(performanceSummary.messageCount)} />
-          <Metric label="Draft rows" value={String(performanceSummary.draftCount)} />
-        </div>
-        <p className="mt-3 text-xs leading-5 text-muted">
-          Generated {formatRelativeTime(performanceSummary.generatedAt)} from IndexedDB,
-          before any network round-trip.
-        </p>
       </div>
-
-      <AiSettingsPanel
-        assistantConfig={assistantConfig}
-        assistantError={assistantError}
-        onSaveSettings={onSaveAssistantSettings}
-        onTestProviderConnection={onTestAssistantProviderConnection}
-        onListOllamaModels={onListOllamaModels}
-      />
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="mb-3 flex items-center gap-2">
@@ -444,9 +276,7 @@ export function ContextRail({
                 className="rounded-xl border border-white/10 bg-black/10 px-3 py-3"
               >
                 <p className="text-sm font-medium text-foreground">{entry.title}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-accent">
-                  {entry.timeLabel}
-                </p>
+                <p className="mt-1 text-xs uppercase text-accent">{entry.timeLabel}</p>
                 <p className="mt-2 text-sm leading-6 text-muted">{entry.detail}</p>
               </div>
             ))
@@ -493,9 +323,7 @@ export function ContextRail({
                 </div>
                 {threadSummary.actionItems.length > 0 ? (
                   <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
-                    <p className="text-[11px] uppercase tracking-[0.18em] text-accent">
-                      Action items
-                    </p>
+                    <p className="text-[11px] uppercase text-accent">Action items</p>
                     <div className="mt-2 space-y-1">
                       {threadSummary.actionItems.map((item) => (
                         <p key={item} className="text-sm leading-6 text-muted">
@@ -577,6 +405,24 @@ export function ContextRail({
                 adding Gmail clutter.
               </p>
             )}
+            {selectedThread?.localRuleSplit &&
+            selectedThread.localRuleSplit !== selectedThread.thread.split ? (
+              <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-3">
+                <p className="text-[11px] uppercase text-accent">Local rule</p>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  {selectedThread.localRuleReason}
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="mt-3 w-full justify-between"
+                  onClick={() => void onApplyLocalRuleSplit()}
+                >
+                  <span>Apply {selectedThread.localRuleSplit}</span>
+                  <span className="text-xs text-muted">manual</span>
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -629,7 +475,245 @@ export function ContextRail({
           {lastQueueError}
         </div>
       ) : null}
+
+      <RailDisclosure
+        title="System, cache, and AI settings"
+        detail="Runtime status, release controls, local cache, and provider setup."
+      >
+        <div className="grid gap-3">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <HardDriveDownload className="h-4 w-4 text-accent" />
+              <p className="text-sm font-medium text-foreground">Offline cache</p>
+            </div>
+            <div className="space-y-2">
+              <Metric label="Asset cache" value={runtimeCacheStatus} />
+              <Metric label="Cached assets" value={String(runtimeCacheItemCount)} />
+              <Metric
+                label="Attachments"
+                value={String(attachmentCacheSummary.cachedItems)}
+              />
+              <Metric
+                label="Attachment bytes"
+                value={formatBytes(attachmentCacheSummary.cachedBytes)}
+              />
+            </div>
+            <p className="mt-3 text-xs leading-5 text-muted">{runtimeCacheDetail}</p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <RefreshCcw className="h-4 w-4 text-accent" />
+              <p className="text-sm font-medium text-foreground">Runtime config</p>
+            </div>
+            {runtimeConfig ? (
+              <>
+                <div className="space-y-2">
+                  <Metric
+                    label="Mode"
+                    value={runtimeConfig.packaged ? "packaged" : "development"}
+                  />
+                  <Metric
+                    label="Gmail OAuth"
+                    value={runtimeConfig.googleOAuthReady ? "ready" : "missing"}
+                  />
+                  <Metric
+                    label="OpenAI"
+                    value={runtimeConfig.openAiReady ? "ready" : "missing"}
+                  />
+                  <Metric
+                    label="Anthropic"
+                    value={runtimeConfig.anthropicReady ? "ready" : "missing"}
+                  />
+                  <Metric
+                    label="Ollama"
+                    value={runtimeConfig.ollamaReady ? "ready" : "missing"}
+                  />
+                  <Metric
+                    label="Updates"
+                    value={runtimeConfig.updatesUrlConfigured ? "ready" : "missing"}
+                  />
+                  <Metric
+                    label="Crash upload"
+                    value={
+                      runtimeConfig.crashReportUploadConfigured ? "ready" : "local only"
+                    }
+                  />
+                </div>
+                <p className="mt-3 text-xs leading-5 text-muted">
+                  {runtimeConfig.loadedConfigPath
+                    ? `Loaded config from ${runtimeConfig.loadedConfigPath}.`
+                    : `No config file loaded yet. Preferred path: ${runtimeConfig.preferredConfigPath}.`}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm leading-6 text-muted">
+                Runtime config details will appear once the shell context loads.
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <Bug className="h-4 w-4 text-accent" />
+              <p className="text-sm font-medium text-foreground">Release ops</p>
+            </div>
+            {autoUpdateStatus ? (
+              <>
+                <div className="space-y-2">
+                  <Metric
+                    label="Updater"
+                    value={formatUpdatePhase(autoUpdateStatus.phase)}
+                  />
+                  <Metric
+                    label="Current build"
+                    value={autoUpdateStatus.currentVersion}
+                  />
+                  <Metric
+                    label="Available build"
+                    value={autoUpdateStatus.availableVersion ?? "none"}
+                  />
+                  <Metric
+                    label="Progress"
+                    value={
+                      autoUpdateStatus.progressPercent === null
+                        ? "n/a"
+                        : `${autoUpdateStatus.progressPercent.toFixed(0)}%`
+                    }
+                  />
+                </div>
+                <p className="mt-3 text-xs leading-5 text-muted">
+                  {autoUpdateStatus.message ??
+                    "Packaged update status will appear here once configured."}
+                </p>
+                <div className="mt-4 flex flex-col gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="justify-between"
+                    disabled={!autoUpdateStatus.enabled}
+                    onClick={() => void onCheckForUpdates()}
+                  >
+                    <span>Check for updates</span>
+                    <RefreshCcw className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-between border border-white/10 bg-white/[0.03]"
+                    disabled={autoUpdateStatus.phase !== "available"}
+                    onClick={() => void onDownloadUpdate()}
+                  >
+                    <span>Download update</span>
+                    <Download className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-between border border-white/10 bg-white/[0.03]"
+                    disabled={autoUpdateStatus.phase !== "downloaded"}
+                    onClick={() => void onInstallUpdate()}
+                  >
+                    <span>Restart to update</span>
+                    <Send className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm leading-6 text-muted">
+                Packaged update controls will appear once the shell context loads.
+              </p>
+            )}
+            {releaseDiagnostics ? (
+              <>
+                <div className="mt-4 space-y-2">
+                  <Metric
+                    label="Crash reporter"
+                    value={releaseDiagnostics.crashReporterEnabled ? "armed" : "idle"}
+                  />
+                  <Metric
+                    label="Crash upload"
+                    value={releaseDiagnostics.crashReportUploadUrl ? "remote" : "local"}
+                  />
+                </div>
+                <p className="mt-3 text-xs leading-5 text-muted">
+                  Logs: {releaseDiagnostics.logsDirectory}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-muted">
+                  Crashes: {releaseDiagnostics.crashDumpsDirectory}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-4 w-full justify-between border border-white/10 bg-white/[0.03]"
+                  onClick={() => void onOpenLogsDirectory()}
+                >
+                  <span>Open logs folder</span>
+                  <FolderOpen className="h-3.5 w-3.5" />
+                </Button>
+              </>
+            ) : null}
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <RefreshCcw className="h-4 w-4 text-accent" />
+              <p className="text-sm font-medium text-foreground">Local performance</p>
+            </div>
+            <div className="space-y-2">
+              <Metric
+                label="Snapshot load"
+                value={`${performanceSummary.snapshotLoadMs.toFixed(1)} ms`}
+              />
+              <Metric label="Threads" value={String(performanceSummary.threadCount)} />
+              <Metric
+                label="Messages"
+                value={String(performanceSummary.messageCount)}
+              />
+              <Metric
+                label="Draft rows"
+                value={String(performanceSummary.draftCount)}
+              />
+            </div>
+            <p className="mt-3 text-xs leading-5 text-muted">
+              Generated {formatRelativeTime(performanceSummary.generatedAt)} from
+              IndexedDB, before any network round-trip.
+            </p>
+          </div>
+
+          <AiSettingsPanel
+            assistantConfig={assistantConfig}
+            assistantError={assistantError}
+            onSaveSettings={onSaveAssistantSettings}
+            onTestProviderConnection={onTestAssistantProviderConnection}
+            onListOllamaModels={onListOllamaModels}
+          />
+        </div>
+      </RailDisclosure>
     </aside>
+  );
+}
+
+function RailDisclosure({
+  title,
+  detail,
+  children
+}: {
+  title: string;
+  detail: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="group rounded-2xl border border-white/10 bg-white/[0.03]">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 marker:hidden">
+        <span>
+          <span className="block text-sm font-medium text-foreground">{title}</span>
+          <span className="mt-1 block text-xs leading-5 text-muted">{detail}</span>
+        </span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted transition-transform duration-150 group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-white/10 p-3">{children}</div>
+    </details>
   );
 }
 

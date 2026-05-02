@@ -100,7 +100,7 @@ export function ThreadComposer({
     return () => {
       cancelled = true;
     };
-  }, [editor, loadDraft, open, thread.thread.id]);
+  }, [editor, loadDraft, open, thread]);
 
   useEffect(() => {
     if (!editor || !open || !draftSeed || draftSeed.threadId !== thread.thread.id) {
@@ -110,7 +110,7 @@ export function ThreadComposer({
     editor.commands.setContent(draftSeed.bodyHtml);
     setStatusLabel("Voice draft inserted");
     onConsumeDraftSeed();
-  }, [draftSeed, editor, onConsumeDraftSeed, open, thread.thread.id]);
+  }, [draftSeed, editor, onConsumeDraftSeed, open, thread]);
 
   useEffect(() => {
     if (!editor || !open) {
@@ -147,7 +147,7 @@ export function ThreadComposer({
 
       editor.off("update", handleUpdate);
     };
-  }, [editor, open, saveDraft, thread.thread.id]);
+  }, [editor, open, saveDraft, thread]);
 
   if (!open) {
     return null;
@@ -225,9 +225,7 @@ export function ThreadComposer({
             </Badge>
           </div>
           <div className="mt-3 rounded-2xl border border-white/10 bg-black/10 px-3 py-2">
-            <label className="text-[11px] uppercase tracking-[0.18em] text-muted">
-              Schedule
-            </label>
+            <label className="text-[11px] uppercase text-muted">Schedule</label>
             <input
               value={scheduleInput}
               onChange={(event) => setScheduleInput(event.target.value)}

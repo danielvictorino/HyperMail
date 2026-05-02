@@ -33,10 +33,11 @@ export const SECTION_BY_NUMBER: Record<string, MailboxSectionId> = {
   "1": "inbox",
   "2": "important",
   "3": "vip",
-  "4": "other",
-  "5": "starred",
-  "6": "snoozed",
-  "7": "archive"
+  "4": "waiting",
+  "5": "other",
+  "6": "starred",
+  "7": "snoozed",
+  "8": "archive"
 };
 
 export function isEditableTarget(target: EventTarget | null): boolean {
