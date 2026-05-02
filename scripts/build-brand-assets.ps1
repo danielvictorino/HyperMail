@@ -26,103 +26,59 @@ function New-HyperMailBitmap {
     [int]$Size
   )
 
-  $bitmap = [System.Drawing.Bitmap]::new($Size, $Size)
+  $bitmap = [System.Drawing.Bitmap]::new(
+    $Size,
+    $Size,
+    [System.Drawing.Imaging.PixelFormat]::Format32bppArgb
+  )
   $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
 
   try {
     $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
     $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-    $graphics.Clear([System.Drawing.ColorTranslator]::FromHtml("#09090b"))
+    $graphics.Clear([System.Drawing.Color]::Transparent)
 
-    $outerBounds = [System.Drawing.RectangleF]::new($Size * 0.08, $Size * 0.08, $Size * 0.84, $Size * 0.84)
-    $innerBounds = [System.Drawing.RectangleF]::new($Size * 0.14, $Size * 0.14, $Size * 0.72, $Size * 0.72)
+    $tileBounds = [System.Drawing.RectangleF]::new(
+      [float]($Size * 0.09375),
+      [float]($Size * 0.09375),
+      [float]($Size * 0.8125),
+      [float]($Size * 0.8125)
+    )
+    $tilePath = New-RoundedRectanglePath -Bounds $tileBounds -Radius ([float]($Size * 0.1015625))
+    $tileBrush = [System.Drawing.SolidBrush]::new(
+      [System.Drawing.ColorTranslator]::FromHtml("#050614")
+    )
 
-    $outerPath = New-RoundedRectanglePath -Bounds $outerBounds -Radius ($Size * 0.2)
-    $innerPath = New-RoundedRectanglePath -Bounds $innerBounds -Radius ($Size * 0.16)
+    $markBrush = [System.Drawing.SolidBrush]::new(
+      [System.Drawing.ColorTranslator]::FromHtml("#f7f8f8")
+    )
 
     try {
-      $outerBrush = [System.Drawing.Drawing2D.LinearGradientBrush]::new(
-        [System.Drawing.PointF]::new(0, 0),
-        [System.Drawing.PointF]::new($Size, $Size),
-        [System.Drawing.ColorTranslator]::FromHtml("#8b5cf6"),
-        [System.Drawing.ColorTranslator]::FromHtml("#2a1247")
+      $graphics.FillPath($tileBrush, $tilePath)
+      $graphics.FillRectangle(
+        $markBrush,
+        [System.Drawing.RectangleF]::new($Size * 0.2890625, $Size * 0.3046875, $Size * 0.078125, $Size * 0.453125)
       )
-
-      try {
-        $outerBlend = [System.Drawing.Drawing2D.ColorBlend]::new()
-        $outerBlend.Colors = @(
-          [System.Drawing.ColorTranslator]::FromHtml("#8b5cf6"),
-          [System.Drawing.ColorTranslator]::FromHtml("#5b21b6"),
-          [System.Drawing.ColorTranslator]::FromHtml("#2a1247")
+      $graphics.FillRectangle(
+        $markBrush,
+        [System.Drawing.RectangleF]::new($Size * 0.6328125, $Size * 0.3046875, $Size * 0.078125, $Size * 0.453125)
+      )
+      $graphics.FillPolygon(
+        $markBrush,
+        [System.Drawing.PointF[]]@(
+          [System.Drawing.PointF]::new($Size * 0.3671875, $Size * 0.54296875),
+          [System.Drawing.PointF]::new($Size * 0.5, $Size * 0.46875),
+          [System.Drawing.PointF]::new($Size * 0.6328125, $Size * 0.54296875),
+          [System.Drawing.PointF]::new($Size * 0.6328125, $Size * 0.6328125),
+          [System.Drawing.PointF]::new($Size * 0.5, $Size * 0.55859375),
+          [System.Drawing.PointF]::new($Size * 0.3671875, $Size * 0.6328125)
         )
-        $outerBlend.Positions = @(0.0, 0.48, 1.0)
-        $outerBrush.InterpolationColors = $outerBlend
-        $graphics.FillPath($outerBrush, $outerPath)
-      } finally {
-        $outerBrush.Dispose()
-      }
-
-      $innerBrush = [System.Drawing.SolidBrush]::new(
-        [System.Drawing.ColorTranslator]::FromHtml("#0f0f14")
       )
-
-      try {
-        $graphics.FillPath($innerBrush, $innerPath)
-      } finally {
-        $innerBrush.Dispose()
-      }
-
-      $glowPen = [System.Drawing.Pen]::new(
-        [System.Drawing.ColorTranslator]::FromHtml("#c4b5fd"),
-        [float]($Size * 0.016)
-      )
-      $glowPen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
-
-      try {
-        $graphics.DrawPath($glowPen, $innerPath)
-      } finally {
-        $glowPen.Dispose()
-      }
     } finally {
-      $outerPath.Dispose()
-      $innerPath.Dispose()
-    }
-
-    $hPen = [System.Drawing.Pen]::new(
-      [System.Drawing.ColorTranslator]::FromHtml("#f5f3ff"),
-      [float]($Size * 0.075)
-    )
-    $hPen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $hPen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $hPen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
-
-    $accentPen = [System.Drawing.Pen]::new(
-      [System.Drawing.ColorTranslator]::FromHtml("#a78bfa"),
-      [float]($Size * 0.05)
-    )
-    $accentPen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $accentPen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $accentPen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
-
-    try {
-      $leftX = [float]($Size * 0.31)
-      $rightX = [float]($Size * 0.69)
-      $topY = [float]($Size * 0.29)
-      $bottomY = [float]($Size * 0.71)
-      $midY = [float]($Size * 0.50)
-      $accentStartX = [float]($Size * 0.56)
-      $accentStartY = [float]($Size * 0.26)
-      $accentEndX = [float]($Size * 0.77)
-      $accentEndY = [float]($Size * 0.47)
-
-      $graphics.DrawLine($hPen, $leftX, $topY, $leftX, $bottomY)
-      $graphics.DrawLine($hPen, $rightX, $topY, $rightX, $bottomY)
-      $graphics.DrawLine($hPen, $leftX, $midY, $rightX, $midY)
-      $graphics.DrawLine($accentPen, $accentStartX, $accentStartY, $accentEndX, $accentEndY)
-    } finally {
-      $hPen.Dispose()
-      $accentPen.Dispose()
+      $tilePath.Dispose()
+      $tileBrush.Dispose()
+      $markBrush.Dispose()
     }
 
     return $bitmap
