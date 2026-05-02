@@ -162,7 +162,7 @@ export function MailSidebar({
         })}
       </div>
 
-      <div className="mt-3 hidden p-3 lg:block hm-section">
+      <div className="mt-3 hidden p-3 xl:block hm-section">
         <div className="mb-2 flex items-center gap-2 text-foreground">
           <KeyboardIcon className="h-4 w-4 text-accent" />
           <span className="text-sm font-medium">Command line</span>

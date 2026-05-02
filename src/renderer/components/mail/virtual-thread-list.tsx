@@ -49,7 +49,8 @@ export function VirtualThreadList({
   const rowVirtualizer = useVirtualizer({
     count: threads.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 118,
+    estimateSize: () => 132,
+    measureElement: (element) => element.getBoundingClientRect().height,
     overscan: 8
   });
 
@@ -161,12 +162,18 @@ export function VirtualThreadList({
                 return null;
               }
               return (
-                <ThreadRow
+                <div
                   key={thread.thread.id}
-                  thread={thread}
-                  selected={selectedThreadId === thread.thread.id}
-                  onSelect={handleSelectThread}
-                />
+                  ref={rowVirtualizer.measureElement}
+                  data-index={item.index}
+                  className="pb-1.5"
+                >
+                  <ThreadRow
+                    thread={thread}
+                    selected={selectedThreadId === thread.thread.id}
+                    onSelect={handleSelectThread}
+                  />
+                </div>
               );
             })}
             <div style={{ height: bottomSpacer }} />
@@ -194,7 +201,7 @@ const ThreadRow = memo(function ThreadRow({
       type="button"
       onClick={() => onSelect(thread.thread.id)}
       className={cn(
-        "mb-1.5 w-full px-3 py-2.5 text-left transition-all duration-150 ease-hyper",
+        "w-full px-3 py-2.5 text-left transition-all duration-150 ease-hyper",
         selected
           ? "hm-list-row-selected"
           : "hm-list-row hover:border-white/[0.08] hover:bg-white/[0.045]"

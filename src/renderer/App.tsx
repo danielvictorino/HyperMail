@@ -158,7 +158,7 @@ function MailboxApp() {
                   </div>
                 </div>
               ) : (
-                <div className="grid h-full min-h-0 grid-cols-1 overflow-hidden xl:grid-cols-[390px_minmax(0,1fr)]">
+                <div className="grid h-full min-h-0 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(280px,36%)_minmax(0,1fr)] 2xl:grid-cols-[390px_minmax(0,1fr)]">
                   <VirtualThreadList
                     sectionLabel={mailbox.sectionLabel}
                     sectionDescription={mailbox.sectionDescription}

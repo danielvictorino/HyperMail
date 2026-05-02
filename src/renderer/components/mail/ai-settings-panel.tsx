@@ -189,9 +189,7 @@ export function AiSettingsPanel({
         key={provider}
         className={cn(
           "rounded-lg border px-3 py-3",
-          isPrimary || isFallback
-            ? "border-accent/25 bg-accent/5"
-            : "border-white/[0.1] bg-black/10"
+          isPrimary || isFallback ? "border-accent/25 bg-accent/5" : "hm-inset-surface"
         )}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
