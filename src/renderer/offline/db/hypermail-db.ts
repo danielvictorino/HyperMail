@@ -11,6 +11,9 @@ import type {
   ThreadSnapshot
 } from "@shared/mail/models";
 
+const ASSISTANT_SUMMARY_METADATA_PREFIX = "assistant:summary:";
+const ASSISTANT_SPLIT_METADATA_PREFIX = "assistant:split:";
+
 export class HypermailDatabase extends Dexie {
   accounts!: Table<LocalMailAccount, string>;
   threads!: Table<LocalMailThread, string>;
@@ -96,7 +99,8 @@ export async function deleteAccountCascade(
       database.labels,
       database.drafts,
       database.attachmentCache,
-      database.queuedModifiers
+      database.queuedModifiers,
+      database.metadata
     ],
     async () => {
       await database.accounts.delete(accountId);
@@ -106,6 +110,14 @@ export async function deleteAccountCascade(
       await database.drafts.where("accountId").equals(accountId).delete();
       await database.attachmentCache.where("accountId").equals(accountId).delete();
       await database.queuedModifiers.where("accountId").equals(accountId).delete();
+      await database.metadata
+        .where("key")
+        .startsWith(`${ASSISTANT_SUMMARY_METADATA_PREFIX}${accountId}:`)
+        .delete();
+      await database.metadata
+        .where("key")
+        .startsWith(`${ASSISTANT_SPLIT_METADATA_PREFIX}${accountId}:`)
+        .delete();
     }
   );
 }

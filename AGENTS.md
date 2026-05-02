@@ -7,7 +7,7 @@ HyperMail is a keyboard-first, offline-first Electron + React 19 email client fo
 ## Environment
 
 - Node: 20 (pinned in CI; `.nvmrc` not present, matches `actions/setup-node@v4 node-version: "20"`)
-- Electron: 35
+- Electron: 41
 - Vite: 6, Vitest: 2, Tailwind: 3
 - Native deps: `keytar` (libsecret on Linux — `sudo apt-get install -y libsecret-1-dev`)
 - Sensitive runtime config: `%APPDATA%\HyperMail\.env` (packaged) or `./.env` (dev). Never commit real keys; `.env.example` has the shape.

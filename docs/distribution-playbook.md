@@ -44,6 +44,7 @@ HYPERMAIL_UPDATE_CHANNEL=latest
 ```
 
 If `HYPERMAIL_UPDATES_URL` is present, the packaged app enables Windows NSIS update checks.
+Windows update builds must be code signed; release packaging fails before artifact creation when signing credentials are missing.
 If `HYPERMAIL_CRASH_REPORT_URL` is absent, HyperMail still writes local crash dumps and logs for smoke-test debugging.
 
 ## Update metadata
@@ -60,24 +61,23 @@ For the generic provider flow, upload those files to the same HTTP(S) location r
 
 1. Run `npm test`.
 2. Run `npm run build`.
-3. Run `npm run package:dir`.
-4. Run `npm run dist`.
-5. Launch `release/win-unpacked/HyperMail.exe`.
-6. Run [release-smoke-test.md](release-smoke-test.md).
-7. If the smoke test passes, distribute either:
+3. Confirm `CSC_LINK` and `CSC_KEY_PASSWORD` or `WIN_CSC_LINK` and `WIN_CSC_KEY_PASSWORD` are configured.
+4. Run `npm run package:dir`.
+5. Run `npm run dist`.
+6. Launch `release/win-unpacked/HyperMail.exe`.
+7. Run [release-smoke-test.md](release-smoke-test.md).
+8. If the smoke test passes, distribute either:
    - the NSIS installer for normal team installs
    - the portable executable for fast internal evaluation
-8. If you are using auto-update, upload `latest.yml`, the installer, and the blockmap to the update host before rolling the build out.
+9. If you are using auto-update, upload `latest.yml`, the installer, and the blockmap to the update host before rolling the build out.
 
 ## Signing
 
-Current Windows artifacts are unsigned. This is acceptable for internal distribution, but Windows SmartScreen warnings should be expected.
-
-When you are ready to sign:
+Windows artifacts must be signed before release packaging or auto-update distribution. Unsigned Windows update builds are blocked.
 
 1. Obtain a code-signing certificate.
 2. Configure the certificate inputs expected by `electron-builder`.
-3. Remove the temporary `signAndEditExecutable: false` limitation from `package.json`.
+3. Set `CSC_LINK` and `CSC_KEY_PASSWORD`, or `WIN_CSC_LINK` and `WIN_CSC_KEY_PASSWORD`.
 4. Rebuild with `npm run dist`.
 
 ## Recommended internal rollout

@@ -3,34 +3,33 @@ import {
   MAIL_ASSISTANT_MODEL_PRESETS,
   MAIL_ASSISTANT_PROVIDERS
 } from "./ai/mail-assistant";
+import {
+  hasHeaderLineBreak,
+  isLoopbackHttpUrl,
+  isSafeRemoteHttpsUrl
+} from "./security/url-safety";
 
 const nonEmptyString = z.string().trim().min(1).max(512);
-const idString = z.string().trim().min(1).max(256);
+const idString = z
+  .string()
+  .trim()
+  .min(1)
+  .max(256)
+  .refine((value) => !hasHeaderLineBreak(value), "Line breaks are not allowed");
 const emailString = z.string().trim().email().max(320);
-const safeHttpsUrl = z
+const singleLineString = (maxLength: number) =>
+  z
+    .string()
+    .max(maxLength)
+    .refine((value) => !hasHeaderLineBreak(value), "Line breaks are not allowed");
+const rawUrlString = z.string().trim().max(2048);
+const loopbackHttpUrl = z
   .string()
   .trim()
   .max(2048)
   .refine((value) => {
-    try {
-      const url = new URL(value);
-      return url.protocol === "https:" || url.protocol === "mailto:";
-    } catch {
-      return false;
-    }
-  }, "Only https and mailto URLs are allowed");
-const safeHttpUrl = z
-  .string()
-  .trim()
-  .max(2048)
-  .refine((value) => {
-    try {
-      const url = new URL(value);
-      return url.protocol === "http:" || url.protocol === "https:";
-    } catch {
-      return false;
-    }
-  }, "Only http and https URLs are allowed");
+    return isLoopbackHttpUrl(value);
+  }, "Only loopback http and https URLs are allowed");
 
 export const gmailMailboxSyncRequestSchema = z.object({
   accountId: idString,
@@ -52,19 +51,51 @@ export const setThreadArchivedRequestSchema = z.object({
   idempotencyKey: idString
 });
 
-const localMailUnsubscribeSchema = z.object({
-  method: z.enum(["mailto", "http-get", "http-post"]),
-  endpoint: safeHttpsUrl,
-  oneClick: z.boolean(),
-  sourceMessageId: idString,
-  mailto: z
-    .object({
-      to: z.array(emailString).min(1).max(20),
-      subject: z.string().max(1024).optional(),
-      body: z.string().max(8192).optional()
-    })
-    .optional()
-});
+const localMailUnsubscribeSchema = z
+  .object({
+    method: z.enum(["mailto", "http-get", "http-post"]),
+    endpoint: rawUrlString,
+    oneClick: z.boolean(),
+    sourceMessageId: idString,
+    mailto: z
+      .object({
+        to: z.array(emailString).min(1).max(20),
+        subject: singleLineString(1024).optional(),
+        body: z.string().max(8192).optional()
+      })
+      .optional()
+  })
+  .superRefine((value, context) => {
+    try {
+      const parsed = new URL(value.endpoint);
+
+      if (value.method === "mailto") {
+        if (parsed.protocol !== "mailto:") {
+          context.addIssue({
+            code: "custom",
+            path: ["endpoint"],
+            message: "Mailto unsubscribe endpoints must use mailto URLs"
+          });
+        }
+        return;
+      }
+
+      if (!isSafeRemoteHttpsUrl(value.endpoint)) {
+        context.addIssue({
+          code: "custom",
+          path: ["endpoint"],
+          message:
+            "HTTP unsubscribe endpoints must be remote https URLs outside private networks"
+        });
+      }
+    } catch {
+      context.addIssue({
+        code: "custom",
+        path: ["endpoint"],
+        message: "Unsubscribe endpoint must be a valid URL"
+      });
+    }
+  });
 
 export const unsubscribeThreadRequestSchema = z.object({
   accountId: idString,
@@ -112,7 +143,7 @@ export const sendDraftRequestSchema = z.object({
   to: z.array(emailString).min(1).max(100),
   cc: z.array(emailString).max(100),
   bcc: z.array(emailString).max(100),
-  subject: z.string().max(2048),
+  subject: singleLineString(2048),
   bodyHtml: z.string().max(5 * 1024 * 1024),
   replyToMessageId: idString.optional(),
   sendAt: z.number().int().nonnegative().nullable().optional()
@@ -148,7 +179,7 @@ const assistantProviderInputConfigSchema = z.object({
   presetId: mailAssistantPresetSchema.nullable(),
   temperature: z.number().min(0).max(2).nullable(),
   maxOutputTokens: z.number().int().positive().max(65_536).nullable(),
-  baseUrl: z.union([safeHttpUrl, z.null()]).default(null),
+  baseUrl: z.union([loopbackHttpUrl, z.null()]).default(null),
   apiKey: z.string().max(4096).optional(),
   clearApiKey: z.boolean().optional()
 });
@@ -182,7 +213,7 @@ export const testMailAssistantProviderConnectionRequestSchema = z.object({
 });
 
 export const listOllamaModelsRequestSchema = z.object({
-  baseUrl: safeHttpUrl.nullable().optional()
+  baseUrl: loopbackHttpUrl.nullable().optional()
 });
 
 export const rendererErrorPayloadSchema = z.object({

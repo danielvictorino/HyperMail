@@ -165,7 +165,7 @@ Every mutating main-process handler routes through `parseIpcPayload(channel, sch
 | `gmailMailboxSync` | Pull Gmail mailbox delta | `maxResults ≤ 500` |
 | `setThreadStarred` | Toggle star | idempotency key required |
 | `setThreadArchived` | Toggle archive | idempotency key required |
-| `unsubscribeThread` | mailto / http-get / http-post unsubscribe | endpoint must be `https:` or `mailto:` |
+| `unsubscribeThread` | mailto / http-get / http-post unsubscribe | endpoint must be `mailto:` or remote public `https:` |
 | `downloadGmailAttachment` | Fetch + cache attachment | `size ≤ 100 MB` |
 | `sendDraft` | Send or schedule draft | recipients ≤ 100 · body ≤ 5 MB · `sendAt > now` |
 | `summarizeThread` | AI summarize | thread context ≤ 512 KB |
@@ -189,7 +189,7 @@ Full threat model + hardening inventory: [`docs/security.md`](docs/security.md).
 | Navigation guard | `setWindowOpenHandler` + `will-navigate` → `isAllowedExternalUrl` (https / mailto only) | `src/shared/ipc-contracts.ts` |
 | CSP | Meta tag + runtime header. `script-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`, `form-action 'none'`; pinned origins for Google / Microsoft / OpenAI / Anthropic / Ollama | `electron/main.ts` |
 | IPC zod validation | 10 mutating channels parsed before any handler runs | `parseIpcPayload` |
-| Unsubscribe URL allowlist | `https:` / `mailto:` only | `safeHttpsUrl` in `ipc-contracts.ts` |
+| Unsubscribe URL allowlist | `mailto:` or remote public `https:` only; local/private targets blocked | `url-safety.ts` + IPC schemas |
 | OAuth hardening | PKCE S256 · per-sign-in state verification · single-flight refresh · jittered `1 s / 2 s / 4 s` backoff · transient vs terminal error classifier | `electron/oauth/google-oauth.ts` |
 | Secret storage | All refresh tokens and OpenAI/Anthropic keys via `keytar` (Windows Credential Manager) | `electron/oauth/` |
 | Gmail retry classifier | `429` / `5xx` honor `Retry-After`; `4xx` terminal | `electron/runtime/retry.ts` |
@@ -234,7 +234,7 @@ Optional. Invoked via `a` (summarize), `d` (voice draft), `l` (split). Calls ori
 |---|---|---|---|
 | OpenAI | `https://api.openai.com` | `keytar` | `OPENAI_API_KEY`, `OPENAI_MODEL` |
 | Anthropic | `https://api.anthropic.com` | `keytar` | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` |
-| Ollama | `http://127.0.0.1:11434` | — (localhost) | `OLLAMA_BASE_URL`, `OLLAMA_MODEL` |
+| Ollama | `http://127.0.0.1:11434` | — (loopback only) | `OLLAMA_BASE_URL`, `OLLAMA_MODEL` |
 
 Fallback routing: when the primary provider fails, the optional fallback retries once. Provider selection, model ids, presets, and non-secret settings persist under Electron `userData`.
 
@@ -250,11 +250,11 @@ Fallback routing: when the primary provider fails, the optional fallback retries
 | `OPENAI_MODEL` | — | Default OpenAI model |
 | `ANTHROPIC_API_KEY` | — | Default Anthropic API key |
 | `ANTHROPIC_MODEL` | — | Default Anthropic model |
-| `OLLAMA_BASE_URL` | — | Default Ollama base URL (`http://127.0.0.1:11434`) |
+| `OLLAMA_BASE_URL` | — | Default loopback-only Ollama base URL (`http://127.0.0.1:11434`) |
 | `OLLAMA_MODEL` | — | Default Ollama model |
 | `HYPERMAIL_AI_PRIMARY_PROVIDER` | — | Default primary provider (`openai`, `anthropic`, `ollama`) |
 | `HYPERMAIL_AI_FALLBACK_PROVIDER` | — | Default fallback provider (`openai`, `anthropic`, `ollama`, `none`) |
-| `HYPERMAIL_UPDATES_URL` | — | Windows auto-update feed; omit to disable auto-update |
+| `HYPERMAIL_UPDATES_URL` | — | Signed Windows auto-update feed; omit to disable auto-update |
 | `HYPERMAIL_UPDATE_CHANNEL` | — | Defaults to `latest` |
 | `HYPERMAIL_CRASH_REPORT_URL` | — | Optional remote crash upload |
 
@@ -279,7 +279,7 @@ Fallback routing: when the primary provider fails, the optional fallback retries
 | Component | Version |
 |---|---|
 | Node | 20 |
-| Electron | 35 |
+| Electron | 41 |
 | React / ReactDOM | 19.0.0 |
 | Vite | 6.0.7 |
 | Vitest | 2.1.8 |

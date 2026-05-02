@@ -120,7 +120,7 @@ describe("mail-assistant helpers", () => {
       "http://127.0.0.1:11434"
     );
     expect(normalizeOllamaBaseUrl("https://ollama.example.com/api/")).toBe(
-      "https://ollama.example.com/api"
+      "http://127.0.0.1:11434"
     );
   });
 });
