@@ -16,6 +16,8 @@
     "build:renderer": "vite build",
     "build:electron": "tsup",
     "package:dir": "npm run build && electron-builder --dir",
+    "package:check": "node scripts/assert-no-packaged-source-maps.cjs",
+    "package:dir:check": "npm run package:dir && npm run package:check",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

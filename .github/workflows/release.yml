@@ -51,6 +51,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder --win --x64 --publish=never
 
+      - name: Verify packaged source maps are excluded
+        run: npm run package:check
+
       - name: Smoke test packaged app startup
         shell: pwsh
         run: |

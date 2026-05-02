@@ -113,6 +113,24 @@ describe("dispatchKeyboardEvent", () => {
     expect(options.commandPaletteMove).toHaveBeenCalledWith(1, 5);
   });
 
+  it("ArrowUp in palette moves the selection backward", async () => {
+    const options = makeOptions({
+      commandPaletteOpen: true,
+      commandPaletteCount: 5
+    });
+    await dispatchKeyboardEvent(fakeEvent({ key: "ArrowUp" }), options);
+    expect(options.commandPaletteMove).toHaveBeenCalledWith(-1, 5);
+  });
+
+  it("Enter in palette executes the active command", async () => {
+    const options = makeOptions({
+      commandPaletteOpen: true,
+      commandPaletteCount: 5
+    });
+    await dispatchKeyboardEvent(fakeEvent({ key: "Enter" }), options);
+    expect(options.executeActiveCommand).toHaveBeenCalledOnce();
+  });
+
   it("j selects next thread when not editable", async () => {
     const options = makeOptions();
     await dispatchKeyboardEvent(fakeEvent({ key: "j" }), options);
