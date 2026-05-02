@@ -8,6 +8,13 @@ From v0.2.0 onward, this file is maintained automatically by
 [release-please](https://github.com/googleapis/release-please) from
 [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [0.2.1](https://github.com/danielvictorino/HyperMail/compare/v0.2.0...v0.2.1) (2026-05-02)
+
+
+### Bug Fixes
+
+* harden security scan findings ([b1b7724](https://github.com/danielvictorino/HyperMail/commit/b1b77247577aaa2ae43c298ae5e6fdfbc576c9a4))
+
 ## [0.2.0](https://github.com/danielvictorino/HyperMail/compare/v0.1.4...v0.2.0) (2026-04-24)
 
 
