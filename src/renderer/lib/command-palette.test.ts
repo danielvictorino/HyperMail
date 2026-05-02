@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  createCommandSearchIndex,
   groupRankedCommands,
   rankCommands,
   type CommandSearchEntry
@@ -73,5 +74,41 @@ describe("rankCommands", () => {
 
     expect(grouped[0]?.group).toBe("Actions");
     expect(grouped[1]?.group).toBe("Threads");
+  });
+
+  it("returns the same ranked results from a prebuilt command index", () => {
+    const index = createCommandSearchIndex(commands);
+
+    expect(rankCommands(index, "archive maya")).toEqual(
+      rankCommands(commands, "archive maya")
+    );
+  });
+
+  it("can keep only the highest ranked commands for large command lists", () => {
+    const largeCommandList: CommandSearchEntry[] = [
+      ...Array.from({ length: 1_500 }, (_, index) => ({
+        id: `bulk-${index}`,
+        group: "Threads" as const,
+        label: `Open: Sender ${index}`,
+        subtitle: `Routine note ${index}`,
+        intent: "open-thread" as const,
+        threadId: `thread-${index}`,
+        keywords: ["bulk", `sender-${index}`]
+      })),
+      {
+        id: "reply-scale-owner",
+        group: "Threads",
+        label: "Reply to: Scale mailbox owner",
+        subtitle: "Large mailbox ranking check",
+        intent: "reply",
+        threadId: "thread-scale",
+        keywords: ["scale", "mailbox", "owner", "reply"]
+      }
+    ];
+    const index = createCommandSearchIndex(largeCommandList);
+    const results = rankCommands(index, "reply scale mailbox", { limit: 12 });
+
+    expect(results).toHaveLength(1);
+    expect(results[0]?.id).toBe("reply-scale-owner");
   });
 });

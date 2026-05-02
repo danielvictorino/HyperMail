@@ -1,11 +1,28 @@
 import type { ThreadProjection } from "@shared/mail/models";
 
+const whitespacePattern = /\s+/g;
+
+interface MailboxSearchEntry {
+  thread: ThreadProjection;
+  subject: string;
+  participants: string;
+  snippet: string;
+  messageBodies: string;
+  lastMessageAt: number;
+  unread: boolean;
+}
+
+export interface MailboxSearchIndex {
+  threads: ThreadProjection[];
+  entries: MailboxSearchEntry[];
+}
+
 function normalize(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
+  return value.trim().toLowerCase().replace(whitespacePattern, " ");
 }
 
 function tokenize(value: string): string[] {
-  return normalize(value)
+  return value
     .split(" ")
     .map((token) => token.trim())
     .filter(Boolean);
@@ -27,52 +44,62 @@ function countMatches(haystack: string, token: string): number {
   return count;
 }
 
-function scoreThread(thread: ThreadProjection, normalizedQuery: string): number {
-  const subject = normalize(thread.thread.subject);
-  const participants = normalize(
-    [...thread.thread.participantNames, ...thread.thread.participantEmails].join(" ")
-  );
-  const snippet = normalize(thread.thread.snippet);
-  const messageBodies = normalize(
-    thread.messages.map((message) => message.bodyPlain).join(" ")
-  );
-  const tokens = tokenize(normalizedQuery);
+function createMailboxSearchEntry(thread: ThreadProjection): MailboxSearchEntry {
+  return {
+    thread,
+    subject: normalize(thread.thread.subject),
+    participants: normalize(
+      [...thread.thread.participantNames, ...thread.thread.participantEmails].join(" ")
+    ),
+    snippet: normalize(thread.thread.snippet),
+    messageBodies: normalize(
+      thread.messages.map((message) => message.bodyPlain).join(" ")
+    ),
+    lastMessageAt: thread.thread.lastMessageAt,
+    unread: thread.thread.unread
+  };
+}
 
+function scoreThreadEntry(
+  entry: MailboxSearchEntry,
+  normalizedQuery: string,
+  tokens: string[]
+): number {
   if (tokens.length === 0) {
     return 0;
   }
 
   let score = 0;
 
-  if (subject.startsWith(normalizedQuery)) {
+  if (entry.subject.startsWith(normalizedQuery)) {
     score += 220;
   }
 
-  if (participants.startsWith(normalizedQuery)) {
+  if (entry.participants.startsWith(normalizedQuery)) {
     score += 180;
   }
 
-  if (subject.includes(normalizedQuery)) {
+  if (entry.subject.includes(normalizedQuery)) {
     score += 120;
   }
 
-  if (participants.includes(normalizedQuery)) {
+  if (entry.participants.includes(normalizedQuery)) {
     score += 90;
   }
 
-  if (snippet.includes(normalizedQuery)) {
+  if (entry.snippet.includes(normalizedQuery)) {
     score += 70;
   }
 
-  if (messageBodies.includes(normalizedQuery)) {
+  if (entry.messageBodies.includes(normalizedQuery)) {
     score += 60;
   }
 
   for (const token of tokens) {
-    const subjectMatches = countMatches(subject, token);
-    const participantMatches = countMatches(participants, token);
-    const snippetMatches = countMatches(snippet, token);
-    const bodyMatches = countMatches(messageBodies, token);
+    const subjectMatches = countMatches(entry.subject, token);
+    const participantMatches = countMatches(entry.participants, token);
+    const snippetMatches = countMatches(entry.snippet, token);
+    const bodyMatches = countMatches(entry.messageBodies, token);
     const tokenMatched =
       subjectMatches + participantMatches + snippetMatches + bodyMatches > 0;
 
@@ -86,35 +113,61 @@ function scoreThread(thread: ThreadProjection, normalizedQuery: string): number 
     score += Math.min(bodyMatches, 3) * 12;
   }
 
-  if (thread.thread.unread) {
+  if (entry.unread) {
     score += 6;
   }
 
   return score;
 }
 
+export function createMailboxSearchIndex(
+  threads: ThreadProjection[]
+): MailboxSearchIndex {
+  return {
+    threads,
+    entries: threads.map(createMailboxSearchEntry)
+  };
+}
+
 export function searchThreads(
-  threads: ThreadProjection[],
+  source: ThreadProjection[] | MailboxSearchIndex,
   query: string
 ): ThreadProjection[] {
+  const index = Array.isArray(source) ? createMailboxSearchIndex(source) : source;
   const normalizedQuery = normalize(query);
 
   if (!normalizedQuery) {
-    return threads;
+    return index.threads;
   }
 
-  return threads
-    .map((thread) => ({
-      thread,
-      score: scoreThread(thread, normalizedQuery)
-    }))
-    .filter((entry) => entry.score > 0)
+  const tokens = tokenize(normalizedQuery);
+  const matches: Array<{
+    thread: ThreadProjection;
+    score: number;
+    lastMessageAt: number;
+  }> = [];
+
+  for (const entry of index.entries) {
+    const score = scoreThreadEntry(entry, normalizedQuery, tokens);
+
+    if (score <= 0) {
+      continue;
+    }
+
+    matches.push({
+      thread: entry.thread,
+      score,
+      lastMessageAt: entry.lastMessageAt
+    });
+  }
+
+  return matches
     .sort((left, right) => {
       if (right.score !== left.score) {
         return right.score - left.score;
       }
 
-      return right.thread.thread.lastMessageAt - left.thread.thread.lastMessageAt;
+      return right.lastMessageAt - left.lastMessageAt;
     })
     .map((entry) => entry.thread);
 }

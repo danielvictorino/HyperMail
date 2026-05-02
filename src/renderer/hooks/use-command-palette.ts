@@ -1,4 +1,4 @@
-import { startTransition, useDeferredValue, useEffect, useMemo } from "react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useRef } from "react";
 import type { AuthSessionSummary } from "@shared/contracts";
 import type { ThreadProjection } from "@shared/mail/models";
 import {
@@ -6,6 +6,7 @@ import {
   parseNaturalLanguageSendLater
 } from "../lib/send-later";
 import {
+  createCommandSearchIndex,
   groupRankedCommands,
   rankCommands,
   type CommandSearchEntry,
@@ -26,6 +27,14 @@ interface CommandPaletteDependencies {
   mailbox: ReturnType<typeof useMailboxLab>;
 }
 
+interface CommandBuildDependencies {
+  authSession: AuthSessionSummary | null;
+  manualOffline: boolean;
+  selectedThread: ThreadProjection | null;
+  threads: ThreadProjection[];
+  getLiveContext: () => CommandPaletteDependencies;
+}
+
 export function useCommandPalette({
   authSession,
   connectGmail,
@@ -41,21 +50,53 @@ export function useCommandPalette({
   const setActiveIndex = useCommandPaletteStore((state) => state.setActiveIndex);
   const moveActiveIndex = useCommandPaletteStore((state) => state.moveActiveIndex);
   const deferredQuery = useDeferredValue(query);
+  const liveContextRef = useRef<CommandPaletteDependencies>({
+    authSession,
+    connectGmail,
+    disconnectGmail,
+    mailbox
+  });
+  liveContextRef.current = {
+    authSession,
+    connectGmail,
+    disconnectGmail,
+    mailbox
+  };
+  const getLiveContext = useMemo(() => () => liveContextRef.current, []);
+  const manualOffline = mailbox.manualOffline;
+  const selectedThread = mailbox.selectedThread;
+  const threads = mailbox.threads;
 
-  const commands = useMemo(() => {
-    const baseCommands = buildCommands({
-      authSession,
-      connectGmail,
-      disconnectGmail,
-      mailbox
-    });
-    return [...buildSnoozeQueryCommands(mailbox, query), ...baseCommands];
-  }, [authSession, connectGmail, disconnectGmail, mailbox, query]);
+  const baseCommands = useMemo(
+    () =>
+      buildCommands({
+        authSession,
+        manualOffline,
+        selectedThread,
+        threads,
+        getLiveContext
+      }),
+    [authSession, getLiveContext, manualOffline, selectedThread, threads]
+  );
+  const snoozeQueryCommands = useMemo(
+    () => buildSnoozeQueryCommands(selectedThread, query, getLiveContext),
+    [getLiveContext, query, selectedThread]
+  );
+  const commands = useMemo(
+    () => [...snoozeQueryCommands, ...baseCommands],
+    [baseCommands, snoozeQueryCommands]
+  );
+
+  const commandSearchIndex = useMemo(
+    () => createCommandSearchIndex(commands),
+    [commands]
+  );
 
   const rankedCommands = useMemo(() => {
-    const ranked = rankCommands(commands, deferredQuery) as RankedExecutableCommand[];
-    return ranked.slice(0, 12);
-  }, [commands, deferredQuery]);
+    return rankCommands(commandSearchIndex, deferredQuery, {
+      limit: 12
+    }) as RankedExecutableCommand[];
+  }, [commandSearchIndex, deferredQuery]);
 
   const groupedCommands = useMemo(
     () => groupRankedCommands(rankedCommands),
@@ -104,20 +145,20 @@ type RankedExecutableCommand = RankedCommand & Pick<ExecutableCommand, "execute"
 
 function buildCommands({
   authSession,
-  connectGmail,
-  disconnectGmail,
-  mailbox
-}: CommandPaletteDependencies): ExecutableCommand[] {
+  getLiveContext,
+  manualOffline,
+  selectedThread,
+  threads
+}: CommandBuildDependencies): ExecutableCommand[] {
   const commands: ExecutableCommand[] = [];
   const connectedProviderLabel =
     authSession?.provider === "microsoft" ? "Microsoft" : "Gmail";
 
-  const selectedThread = mailbox.selectedThread;
-  const threadCommands = mailbox.threads.flatMap((thread) =>
-    buildThreadCommands(thread, mailbox)
+  const threadCommands = threads.flatMap((thread) =>
+    buildThreadCommands(thread, getLiveContext)
   );
 
-  commands.push(...buildSectionCommands(mailbox));
+  commands.push(...buildSectionCommands(getLiveContext));
   commands.push(
     {
       id: "reply-current",
@@ -129,7 +170,9 @@ function buildCommands({
       intent: "reply",
       keywords: ["reply", "respond", "current thread", "composer"],
       execute: () => {
-        if (selectedThread) {
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
           mailbox.openComposer();
         }
       }
@@ -145,8 +188,10 @@ function buildCommands({
       intent: "draft",
       keywords: ["draft", "voice", "ai", "reply", "current thread"],
       execute: async () => {
-        if (selectedThread) {
-          await mailbox.generateVoiceDraft(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
+          await mailbox.generateVoiceDraft(mailbox.selectedThread);
         }
       }
     },
@@ -161,8 +206,10 @@ function buildCommands({
       intent: "summarize",
       keywords: ["summarize", "summary", "brief", "triage", "current thread"],
       execute: async () => {
-        if (selectedThread) {
-          await mailbox.generateThreadSummary(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
+          await mailbox.generateThreadSummary(mailbox.selectedThread);
         }
       }
     },
@@ -177,8 +224,10 @@ function buildCommands({
       intent: "classify",
       keywords: ["label", "split", "classify", "vip", "important", "other"],
       execute: async () => {
-        if (selectedThread) {
-          await mailbox.suggestThreadSplit(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
+          await mailbox.suggestThreadSplit(mailbox.selectedThread);
         }
       }
     },
@@ -201,19 +250,22 @@ function buildCommands({
           : "snooze",
       keywords: ["snooze", "unsnooze", "later", "pause", "tomorrow 8am"],
       execute: async () => {
-        if (!selectedThread) {
+        const { mailbox } = getLiveContext();
+        const currentThread = mailbox.selectedThread;
+
+        if (!currentThread) {
           return;
         }
 
         if (
-          selectedThread.thread.snoozedUntil &&
-          selectedThread.thread.snoozedUntil > Date.now()
+          currentThread.thread.snoozedUntil &&
+          currentThread.thread.snoozedUntil > Date.now()
         ) {
-          await mailbox.unsnoozeThread(selectedThread);
+          await mailbox.unsnoozeThread(currentThread);
           return;
         }
 
-        await mailbox.snoozeThread(selectedThread, getDefaultSnoozeTimestamp());
+        await mailbox.snoozeThread(currentThread, getDefaultSnoozeTimestamp());
       }
     },
     ...(selectedThread?.thread.unsubscribe || selectedThread?.thread.unsubscribedAt
@@ -237,12 +289,15 @@ function buildCommands({
               "current thread"
             ],
             execute: async () => {
+              const { mailbox } = getLiveContext();
+              const currentThread = mailbox.selectedThread;
+
               if (
-                selectedThread &&
-                selectedThread.thread.unsubscribe &&
-                !selectedThread.thread.unsubscribedAt
+                currentThread &&
+                currentThread.thread.unsubscribe &&
+                !currentThread.thread.unsubscribedAt
               ) {
-                await mailbox.unsubscribeThread(selectedThread);
+                await mailbox.unsubscribeThread(currentThread);
               }
             }
           }
@@ -259,8 +314,10 @@ function buildCommands({
       intent: "follow-up",
       keywords: ["follow up", "waiting", "nudge", "draft", "current thread"],
       execute: async () => {
-        if (selectedThread) {
-          await mailbox.generateVoiceDraft(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
+          await mailbox.generateVoiceDraft(mailbox.selectedThread);
         }
       }
     },
@@ -277,8 +334,10 @@ function buildCommands({
       intent: selectedThread?.thread.archived ? "restore" : "archive",
       keywords: ["archive", "restore", "current thread", "done", "clear"],
       execute: async () => {
-        if (selectedThread) {
-          await mailbox.toggleArchive(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
+          await mailbox.toggleArchive(mailbox.selectedThread);
         }
       }
     },
@@ -293,8 +352,10 @@ function buildCommands({
       intent: "handled",
       keywords: ["handled", "done", "clear", "archive", "current thread"],
       execute: async () => {
-        if (selectedThread && !selectedThread.thread.archived) {
-          await mailbox.toggleArchive(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread && !mailbox.selectedThread.thread.archived) {
+          await mailbox.toggleArchive(mailbox.selectedThread);
         }
       }
     },
@@ -310,23 +371,25 @@ function buildCommands({
       intent: selectedThread?.thread.starred ? "unstar" : "star",
       keywords: ["star", "favorite", "pin", "current thread"],
       execute: async () => {
-        if (selectedThread) {
-          await mailbox.toggleStar(selectedThread);
+        const { mailbox } = getLiveContext();
+
+        if (mailbox.selectedThread) {
+          await mailbox.toggleStar(mailbox.selectedThread);
         }
       }
     },
     {
-      id: mailbox.manualOffline ? "system-online" : "system-offline",
+      id: manualOffline ? "system-online" : "system-offline",
       group: "System",
-      label: mailbox.manualOffline ? "Resume online mode" : "Simulate offline mode",
-      subtitle: mailbox.manualOffline
+      label: manualOffline ? "Resume online mode" : "Simulate offline mode",
+      subtitle: manualOffline
         ? "Reconnect the queue processor"
         : "Pause persistence and keep working locally",
       hint: "⌥O",
-      intent: mailbox.manualOffline ? "online" : "offline",
+      intent: manualOffline ? "online" : "offline",
       keywords: ["offline", "online", "queue", "network", "simulate"],
       execute: () => {
-        mailbox.toggleManualOffline();
+        getLiveContext().mailbox.toggleManualOffline();
       }
     },
     {
@@ -338,7 +401,7 @@ function buildCommands({
       intent: "refresh",
       keywords: ["refresh", "retry", "queue", "sync", "kick"],
       execute: async () => {
-        await mailbox.refreshQueue();
+        await getLiveContext().mailbox.refreshQueue();
       }
     },
     {
@@ -351,10 +414,12 @@ function buildCommands({
       intent: authSession ? "online" : "open-thread",
       keywords: ["gmail", "connect", "disconnect", "account"],
       execute: async () => {
-        if (authSession) {
-          await disconnectGmail();
+        const liveContext = getLiveContext();
+
+        if (liveContext.authSession) {
+          await liveContext.disconnectGmail();
         } else {
-          await connectGmail();
+          await liveContext.connectGmail();
         }
       }
     }
@@ -366,7 +431,7 @@ function buildCommands({
 }
 
 function buildSectionCommands(
-  mailbox: CommandPaletteDependencies["mailbox"]
+  getLiveContext: () => CommandPaletteDependencies
 ): ExecutableCommand[] {
   const sections: Array<{ id: MailboxSectionId; label: string; hint: string }> = [
     { id: "inbox", label: "Inbox", hint: "1" },
@@ -390,7 +455,7 @@ function buildSectionCommands(
     keywords: [section.label.toLowerCase(), "section", "split", "go", "switch"],
     execute: () => {
       startTransition(() => {
-        mailbox.setSelectedSection(section.id);
+        getLiveContext().mailbox.setSelectedSection(section.id);
       });
     }
   }));
@@ -398,7 +463,7 @@ function buildSectionCommands(
 
 function buildThreadCommands(
   thread: ThreadProjection,
-  mailbox: CommandPaletteDependencies["mailbox"]
+  getLiveContext: () => CommandPaletteDependencies
 ): ExecutableCommand[] {
   const labelBase = thread.thread.participantNames.join(", ");
   const keywords = [
@@ -418,7 +483,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "open", "show", "jump"],
       execute: () => {
-        mailbox.selectThread(thread.thread.id);
+        getLiveContext().mailbox.selectThread(thread.thread.id);
       }
     },
     {
@@ -431,6 +496,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "reply", "respond"],
       execute: () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         mailbox.openComposer();
       }
@@ -445,6 +511,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "draft", "voice", "ai", "reply"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         await mailbox.generateVoiceDraft(thread);
       }
@@ -459,6 +526,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "follow up", "waiting", "nudge", "draft"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         await mailbox.generateVoiceDraft(thread);
       }
@@ -473,6 +541,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "summary", "summarize", "brief", "triage"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         await mailbox.generateThreadSummary(thread);
       }
@@ -487,6 +556,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "split", "label", "classify", "vip", "important"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         await mailbox.suggestThreadSplit(thread);
       }
@@ -504,6 +574,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "snooze", "later", "pause", "resume"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
 
         if (thread.thread.snoozedUntil && thread.thread.snoozedUntil > Date.now()) {
@@ -526,6 +597,7 @@ function buildThreadCommands(
             threadId: thread.thread.id,
             keywords: [...keywords, "unsubscribe", "opt out", "stop emails", "remove"],
             execute: async () => {
+              const { mailbox } = getLiveContext();
               mailbox.selectThread(thread.thread.id);
 
               if (thread.thread.unsubscribe && !thread.thread.unsubscribedAt) {
@@ -545,6 +617,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "archive", "restore", "done", "clear"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         await mailbox.toggleArchive(thread);
       }
@@ -559,6 +632,7 @@ function buildThreadCommands(
       threadId: thread.thread.id,
       keywords: [...keywords, "star", "favorite", "pin"],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         mailbox.selectThread(thread.thread.id);
         await mailbox.toggleStar(thread);
       }
@@ -567,11 +641,10 @@ function buildThreadCommands(
 }
 
 function buildSnoozeQueryCommands(
-  mailbox: CommandPaletteDependencies["mailbox"],
-  query: string
+  selectedThread: ThreadProjection | null,
+  query: string,
+  getLiveContext: () => CommandPaletteDependencies
 ): ExecutableCommand[] {
-  const selectedThread = mailbox.selectedThread;
-
   if (!selectedThread) {
     return [];
   }
@@ -594,6 +667,7 @@ function buildSnoozeQueryCommands(
       intent: "snooze",
       keywords: ["snooze", "later", schedule.label, selectedThread.thread.subject],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         await mailbox.snoozeThread(selectedThread, schedule.sendAt);
       }
     },
@@ -606,6 +680,7 @@ function buildSnoozeQueryCommands(
       intent: "unsnooze",
       keywords: ["unsnooze", "resume", selectedThread.thread.subject],
       execute: async () => {
+        const { mailbox } = getLiveContext();
         await mailbox.unsnoozeThread(selectedThread);
       }
     }

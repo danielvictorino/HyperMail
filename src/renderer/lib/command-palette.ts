@@ -33,14 +33,37 @@ export interface CommandSearchEntry {
   threadId?: string;
 }
 
-export interface RankedCommand extends CommandSearchEntry {
-  score: number;
+export type RankedCommand<TCommand extends CommandSearchEntry = CommandSearchEntry> =
+  TCommand & {
+    score: number;
+  };
+
+interface IndexedCommandSearchEntry<
+  TCommand extends CommandSearchEntry = CommandSearchEntry
+> {
+  command: TCommand;
+  normalizedLabel: string;
+  haystack: string;
+  order: number;
+}
+
+export interface CommandSearchIndex<
+  TCommand extends CommandSearchEntry = CommandSearchEntry
+> {
+  commands: TCommand[];
+  entries: Array<IndexedCommandSearchEntry<TCommand>>;
+}
+
+export interface RankCommandOptions {
+  limit?: number;
 }
 
 interface ParsedIntent {
   intent: CommandIntent | null;
   remainder: string;
 }
+
+const whitespacePattern = /\s+/g;
 
 const intentAliases: Record<CommandIntent, string[]> = {
   reply: ["reply", "respond", "answer"],
@@ -64,7 +87,7 @@ const intentAliases: Record<CommandIntent, string[]> = {
 };
 
 function normalize(input: string): string {
-  return input.trim().toLowerCase().replace(/\s+/g, " ");
+  return input.trim().toLowerCase().replace(whitespacePattern, " ");
 }
 
 function tokenize(input: string): string[] {
@@ -110,81 +133,145 @@ function parseIntent(query: string): ParsedIntent {
   };
 }
 
-export function rankCommands(
-  commands: CommandSearchEntry[],
-  query: string
-): RankedCommand[] {
+export function createCommandSearchIndex<TCommand extends CommandSearchEntry>(
+  commands: TCommand[]
+): CommandSearchIndex<TCommand> {
+  return {
+    commands,
+    entries: commands.map((command, order) => ({
+      command,
+      normalizedLabel: normalize(command.label),
+      haystack: normalize(
+        [command.label, command.subtitle ?? "", ...command.keywords].join(" ")
+      ),
+      order
+    }))
+  };
+}
+
+function compareRankedCommands(left: RankedCommand, right: RankedCommand): number {
+  return right.score - left.score;
+}
+
+function insertRankedCommand<TCommand extends CommandSearchEntry>(
+  rankedCommands: Array<RankedCommand<TCommand>>,
+  command: RankedCommand<TCommand>,
+  limit: number | undefined
+): void {
+  if (!limit) {
+    rankedCommands.push(command);
+    return;
+  }
+
+  let insertIndex = 0;
+
+  while (insertIndex < rankedCommands.length) {
+    const existingCommand = rankedCommands[insertIndex];
+
+    if (!existingCommand || existingCommand.score < command.score) {
+      break;
+    }
+
+    insertIndex += 1;
+  }
+
+  if (insertIndex >= limit) {
+    return;
+  }
+
+  rankedCommands.splice(insertIndex, 0, command);
+
+  if (rankedCommands.length > limit) {
+    rankedCommands.pop();
+  }
+}
+
+export function rankCommands<TCommand extends CommandSearchEntry>(
+  source: TCommand[] | CommandSearchIndex<TCommand>,
+  query: string,
+  options: RankCommandOptions = {}
+): Array<RankedCommand<TCommand>> {
+  const index = Array.isArray(source) ? createCommandSearchIndex(source) : source;
   const normalizedQuery = normalize(query);
+  const rankedCommands: Array<RankedCommand<TCommand>> = [];
 
   if (!normalizedQuery) {
-    return commands
-      .map((command, index) => ({
-        ...command,
-        score: 10_000 - index
-      }))
-      .sort((left, right) => right.score - left.score);
+    for (const entry of index.entries) {
+      insertRankedCommand(
+        rankedCommands,
+        {
+          ...entry.command,
+          score: 10_000 - entry.order
+        },
+        options.limit
+      );
+    }
+
+    return options.limit ? rankedCommands : rankedCommands.sort(compareRankedCommands);
   }
 
   const parsedIntent = parseIntent(normalizedQuery);
   const queryTokens = tokenize(parsedIntent.remainder || normalizedQuery);
 
-  return commands
-    .map((command, index) => {
-      const haystack = [command.label, command.subtitle ?? "", ...command.keywords]
-        .join(" ")
-        .toLowerCase();
+  for (const entry of index.entries) {
+    const command = entry.command;
+    let score = 0;
 
-      let score = 0;
+    if (parsedIntent.intent && command.intent === parsedIntent.intent) {
+      score += 200;
+    }
 
-      if (parsedIntent.intent && command.intent === parsedIntent.intent) {
-        score += 200;
+    if (entry.normalizedLabel.startsWith(normalizedQuery)) {
+      score += 160;
+    }
+
+    if (entry.normalizedLabel.includes(normalizedQuery)) {
+      score += 90;
+    }
+
+    for (const token of queryTokens) {
+      if (entry.haystack.includes(token)) {
+        score += 40;
+      } else {
+        score -= 25;
       }
+    }
 
-      if (command.label.toLowerCase().startsWith(normalizedQuery)) {
-        score += 160;
-      }
+    if (
+      parsedIntent.intent &&
+      parsedIntent.remainder &&
+      entry.haystack.includes(parsedIntent.remainder)
+    ) {
+      score += 120;
+    }
 
-      if (command.label.toLowerCase().includes(normalizedQuery)) {
-        score += 90;
-      }
+    if (command.group === "Actions") {
+      score += 14;
+    }
 
-      for (const token of queryTokens) {
-        if (haystack.includes(token)) {
-          score += 40;
-        } else {
-          score -= 25;
-        }
-      }
+    if (command.group === "Threads") {
+      score += 6;
+    }
 
-      if (
-        parsedIntent.intent &&
-        parsedIntent.remainder &&
-        haystack.includes(parsedIntent.remainder)
-      ) {
-        score += 120;
-      }
+    const rankedCommand = {
+      ...command,
+      score: score - entry.order * 0.01
+    };
 
-      if (command.group === "Actions") {
-        score += 14;
-      }
+    if (rankedCommand.score <= 0) {
+      continue;
+    }
 
-      if (command.group === "Threads") {
-        score += 6;
-      }
+    insertRankedCommand(rankedCommands, rankedCommand, options.limit);
+  }
 
-      return {
-        ...command,
-        score: score - index * 0.01
-      };
-    })
-    .filter((command) => command.score > 0)
-    .sort((left, right) => right.score - left.score);
+  return options.limit ? rankedCommands : rankedCommands.sort(compareRankedCommands);
 }
 
-export function groupRankedCommands(
-  commands: RankedCommand[]
-): Array<{ group: CommandGroup; items: RankedCommand[] }> {
-  const grouped = new Map<CommandGroup, RankedCommand[]>();
+export function groupRankedCommands<TCommand extends CommandSearchEntry>(
+  commands: Array<RankedCommand<TCommand>>
+): Array<{ group: CommandGroup; items: Array<RankedCommand<TCommand>> }> {
+  const grouped = new Map<CommandGroup, Array<RankedCommand<TCommand>>>();
   const groupOrder: CommandGroup[] = ["Actions", "Threads", "Sections", "System"];
 
   for (const command of commands) {

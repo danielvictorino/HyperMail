@@ -10,7 +10,7 @@ import {
   getSectionHeadline,
   type DailyBrief
 } from "../lib/mailbox-view";
-import { searchThreads } from "../lib/mailbox-search";
+import { createMailboxSearchIndex, searchThreads } from "../lib/mailbox-search";
 import { type MailboxSectionId, useInboxUiStore } from "../state/inbox-ui-store";
 
 export interface MailboxViewState {
@@ -65,6 +65,7 @@ export function useMailboxViewState({
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const threads = useMemo(() => snapshot?.threads ?? [], [snapshot?.threads]);
+  const searchIndex = useMemo(() => createMailboxSearchIndex(threads), [threads]);
   const navItems = useMemo(() => getMailboxNavItems(threads), [threads]);
   const activeThreads = useMemo(
     () => filterThreadsBySection(threads, selectedSection),
@@ -73,9 +74,9 @@ export function useMailboxViewState({
   const visibleThreads = useMemo(
     () =>
       deferredSearchQuery.trim()
-        ? searchThreads(threads, deferredSearchQuery)
+        ? searchThreads(searchIndex, deferredSearchQuery)
         : activeThreads,
-    [activeThreads, deferredSearchQuery, threads]
+    [activeThreads, deferredSearchQuery, searchIndex]
   );
   const isSearching = deferredSearchQuery.trim().length > 0;
   const dailyBrief = useMemo(
