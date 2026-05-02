@@ -1,15 +1,5 @@
 import type { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
-import {
-  amberDark,
-  cyanDark,
-  grassDark,
-  pinkDark,
-  redDark,
-  slateDark,
-  tealDark,
-  violetDark
-} from "@radix-ui/colors";
 
 function toRgbChannel(value: string): string {
   const hex = value.replace("#", "");
@@ -22,23 +12,23 @@ function toRgbChannel(value: string): string {
   ].join(" ");
 }
 
-const radixHypermailTokens: Record<string, string> = {
-  "--hm-bg": toRgbChannel(slateDark.slate1),
-  "--hm-panel": toRgbChannel(slateDark.slate2),
-  "--hm-panel-strong": toRgbChannel(slateDark.slate3),
-  "--hm-surface": toRgbChannel(slateDark.slate4),
-  "--hm-surface-muted": toRgbChannel(slateDark.slate5),
-  "--hm-border": toRgbChannel(slateDark.slate7),
-  "--hm-foreground": toRgbChannel(slateDark.slate12),
-  "--hm-muted": toRgbChannel(slateDark.slate11),
-  "--hm-accent": toRgbChannel(tealDark.teal9),
-  "--hm-accent-soft": toRgbChannel(tealDark.teal5),
-  "--hm-positive": toRgbChannel(grassDark.grass9),
-  "--hm-warning": toRgbChannel(amberDark.amber9),
-  "--hm-danger": toRgbChannel(redDark.red9),
-  "--hm-info": toRgbChannel(cyanDark.cyan9),
-  "--hm-vip": toRgbChannel(pinkDark.pink9),
-  "--hm-ai": toRgbChannel(violetDark.violet9)
+const linearHypermailTokens: Record<string, string> = {
+  "--hm-bg": toRgbChannel("#050614"),
+  "--hm-panel": toRgbChannel("#0b0d1a"),
+  "--hm-panel-strong": toRgbChannel("#101322"),
+  "--hm-surface": toRgbChannel("#171a2b"),
+  "--hm-surface-muted": toRgbChannel("#202438"),
+  "--hm-border": toRgbChannel("#ffffff"),
+  "--hm-foreground": toRgbChannel("#f7f8f8"),
+  "--hm-muted": toRgbChannel("#b4bcd0"),
+  "--hm-accent": toRgbChannel("#673fd7"),
+  "--hm-accent-soft": toRgbChannel("#455eb5"),
+  "--hm-positive": toRgbChannel("#4dab76"),
+  "--hm-warning": toRgbChannel("#e6a94c"),
+  "--hm-danger": toRgbChannel("#ef5d5d"),
+  "--hm-info": toRgbChannel("#63b3ed"),
+  "--hm-vip": toRgbChannel("#e76bb0"),
+  "--hm-ai": toRgbChannel("#8462f4")
 };
 
 const config: Config = {
@@ -81,7 +71,7 @@ const config: Config = {
   plugins: [
     plugin(({ addBase }) => {
       addBase({
-        ":root": radixHypermailTokens
+        ":root": linearHypermailTokens
       });
     })
   ]

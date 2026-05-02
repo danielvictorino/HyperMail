@@ -20,6 +20,7 @@ function hypermailCspMeta(): Plugin {
 }
 
 export default defineConfig({
+  base: "./",
   plugins: [hypermailCspMeta(), react()],
   resolve: {
     alias: {

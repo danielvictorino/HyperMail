@@ -158,9 +158,9 @@ export function ContextRail({
       <div className="hm-section px-3 py-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-foreground">Context rail</p>
+            <p className="text-sm font-medium text-foreground">Inspector</p>
             <p className="mt-1 text-xs leading-5 text-muted">
-              Briefing, thread intelligence, runtime, and AI controls.
+              Brief, intel, runtime, and AI.
             </p>
           </div>
           <Badge
@@ -232,7 +232,7 @@ export function ContextRail({
                   <Metric label="Processing" value={String(summary.processing)} />
                   <Metric label="Retry" value={String(summary.retry)} />
                 </div>
-                <div className="mt-4 rounded-xl border border-white/10 bg-black/10 px-3 py-3 text-sm">
+                <div className="mt-4 rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3 text-sm">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted">Gmail sync</span>
                     <span className="font-medium text-foreground">
@@ -249,10 +249,10 @@ export function ContextRail({
                   </p>
                   {syncTelemetry ? (
                     <p className="mt-2 text-xs leading-5 text-muted">
-                      {syncTelemetry.mode} · {syncTelemetry.threadCount} threads ·{" "}
+                      {syncTelemetry.mode} - {syncTelemetry.threadCount} threads -{" "}
                       {syncTelemetry.durationMs} ms
                       {syncTelemetry.recoveryReason === "history-gap"
-                        ? " · recovered from history gap"
+                        ? " - recovered from history gap"
                         : ""}
                     </p>
                   ) : null}
@@ -272,7 +272,7 @@ export function ContextRail({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-between border border-white/10 bg-white/[0.03]"
+                    className="justify-between border border-white/[0.1] bg-white/[0.035]"
                     onClick={() => void onRefreshQueue()}
                   >
                     <span>Sync now</span>
@@ -404,7 +404,7 @@ export function ContextRail({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="justify-between border border-white/10 bg-white/[0.03]"
+                        className="justify-between border border-white/[0.1] bg-white/[0.035]"
                         disabled={autoUpdateStatus.phase !== "available"}
                         onClick={() => void onDownloadUpdate()}
                       >
@@ -414,7 +414,7 @@ export function ContextRail({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="justify-between border border-white/10 bg-white/[0.03]"
+                        className="justify-between border border-white/[0.1] bg-white/[0.035]"
                         disabled={autoUpdateStatus.phase !== "downloaded"}
                         onClick={() => void onInstallUpdate()}
                       >
@@ -453,7 +453,7 @@ export function ContextRail({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="mt-4 w-full justify-between border border-white/10 bg-white/[0.03]"
+                      className="mt-4 w-full justify-between border border-white/[0.1] bg-white/[0.035]"
                       onClick={() => void onOpenLogsDirectory()}
                     >
                       <span>Open logs folder</span>
@@ -519,7 +519,7 @@ export function ContextRail({
                     value={String(dailyBrief.failedSendCount)}
                   />
                 </div>
-                <div className="mt-4 rounded-xl border border-accent/20 bg-accent/10 px-3 py-3">
+                <div className="mt-4 rounded-lg border border-accent/20 bg-accent/10 px-3 py-3">
                   <p className="text-sm font-medium text-foreground">
                     {dailyBrief.topActionLabel}
                   </p>
@@ -545,7 +545,7 @@ export function ContextRail({
                     <p className="text-sm leading-6 text-muted">
                       {senderInsight.relationship}
                     </p>
-                    <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                    <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                       {senderInsight.responseTimeLabel}
                     </Badge>
                   </div>
@@ -572,7 +572,7 @@ export function ContextRail({
                     calendarContext.map((entry) => (
                       <div
                         key={`${entry.title}-${entry.timeLabel}`}
-                        className="rounded-xl border border-white/10 bg-black/10 px-3 py-3"
+                        className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3"
                       >
                         <p className="text-sm font-medium text-foreground">
                           {entry.title}
@@ -601,7 +601,7 @@ export function ContextRail({
                   </p>
                 </div>
                 <div className="space-y-3">
-                  <div className="rounded-xl border border-white/10 bg-black/10 px-3 py-3">
+                  <div className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-medium text-foreground">Summary</p>
                       <Button
@@ -635,7 +635,7 @@ export function ContextRail({
                           ))}
                         </div>
                         {threadSummary.actionItems.length > 0 ? (
-                          <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+                          <div className="mt-3 rounded-lg border border-white/[0.1] bg-white/[0.035] px-3 py-2">
                             <p className="text-[11px] uppercase text-accent">
                               Action items
                             </p>
@@ -651,7 +651,7 @@ export function ContextRail({
                         <p className="mt-3 text-xs leading-5 text-muted">
                           {threadSummary.replyRecommendation}
                           {threadSummaryGeneratedAt
-                            ? ` · ${formatRelativeTime(threadSummaryGeneratedAt)}`
+                            ? ` - ${formatRelativeTime(threadSummaryGeneratedAt)}`
                             : ""}
                         </p>
                       </>
@@ -662,7 +662,7 @@ export function ContextRail({
                     )}
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-black/10 px-3 py-3">
+                  <div className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-medium text-foreground">
                         Split suggestion
@@ -688,10 +688,10 @@ export function ContextRail({
                     {splitSuggestion ? (
                       <>
                         <div className="mt-2 flex items-center gap-2">
-                          <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                          <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                             {splitSuggestion.split}
                           </Badge>
-                          <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                          <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                             {splitSuggestion.confidence}
                           </Badge>
                         </div>
@@ -699,9 +699,9 @@ export function ContextRail({
                           {splitSuggestion.rationale}
                         </p>
                         <p className="mt-2 text-xs leading-5 text-muted">
-                          {splitSuggestion.triggerKeywords.join(" · ")}
+                          {splitSuggestion.triggerKeywords.join(" - ")}
                           {splitSuggestionGeneratedAt
-                            ? ` · ${formatRelativeTime(splitSuggestionGeneratedAt)}`
+                            ? ` - ${formatRelativeTime(splitSuggestionGeneratedAt)}`
                             : ""}
                         </p>
                         <Button
@@ -726,7 +726,7 @@ export function ContextRail({
                     )}
                     {selectedThread?.localRuleSplit &&
                     selectedThread.localRuleSplit !== selectedThread.thread.split ? (
-                      <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-3">
+                      <div className="mt-3 rounded-lg border border-white/[0.1] bg-white/[0.035] px-3 py-3">
                         <p className="text-[11px] uppercase text-accent">Local rule</p>
                         <p className="mt-2 text-sm leading-6 text-muted">
                           {selectedThread.localRuleReason}
@@ -765,18 +765,18 @@ export function ContextRail({
                     selectedThreadQueue.map((record) => (
                       <div
                         key={record.id}
-                        className="rounded-xl border border-white/10 bg-black/10 px-3 py-2"
+                        className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-2"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-sm font-medium text-foreground">
                             {record.type}
                           </span>
-                          <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                          <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                             {record.status}
                           </Badge>
                         </div>
                         <p className="mt-2 text-xs leading-5 text-muted">
-                          attempt {record.attempts + 1} · next{" "}
+                          attempt {record.attempts + 1} - next{" "}
                           {new Date(record.nextAttemptAt).toLocaleTimeString()}
                         </p>
                       </div>

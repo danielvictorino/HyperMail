@@ -6,16 +6,16 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border-accent/[0.65] bg-accent text-background shadow-[inset_0_1px_0_rgb(255_255_255/0.22)] hover:brightness-110",
+          "hm-accent-gradient border-white/[0.08] text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_18px_rgb(47_35_120/0.22)] hover:brightness-110",
         secondary:
-          "border-border/[0.45] bg-surface-muted/[0.48] text-foreground hover:border-border/70 hover:bg-surface-muted/70",
+          "border-white/[0.1] bg-foreground/[0.06] text-foreground hover:border-white/[0.16] hover:bg-foreground/[0.09]",
         ghost:
-          "border-transparent bg-transparent text-muted hover:border-border/[0.45] hover:bg-surface-muted/[0.45] hover:text-foreground"
+          "border-transparent bg-transparent text-muted hover:border-white/[0.1] hover:bg-foreground/[0.06] hover:text-foreground"
       },
       size: {
-        sm: "h-9 px-3.5",
-        md: "h-11 px-4.5",
-        lg: "h-12 px-5 text-[15px]"
+        sm: "h-8 px-3",
+        md: "h-9 px-3.5",
+        lg: "h-10 px-4 text-[15px]"
       }
     },
     defaultVariants: {

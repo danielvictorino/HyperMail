@@ -13,6 +13,10 @@ import { isMacLike } from "./lib/utils";
 import { useRuntimeCacheStore } from "./state/runtime-cache-store";
 
 export default function App() {
+  return <MailboxApp />;
+}
+
+function MailboxApp() {
   const auth = useAuthSession();
   const mailbox = useMailboxLab(auth.session);
   const runtimeCacheStatus = useRuntimeCacheStore((state) => state.status);

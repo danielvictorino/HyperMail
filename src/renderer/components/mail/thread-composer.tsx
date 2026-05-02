@@ -72,7 +72,7 @@ export function ThreadComposer({
     editorProps: {
       attributes: {
         class:
-          "min-h-[180px] max-h-[320px] overflow-auto px-5 py-4 text-[15px] leading-7 text-slate-100 focus:outline-none"
+          "min-h-[170px] max-h-[300px] overflow-auto px-4 py-4 text-[15px] leading-7 text-foreground/90 focus:outline-none"
       }
     },
     immediatelyRender: false
@@ -189,17 +189,16 @@ export function ThreadComposer({
   }
 
   return (
-    <div className="border-t border-white/10 bg-panel/80">
-      <div className="flex items-center justify-between gap-3 px-5 py-4">
+    <div className="border-t border-white/[0.08] bg-panel/88">
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
         <div>
-          <p className="text-sm font-medium text-foreground">Instant Reply</p>
+          <p className="text-sm font-medium text-foreground">Instant reply</p>
           <p className="mt-1 text-xs text-muted">
-            Drafts stay local first, then the outbox engine delivers when the network is
-            ready.
+            Draft locally, queue through the outbox, and send when ready.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className="border-white/10 bg-white/[0.03] text-muted">
+          <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
             {statusLabel}
           </Badge>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -208,24 +207,24 @@ export function ThreadComposer({
         </div>
       </div>
 
-      <div className="border-y border-white/10">
+      <div className="border-y border-white/[0.08] bg-black/10">
         <EditorContent editor={editor} />
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="min-w-[280px] flex-1">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-            <Badge className="border-white/10 bg-white/[0.03] text-muted">
+            <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
               <Sparkles className="mr-1 h-3 w-3" />
               Voice examples local
             </Badge>
-            <Badge className="border-white/10 bg-white/[0.03] text-muted">
+            <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
               <Clock3 className="mr-1 h-3 w-3" />
               Natural language send later
             </Badge>
           </div>
           <div className="hm-input-shell mt-3 px-3 py-2">
-            <label className="text-[11px] uppercase text-muted">Schedule</label>
+            <label className="text-[11px] font-medium text-muted">Schedule</label>
             <input
               value={scheduleInput}
               onChange={(event) => setScheduleInput(event.target.value)}
@@ -239,7 +238,7 @@ export function ThreadComposer({
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2 border border-white/10 bg-white/[0.03]"
+            className="gap-2 border border-white/[0.1] bg-white/[0.035]"
             disabled={!assistantEnabled || isGeneratingDraft || isSubmitting}
             onClick={() => void onGenerateDraft(thread)}
           >

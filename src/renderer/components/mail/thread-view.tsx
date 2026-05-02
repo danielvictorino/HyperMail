@@ -110,11 +110,10 @@ export function ThreadView({
   if (!thread) {
     return (
       <div className="grid h-full place-items-center p-8 text-center">
-        <div className="space-y-3">
+        <div className="hm-section max-w-sm p-5">
           <p className="text-sm font-medium text-foreground">No thread selected</p>
-          <p className="max-w-sm text-sm leading-6 text-muted">
-            Pick a thread from the virtualized list. This pane stays focused on one
-            conversation at a time and keeps actions within immediate reach.
+          <p className="mt-2 text-sm leading-6 text-muted">
+            Pick a thread from the list to inspect the conversation and queue actions.
           </p>
         </div>
       </div>
@@ -126,12 +125,12 @@ export function ThreadView({
     Boolean(thread.thread.unsubscribe) && !thread.thread.unsubscribedAt;
 
   return (
-    <section className="flex h-full min-h-0 flex-col bg-panel/60">
-      <div className="border-b border-white/10 px-6 py-5">
+    <section className="flex h-full min-h-0 flex-col bg-panel-strong/36">
+      <div className="border-b border-white/[0.08] px-4 py-3">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
+          <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-white/10 bg-white/[0.03] text-muted">
+              <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                 {thread.thread.split}
               </Badge>
               {thread.queueDepth > 0 ? (
@@ -151,7 +150,7 @@ export function ThreadView({
               ) : null}
               {thread.localRuleSplit &&
               thread.localRuleSplit !== thread.thread.split ? (
-                <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                   Rule suggests {thread.localRuleSplit}
                 </Badge>
               ) : null}
@@ -176,15 +175,15 @@ export function ThreadView({
               </Badge>
             </div>
 
-            <h2 className="text-[27px] font-semibold text-foreground">
+            <h2 className="truncate text-[21px] font-semibold leading-7 text-foreground">
               {thread.thread.subject}
             </h2>
-            <p className="text-sm text-muted">
+            <p className="truncate text-sm text-muted">
               {thread.thread.participantNames.join(", ")}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
             <ActionButton
               label="Summarize"
               hint="A"
@@ -267,27 +266,29 @@ export function ThreadView({
         ) : null}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5">
-        <div className="space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="space-y-3">
           {thread.messages.map((message, index) => (
-            <article key={message.id} className="hm-section p-5">
+            <article key={message.id} className="hm-section p-4">
               <div className="mb-4 flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-black/15 text-muted">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-black/15 text-muted">
                     <PersonIcon className="h-4 w-4" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {message.fromName}
                     </p>
-                    <p className="mt-1 text-xs text-muted">{message.fromEmail}</p>
+                    <p className="mt-1 truncate text-xs text-muted">
+                      {message.fromEmail}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-muted">
+                <div className="flex shrink-0 items-center gap-2 text-xs text-muted">
                   <ClockIcon className="h-3.5 w-3.5" />
                   <span>{formatLongDate(message.sentAt)}</span>
                   {message.deliveryState && message.deliveryState !== "sent" ? (
-                    <Badge className="border-white/10 bg-white/[0.03] text-muted">
+                    <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                       {message.deliveryState}
                     </Badge>
                   ) : null}
@@ -302,7 +303,7 @@ export function ThreadView({
                 </p>
               ) : null}
 
-              <p className="whitespace-pre-wrap text-[15px] leading-7 text-slate-100">
+              <p className="whitespace-pre-wrap text-[15px] leading-7 text-foreground/90">
                 {message.bodyPlain}
               </p>
 
@@ -314,7 +315,7 @@ export function ThreadView({
                       type="button"
                       disabled={activeAttachmentId === attachment.id}
                       onClick={() => void onCacheAttachment(message, attachment)}
-                      className="rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-left transition-colors duration-150 hover:bg-black/20"
+                      className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-2 text-left transition-colors duration-150 hover:bg-black/20"
                     >
                       <div className="flex items-center gap-2 text-sm text-foreground">
                         {activeAttachmentId === attachment.id ? (
@@ -326,15 +327,15 @@ export function ThreadView({
                       </div>
                       <div className="mt-1 flex items-center gap-2 text-xs text-muted">
                         <span>{formatAttachmentSize(attachment.size)}</span>
-                        <span>·</span>
+                        <span>-</span>
                         <span>
                           {activeAttachmentId === attachment.id
                             ? attachment.cacheState === "cached"
                               ? "Saving copy"
                               : "Caching locally"
                             : attachment.cacheState === "cached"
-                              ? "Cached offline · Save copy"
-                              : "Not cached · Cache locally"}
+                              ? "Cached offline - Save copy"
+                              : "Not cached - Cache locally"}
                         </span>
                       </div>
                     </button>
@@ -349,7 +350,7 @@ export function ThreadView({
       <Suspense
         fallback={
           composerOpen ? (
-            <div className="border-t border-white/10 px-5 py-4 text-sm text-muted">
+            <div className="border-t border-white/[0.08] px-4 py-3 text-sm text-muted">
               Loading composer...
             </div>
           ) : null
@@ -402,7 +403,7 @@ function ActionButton({
     >
       {icon}
       {label}
-      <Badge className="border-white/10 bg-black/10 text-inherit">{hint}</Badge>
+      <span className="hm-kbd text-inherit">{hint}</span>
     </Button>
   );
 }

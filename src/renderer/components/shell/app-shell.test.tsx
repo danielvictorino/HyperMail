@@ -23,6 +23,6 @@ describe("AppShell", () => {
     expect(view.container.textContent).toContain("Account rail");
     expect(view.container.textContent).toContain("Mailbox pane");
     expect(view.container.textContent).toContain("Context rail");
-    expect(view.container.querySelectorAll(".shadow-shell")).toHaveLength(3);
+    expect(view.container.querySelector(".hm-app-frame")).not.toBeNull();
   });
 });

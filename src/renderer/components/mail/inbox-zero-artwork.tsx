@@ -20,10 +20,10 @@ export function InboxZeroArtwork({ sectionLabel }: InboxZeroArtworkProps) {
   });
 
   return (
-    <div className="w-full max-w-[320px] rounded-[28px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+    <div className="w-full max-w-[300px] rounded-lg border border-white/[0.1] bg-white/[0.035] p-3 shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
       <svg
         viewBox="0 0 220 220"
-        className="h-auto w-full rounded-[22px] bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.24),transparent_42%),linear-gradient(180deg,rgba(13,16,23,0.98),rgba(7,8,11,0.98))]"
+        className="h-auto w-full rounded-lg bg-[linear-gradient(180deg,rgba(18,21,38,0.98),rgba(7,8,18,0.98))]"
         aria-hidden="true"
       >
         <defs>
