@@ -3,54 +3,82 @@ $ErrorActionPreference = "Stop"
 
 Add-Type -AssemblyName System.Drawing
 
+function New-RoundedRectanglePath {
+  param(
+    [System.Drawing.RectangleF]$Bounds,
+    [float]$Radius
+  )
+
+  $diameter = $Radius * 2
+  $path = [System.Drawing.Drawing2D.GraphicsPath]::new()
+
+  $path.AddArc($Bounds.X, $Bounds.Y, $diameter, $diameter, 180, 90)
+  $path.AddArc($Bounds.Right - $diameter, $Bounds.Y, $diameter, $diameter, 270, 90)
+  $path.AddArc($Bounds.Right - $diameter, $Bounds.Bottom - $diameter, $diameter, $diameter, 0, 90)
+  $path.AddArc($Bounds.X, $Bounds.Bottom - $diameter, $diameter, $diameter, 90, 90)
+  $path.CloseFigure()
+
+  return $path
+}
+
 function New-HyperMailBitmap {
   param(
     [int]$Size
   )
 
-  $bitmap = [System.Drawing.Bitmap]::new($Size, $Size)
+  $bitmap = [System.Drawing.Bitmap]::new(
+    $Size,
+    $Size,
+    [System.Drawing.Imaging.PixelFormat]::Format32bppArgb
+  )
   $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
 
   try {
     $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
     $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-    $graphics.Clear([System.Drawing.ColorTranslator]::FromHtml("#050614"))
+    $graphics.Clear([System.Drawing.Color]::Transparent)
 
-    $hPen = [System.Drawing.Pen]::new(
-      [System.Drawing.ColorTranslator]::FromHtml("#f7f8f8"),
-      [float]($Size * 0.09375)
+    $tileBounds = [System.Drawing.RectangleF]::new(
+      [float]($Size * 0.09375),
+      [float]($Size * 0.09375),
+      [float]($Size * 0.8125),
+      [float]($Size * 0.8125)
     )
-    $hPen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $hPen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $hPen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
+    $tilePath = New-RoundedRectanglePath -Bounds $tileBounds -Radius ([float]($Size * 0.1015625))
+    $tileBrush = [System.Drawing.SolidBrush]::new(
+      [System.Drawing.ColorTranslator]::FromHtml("#050614")
+    )
 
-    $foldPen = [System.Drawing.Pen]::new(
-      [System.Drawing.ColorTranslator]::FromHtml("#f7f8f8"),
-      [float]($Size * 0.0703125)
+    $markBrush = [System.Drawing.SolidBrush]::new(
+      [System.Drawing.ColorTranslator]::FromHtml("#f7f8f8")
     )
-    $foldPen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $foldPen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
-    $foldPen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
 
     try {
-      $leftX = [float]($Size * 0.296875)
-      $rightX = [float]($Size * 0.703125)
-      $topY = [float]($Size * 0.2265625)
-      $bottomY = [float]($Size * 0.7734375)
-      $midY = [float]($Size * 0.50)
-      $foldLeftX = [float]($Size * 0.4375)
-      $foldTopY = [float]($Size * 0.3515625)
-      $foldBottomY = [float]($Size * 0.6484375)
-
-      $graphics.DrawLine($hPen, $leftX, $topY, $leftX, $bottomY)
-      $graphics.DrawLine($hPen, $rightX, $topY, $rightX, $bottomY)
-      $graphics.DrawLine($foldPen, $foldLeftX, $foldTopY, $rightX, $midY)
-      $graphics.DrawLine($foldPen, $rightX, $midY, $foldLeftX, $foldBottomY)
-      $graphics.DrawLine($hPen, $leftX, $midY, $rightX, $midY)
+      $graphics.FillPath($tileBrush, $tilePath)
+      $graphics.FillRectangle(
+        $markBrush,
+        [System.Drawing.RectangleF]::new($Size * 0.2890625, $Size * 0.3046875, $Size * 0.078125, $Size * 0.453125)
+      )
+      $graphics.FillRectangle(
+        $markBrush,
+        [System.Drawing.RectangleF]::new($Size * 0.6328125, $Size * 0.3046875, $Size * 0.078125, $Size * 0.453125)
+      )
+      $graphics.FillPolygon(
+        $markBrush,
+        [System.Drawing.PointF[]]@(
+          [System.Drawing.PointF]::new($Size * 0.3671875, $Size * 0.54296875),
+          [System.Drawing.PointF]::new($Size * 0.5, $Size * 0.46875),
+          [System.Drawing.PointF]::new($Size * 0.6328125, $Size * 0.54296875),
+          [System.Drawing.PointF]::new($Size * 0.6328125, $Size * 0.6328125),
+          [System.Drawing.PointF]::new($Size * 0.5, $Size * 0.55859375),
+          [System.Drawing.PointF]::new($Size * 0.3671875, $Size * 0.6328125)
+        )
+      )
     } finally {
-      $hPen.Dispose()
-      $foldPen.Dispose()
+      $tilePath.Dispose()
+      $tileBrush.Dispose()
+      $markBrush.Dispose()
     }
 
     return $bitmap
