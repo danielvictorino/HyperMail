@@ -1,15 +1,16 @@
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
-  Archive,
-  Clock3,
-  MailX,
-  Paperclip,
-  Search,
-  Sparkles,
-  Star,
-  X
-} from "lucide-react";
+  ArchiveIcon,
+  ClockIcon,
+  Cross2Icon,
+  EnvelopeClosedIcon,
+  FileTextIcon,
+  IdCardIcon,
+  LightningBoltIcon,
+  MagnifyingGlassIcon,
+  StarFilledIcon
+} from "@radix-ui/react-icons";
 import type { ThreadProjection } from "@shared/mail/models";
 import {
   formatSnoozedUntil,
@@ -87,7 +88,7 @@ export function VirtualThreadList({
         </div>
         <p className="mt-2 text-sm leading-6 text-muted">{sectionDescription}</p>
         <div className="hm-input-shell mt-4 flex items-center gap-3 px-3 py-2.5">
-          <Search className="h-4 w-4 shrink-0 text-muted" />
+          <MagnifyingGlassIcon className="h-4 w-4 shrink-0 text-muted" />
           <input
             ref={searchInputRef}
             value={searchQuery}
@@ -111,7 +112,7 @@ export function VirtualThreadList({
             )}
             aria-label="Clear mailbox search"
           >
-            <X className="h-3.5 w-3.5" />
+            <Cross2Icon className="h-3.5 w-3.5" />
           </button>
         </div>
         <div className="mt-2 flex items-center justify-between text-[11px] uppercase text-muted">
@@ -222,20 +223,20 @@ const ThreadRow = memo(function ThreadRow({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {thread.thread.starred ? (
-          <Badge className="border-amber-400/20 bg-amber-400/10 text-amber-100">
-            <Star className="mr-1 h-3 w-3" />
+          <Badge className="border-warning/25 bg-warning/10 text-warning">
+            <StarFilledIcon className="mr-1 h-3 w-3" />
             Starred
           </Badge>
         ) : null}
         {thread.actionNeeded ? (
           <Badge className="border-accent/25 bg-accent/10 text-accent">
-            <Sparkles className="mr-1 h-3 w-3" />
+            <LightningBoltIcon className="mr-1 h-3 w-3" />
             Action
           </Badge>
         ) : null}
         {thread.waitingForReply ? (
-          <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
-            <Clock3 className="mr-1 h-3 w-3" />
+          <Badge className="border-info/25 bg-info/10 text-info">
+            <ClockIcon className="mr-1 h-3 w-3" />
             Waiting
           </Badge>
         ) : null}
@@ -245,30 +246,30 @@ const ThreadRow = memo(function ThreadRow({
           </Badge>
         ) : null}
         {activelySnoozed && thread.thread.snoozedUntil ? (
-          <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
-            <Clock3 className="mr-1 h-3 w-3" />
+          <Badge className="border-info/25 bg-info/10 text-info">
+            <ClockIcon className="mr-1 h-3 w-3" />
             Until {formatSnoozedUntil(thread.thread.snoozedUntil)}
           </Badge>
         ) : null}
         {thread.thread.unsubscribedAt ? (
-          <Badge className="border-emerald-400/20 bg-emerald-400/10 text-emerald-100">
-            <MailX className="mr-1 h-3 w-3" />
+          <Badge className="border-positive/25 bg-positive/10 text-positive">
+            <EnvelopeClosedIcon className="mr-1 h-3 w-3" />
             Unsubscribed
           </Badge>
         ) : null}
         {thread.thread.split === "vip" ? (
-          <Badge className="border-pink-400/20 bg-pink-400/10 text-pink-100">
-            <Sparkles className="mr-1 h-3 w-3" />
+          <Badge className="border-vip/25 bg-vip/10 text-vip">
+            <IdCardIcon className="mr-1 h-3 w-3" />
             VIP
           </Badge>
         ) : null}
         <Badge className="border-white/10 bg-white/[0.03] text-muted">
-          <Paperclip className="mr-1 h-3 w-3" />
+          <FileTextIcon className="mr-1 h-3 w-3" />
           {thread.messages.length} msgs
         </Badge>
         {thread.queueDepth > 0 ? (
-          <Badge className="border-sky-400/20 bg-sky-400/10 text-sky-100">
-            <Archive className="mr-1 h-3 w-3" />
+          <Badge className="border-info/25 bg-info/10 text-info">
+            <ArchiveIcon className="mr-1 h-3 w-3" />
             {thread.queueDepth} queued
           </Badge>
         ) : null}

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Search } from "lucide-react";
+import { EnterIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import type { RankedCommand } from "@/lib/command-palette";
 import { Badge } from "../ui/badge";
@@ -50,7 +50,7 @@ export function CommandPalette({
       />
       <div className="relative mx-auto mt-[10vh] w-[min(780px,calc(100vw-2rem))] overflow-hidden rounded-[28px] border border-white/10 bg-panel-strong/95 shadow-shell">
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-          <Search className="h-4 w-4 text-accent" />
+          <MagnifyingGlassIcon className="h-4 w-4 text-accent" />
           <input
             ref={inputRef}
             value={query}
@@ -58,7 +58,10 @@ export function CommandPalette({
             placeholder="Search actions, sections, threads..."
             className="w-full border-none bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted"
           />
-          <Badge className="border-white/10 bg-white/[0.03] text-muted">Enter</Badge>
+          <Badge className="gap-1 border-white/10 bg-white/[0.03] text-muted">
+            <EnterIcon className="h-3 w-3" />
+            Enter
+          </Badge>
         </div>
 
         <div className="max-h-[70vh] overflow-auto px-2 py-2">

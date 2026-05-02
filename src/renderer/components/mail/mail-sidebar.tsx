@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
 import {
-  Command,
-  Inbox,
-  Mail,
-  Send,
-  Sparkles,
-  Star,
-  Archive,
-  ShieldCheck,
-  Clock3
-} from "lucide-react";
+  ArchiveIcon,
+  ClockIcon,
+  EnvelopeClosedIcon,
+  EnvelopeOpenIcon,
+  IdCardIcon,
+  KeyboardIcon,
+  LightningBoltIcon,
+  PaperPlaneIcon,
+  StarIcon,
+  ViewGridIcon
+} from "@radix-ui/react-icons";
 import type { MailboxNavItem } from "@/lib/mailbox-view";
 import type { MailboxSectionId } from "@/state/inbox-ui-store";
 import { Badge } from "../ui/badge";
@@ -34,14 +35,14 @@ interface MailSidebarProps {
 }
 
 const navIcons: Record<MailboxSectionId, ReactNode> = {
-  inbox: <Inbox className="h-4 w-4" />,
-  important: <Sparkles className="h-4 w-4" />,
-  vip: <ShieldCheck className="h-4 w-4" />,
-  waiting: <Send className="h-4 w-4" />,
-  other: <Mail className="h-4 w-4" />,
-  starred: <Star className="h-4 w-4" />,
-  snoozed: <Clock3 className="h-4 w-4" />,
-  archive: <Archive className="h-4 w-4" />
+  inbox: <EnvelopeClosedIcon className="h-4 w-4" />,
+  important: <LightningBoltIcon className="h-4 w-4" />,
+  vip: <IdCardIcon className="h-4 w-4" />,
+  waiting: <PaperPlaneIcon className="h-4 w-4" />,
+  other: <EnvelopeOpenIcon className="h-4 w-4" />,
+  starred: <StarIcon className="h-4 w-4" />,
+  snoozed: <ClockIcon className="h-4 w-4" />,
+  archive: <ArchiveIcon className="h-4 w-4" />
 };
 
 export function MailSidebar({
@@ -89,7 +90,7 @@ export function MailSidebar({
             <Badge
               className={
                 connected
-                  ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
+                  ? "border-positive/25 bg-positive/10 text-positive"
                   : "border-white/10 bg-white/[0.03] text-muted"
               }
             >
@@ -151,7 +152,7 @@ export function MailSidebar({
 
         <div className="hm-section p-4">
           <div className="mb-3 flex items-center gap-2 text-foreground">
-            <Command className="h-4 w-4 text-accent" />
+            <KeyboardIcon className="h-4 w-4 text-accent" />
             <span className="text-sm font-medium">Keyboard-first shell</span>
           </div>
           <div className="space-y-2 text-sm text-muted">
@@ -173,7 +174,10 @@ export function MailSidebar({
             onClick={onOpenPalette}
           >
             <span>Open palette</span>
-            <Badge>{commandHint}</Badge>
+            <Badge className="gap-1">
+              <ViewGridIcon className="h-3 w-3" />
+              {commandHint}
+            </Badge>
           </Button>
         </div>
       </div>

@@ -214,8 +214,8 @@ export function AiSettingsPanel({
             className={cn(
               "border-white/10",
               providerStatus.available
-                ? "bg-emerald-400/10 text-emerald-100"
-                : "bg-amber-400/10 text-amber-100"
+                ? "bg-positive/10 text-positive"
+                : "bg-warning/10 text-warning"
             )}
           >
             {providerStatus.available ? "ready" : "needs setup"}
@@ -399,9 +399,7 @@ export function AiSettingsPanel({
             <p
               className={cn(
                 "text-xs leading-5",
-                providerMessage.tone === "success"
-                  ? "text-emerald-100"
-                  : "text-amber-100"
+                providerMessage.tone === "success" ? "text-positive" : "text-warning"
               )}
             >
               {providerMessage.text}
@@ -487,7 +485,7 @@ export function AiSettingsPanel({
         )}
 
         {assistantError ? (
-          <p className="text-xs leading-5 text-amber-100">{assistantError}</p>
+          <p className="text-xs leading-5 text-warning">{assistantError}</p>
         ) : null}
 
         <Button
