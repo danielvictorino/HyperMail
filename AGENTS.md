@@ -62,3 +62,30 @@ This runs typecheck → test → build. CI runs the same sequence on `ubuntu-lat
 - **IPC boundary is authoritative.** New mutating IPC channels must go through `parseIpcPayload(channel, schema, input)` in `electron/main.ts` with a zod schema declared in `src/shared/ipc-contracts.ts`. See `docs/security.md` for why.
 - **OAuth / Gmail errors flow through the shared retry helper.** Don't add ad-hoc fetch loops; extend the transient classifier instead.
 - **Feedback on corrections goes to auto-memory**, not this file.
+
+## Figma / design system rules
+
+HyperMail is code-led. The repo is the source of truth for tokens, component
+APIs, behavior, and verification. The HyperMail Figma file mirrors the repo for
+design QA: `https://www.figma.com/design/BmRFSlVeEDf2yJTMi4X1VI`.
+
+- Use `docs/design-system.md` before Figma-driven renderer work.
+- Treat the Linear community file as reference only; do not import its naming,
+  variables, or components as production authority.
+- Fetch Figma design context and screenshot for the exact node being
+  implemented, then translate the result into existing React/Tailwind/CSS
+  patterns instead of pasting generated code.
+- Reuse tokens from `tailwind.config.ts` and primitives from
+  `src/renderer/index.css` before hardcoding color, radius, shadow, density, or
+  typography values.
+- Prefer existing UI atoms in `src/renderer/components/ui/` and existing
+  product surfaces in `src/renderer/components/mail/` and
+  `src/renderer/components/shell/`.
+- If a new repeated visual value is required, add the repo token first, then
+  update the Figma variables and `docs/design-system.md` in the same PR.
+- Keep visual PRs behavior-preserving unless the user explicitly asks for
+  product behavior changes. Do not touch Electron, IPC, OAuth, Gmail, Dexie, or
+  assistant runtime code for visual-only tranches.
+- Do not add Code Connect files yet. `figma.config.json`, `.figma.js`, and
+  `.figma.tsx` mappings are deferred until HyperMail Figma components are
+  published in a team library and Code Connect access is confirmed.
