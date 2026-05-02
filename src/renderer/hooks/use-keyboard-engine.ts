@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useRef } from "react";
 import {
   dispatchKeyboardEvent,
   type KeyboardDispatchOptions
@@ -7,13 +7,15 @@ import {
 export type KeyboardEngineOptions = KeyboardDispatchOptions;
 
 export function useKeyboardEngine(options: KeyboardEngineOptions): void {
-  const onKeyDown = useEffectEvent(async (event: KeyboardEvent) => {
-    await dispatchKeyboardEvent(event, options);
+  const optionsRef = useRef(options);
+
+  useEffect(() => {
+    optionsRef.current = options;
   });
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      void onKeyDown(event);
+      void dispatchKeyboardEvent(event, optionsRef.current);
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -21,5 +23,5 @@ export function useKeyboardEngine(options: KeyboardEngineOptions): void {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onKeyDown]);
+  }, []);
 }

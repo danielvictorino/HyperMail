@@ -7,9 +7,12 @@
   --hm-radius-panel: 8px;
   --hm-radius-control: 8px;
   --hm-radius-row: 8px;
-  --hm-shadow-shell: 0 18px 52px rgba(0, 0, 0, 0.32);
+  --hm-shadow-shell:
+    0 24px 80px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --hm-shadow-command: 0 7px 32px rgba(0, 0, 0, 0.35);
   --hm-shadow-focus:
-    0 0 0 1px rgb(var(--hm-accent) / 0.5), 0 0 0 5px rgb(var(--hm-accent) / 0.12);
+    0 0 0 1px rgb(var(--hm-accent) / 0.55), 0 0 0 4px rgb(var(--hm-accent) / 0.13);
+  --hm-accent-gradient: linear-gradient(97deg, #455eb5 9%, #5643cc 44%, #673fd7 65%);
 }
 
 * {
@@ -26,8 +29,9 @@ body {
   margin: 0;
   font-family: Inter, sans-serif;
   background:
-    linear-gradient(180deg, rgb(var(--hm-foreground) / 0.035), transparent 18%),
-    linear-gradient(90deg, rgb(var(--hm-accent) / 0.055), transparent 34%),
+    linear-gradient(180deg, rgb(var(--hm-foreground) / 0.035), transparent 360px),
+    linear-gradient(90deg, rgb(var(--hm-accent-soft) / 0.075), transparent 38%),
+    linear-gradient(270deg, rgb(var(--hm-accent) / 0.07), transparent 46%),
     rgb(var(--hm-bg));
   color: rgb(var(--hm-foreground));
   text-rendering: optimizeLegibility;
@@ -86,56 +90,99 @@ textarea {
 }
 
 @layer components {
+  .hm-app-frame {
+    border-radius: var(--hm-radius-panel);
+    border: 1px solid rgb(var(--hm-border) / 0.1);
+    background:
+      linear-gradient(180deg, rgb(var(--hm-foreground) / 0.035), transparent 92px),
+      rgb(var(--hm-panel) / 0.96);
+    box-shadow: var(--hm-shadow-shell);
+    backdrop-filter: blur(18px);
+  }
+
   .hm-panel {
     border-radius: var(--hm-radius-panel);
-    border: 1px solid rgb(var(--hm-border) / 0.11);
-    background: rgb(var(--hm-panel) / 0.84);
+    border: 1px solid rgb(var(--hm-border) / 0.1);
+    background: rgb(var(--hm-panel) / 0.9);
     box-shadow: var(--hm-shadow-shell);
     backdrop-filter: blur(18px);
   }
 
   .hm-panel-strong {
     border-radius: var(--hm-radius-panel);
-    border: 1px solid rgb(var(--hm-border) / 0.12);
-    background: rgb(var(--hm-panel-strong) / 0.92);
+    border: 1px solid rgb(var(--hm-border) / 0.11);
+    background: rgb(var(--hm-panel-strong) / 0.95);
     box-shadow: var(--hm-shadow-shell);
   }
 
   .hm-section {
     border-radius: var(--hm-radius-panel);
-    border: 1px solid rgb(var(--hm-border) / 0.11);
-    background: rgb(var(--hm-surface) / 0.46);
+    border: 1px solid rgb(var(--hm-border) / 0.09);
+    background: rgb(var(--hm-surface) / 0.42);
   }
 
   .hm-rail-section {
     border-radius: var(--hm-radius-panel);
-    border: 1px solid rgb(var(--hm-border) / 0.11);
-    background: rgb(var(--hm-surface) / 0.44);
+    border: 1px solid rgb(var(--hm-border) / 0.09);
+    background: rgb(var(--hm-surface) / 0.36);
     padding: 14px;
   }
 
   .hm-list-surface {
     border-radius: var(--hm-radius-panel);
-    border: 1px solid rgb(var(--hm-border) / 0.1);
-    background: rgb(var(--hm-surface) / 0.36);
+    border: 1px solid rgb(var(--hm-border) / 0.08);
+    background: rgb(var(--hm-surface) / 0.28);
   }
 
   .hm-list-row {
     border-radius: var(--hm-radius-row);
     border: 1px solid transparent;
-    background: rgb(var(--hm-surface) / 0.34);
+    background: rgb(var(--hm-surface) / 0.22);
   }
 
   .hm-list-row-selected {
-    border-color: rgb(var(--hm-accent) / 0.36);
-    background: rgb(var(--hm-accent) / 0.1);
-    box-shadow: var(--hm-shadow-focus);
+    border-color: rgb(var(--hm-border) / 0.12);
+    background:
+      linear-gradient(90deg, rgb(var(--hm-accent-soft) / 0.18), transparent 68%),
+      rgb(var(--hm-surface-muted) / 0.5);
+    box-shadow: inset 2px 0 0 rgb(var(--hm-accent));
   }
 
   .hm-input-shell {
     border-radius: var(--hm-radius-control);
-    border: 1px solid rgb(var(--hm-border) / 0.11);
+    border: 1px solid rgb(var(--hm-border) / 0.1);
     background: rgb(var(--hm-surface-muted) / 0.34);
+    box-shadow: 0 1px 0 rgb(var(--hm-foreground) / 0.03) inset;
+  }
+
+  .hm-command-surface {
+    border-radius: var(--hm-radius-panel);
+    border: 1px solid rgb(var(--hm-border) / 0.1);
+    background:
+      linear-gradient(180deg, rgb(var(--hm-foreground) / 0.07), transparent 112px),
+      rgb(var(--hm-panel-strong) / 0.94);
+    box-shadow: var(--hm-shadow-command);
+    backdrop-filter: blur(22px);
+  }
+
+  .hm-accent-gradient {
+    background-image: var(--hm-accent-gradient);
+  }
+
+  .hm-kbd {
+    display: inline-flex;
+    height: 20px;
+    min-width: 20px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    border: 1px solid rgb(var(--hm-border) / 0.1);
+    background: rgb(var(--hm-foreground) / 0.05);
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    color: rgb(var(--hm-muted));
   }
 
   .hm-tab {
@@ -157,8 +204,8 @@ textarea {
   }
 
   .hm-tab-active {
-    border-color: rgb(var(--hm-accent) / 0.34);
-    background: rgb(var(--hm-accent) / 0.12);
+    border-color: rgb(var(--hm-border) / 0.1);
+    background: rgb(var(--hm-foreground) / 0.08);
     color: rgb(var(--hm-foreground));
   }
 

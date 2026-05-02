@@ -76,7 +76,7 @@ describe("ContextRail", () => {
     );
 
     expect(view.container.textContent).toContain("Daily brief");
-    expect(view.container.textContent).toContain("Context rail");
+    expect(view.container.textContent).toContain("Inspector");
     expect(view.container.textContent).not.toContain("Offline cache");
 
     await clickElement(findButton(view.container, "System"));

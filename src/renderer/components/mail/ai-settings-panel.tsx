@@ -191,7 +191,7 @@ export function AiSettingsPanel({
           "rounded-lg border px-3 py-3",
           isPrimary || isFallback
             ? "border-accent/25 bg-accent/5"
-            : "border-white/10 bg-black/10"
+            : "border-white/[0.1] bg-black/10"
         )}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -205,14 +205,14 @@ export function AiSettingsPanel({
               </Badge>
             ) : null}
             {isFallback ? (
-              <Badge className="border-white/10 bg-white/[0.03] text-muted">
+              <Badge className="border-white/[0.1] bg-white/[0.035] text-muted">
                 fallback
               </Badge>
             ) : null}
           </div>
           <Badge
             className={cn(
-              "border-white/10",
+              "border-white/[0.1]",
               providerStatus.available
                 ? "bg-positive/10 text-positive"
                 : "bg-warning/10 text-warning"
@@ -313,7 +313,7 @@ export function AiSettingsPanel({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="justify-between border border-white/10 bg-white/[0.03]"
+                  className="justify-between border border-white/[0.1] bg-white/[0.035]"
                   disabled={isRefreshingOllama}
                   onClick={() => void handleRefreshOllamaModels()}
                 >
@@ -425,7 +425,7 @@ export function AiSettingsPanel({
             onChange={(event) =>
               updatePrimaryProvider(event.target.value as MailAssistantProvider)
             }
-            className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
+            className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
           >
             {MAIL_ASSISTANT_PROVIDERS.map((provider) => (
               <option key={provider} value={provider}>
@@ -440,7 +440,7 @@ export function AiSettingsPanel({
           <select
             value={draft.fallbackProvider ?? "none"}
             onChange={(event) => updateFallbackProvider(event.target.value)}
-            className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
+            className="hm-input-shell px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent/40"
           >
             <option value="none">No automatic fallback</option>
             {MAIL_ASSISTANT_PROVIDERS.map((provider) => (
@@ -460,7 +460,7 @@ export function AiSettingsPanel({
             <span>Selected route</span>
             <span className="font-medium text-foreground">
               {assistantConfig.activeProvider
-                ? `${getProviderLabel(assistantConfig.activeProvider)} · ${assistantConfig.activeModel}`
+                ? `${getProviderLabel(assistantConfig.activeProvider)} - ${assistantConfig.activeModel}`
                 : "disabled"}
             </span>
           </div>
