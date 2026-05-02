@@ -272,7 +272,7 @@ export function ThreadView({
             <article key={message.id} className="hm-section p-4">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-start gap-3">
-                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-black/15 text-muted">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-panel-strong/35 text-muted">
                     <PersonIcon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
@@ -315,7 +315,7 @@ export function ThreadView({
                       type="button"
                       disabled={activeAttachmentId === attachment.id}
                       onClick={() => void onCacheAttachment(message, attachment)}
-                      className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-2 text-left transition-colors duration-150 hover:bg-black/20"
+                      className="hm-inset-surface-interactive rounded-lg px-3 py-2 text-left"
                     >
                       <div className="flex items-center gap-2 text-sm text-foreground">
                         {activeAttachmentId === attachment.id ? (
@@ -397,12 +397,13 @@ function ActionButton({
     <Button
       variant={active ? "primary" : "secondary"}
       size="sm"
-      className="gap-2"
+      className="gap-2 px-2 2xl:px-3"
       disabled={disabled}
       onClick={onClick}
+      title={label}
     >
       {icon}
-      {label}
+      <span className="sr-only 2xl:not-sr-only">{label}</span>
       <span className="hm-kbd text-inherit">{hint}</span>
     </Button>
   );

@@ -154,7 +154,7 @@ export function ContextRail({
   };
 
   return (
-    <aside className="hm-density-compact flex h-full min-h-0 flex-col gap-3 p-3">
+    <aside className="hm-density-compact flex h-full min-h-0 flex-col gap-3 break-words p-3">
       <div className="hm-section px-3 py-3">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -232,7 +232,7 @@ export function ContextRail({
                   <Metric label="Processing" value={String(summary.processing)} />
                   <Metric label="Retry" value={String(summary.retry)} />
                 </div>
-                <div className="mt-4 rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3 text-sm">
+                <div className="hm-inset-surface mt-4 rounded-lg px-3 py-3 text-sm">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-muted">Gmail sync</span>
                     <span className="font-medium text-foreground">
@@ -572,7 +572,7 @@ export function ContextRail({
                     calendarContext.map((entry) => (
                       <div
                         key={`${entry.title}-${entry.timeLabel}`}
-                        className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3"
+                        className="hm-inset-surface rounded-lg px-3 py-3"
                       >
                         <p className="text-sm font-medium text-foreground">
                           {entry.title}
@@ -601,7 +601,7 @@ export function ContextRail({
                   </p>
                 </div>
                 <div className="space-y-3">
-                  <div className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3">
+                  <div className="hm-inset-surface rounded-lg px-3 py-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-medium text-foreground">Summary</p>
                       <Button
@@ -662,7 +662,7 @@ export function ContextRail({
                     )}
                   </div>
 
-                  <div className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-3">
+                  <div className="hm-inset-surface rounded-lg px-3 py-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-medium text-foreground">
                         Split suggestion
@@ -765,7 +765,7 @@ export function ContextRail({
                     selectedThreadQueue.map((record) => (
                       <div
                         key={record.id}
-                        className="rounded-lg border border-white/[0.1] bg-black/10 px-3 py-2"
+                        className="hm-inset-surface rounded-lg px-3 py-2"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-sm font-medium text-foreground">
@@ -814,9 +814,11 @@ export function ContextRail({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="hm-list-row flex items-center justify-between px-3 py-2 text-sm">
-      <span className="text-muted">{label}</span>
-      <span className="font-medium text-foreground">{value}</span>
+    <div className="hm-list-row flex min-w-0 items-center justify-between gap-3 px-3 py-2 text-sm">
+      <span className="min-w-0 text-muted">{label}</span>
+      <span className="min-w-0 break-words text-right font-medium text-foreground">
+        {value}
+      </span>
     </div>
   );
 }

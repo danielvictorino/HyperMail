@@ -207,7 +207,7 @@ export function ThreadComposer({
         </div>
       </div>
 
-      <div className="border-y border-white/[0.08] bg-black/10">
+      <div className="border-y border-white/[0.08] bg-panel-strong/32">
         <EditorContent editor={editor} />
       </div>
 

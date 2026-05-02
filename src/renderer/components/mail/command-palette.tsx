@@ -40,7 +40,7 @@ export function CommandPalette({
   let flatIndex = 0;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 bg-background/75 backdrop-blur-md">
       <button
         type="button"
         aria-label="Close command palette"
