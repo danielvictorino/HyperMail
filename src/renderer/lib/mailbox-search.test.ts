@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ThreadProjection } from "@shared/mail/models";
-import { searchThreads } from "./mailbox-search";
+import { createMailboxSearchIndex, searchThreads } from "./mailbox-search";
 
 function createThreadProjection(
   id: string,
@@ -104,5 +104,43 @@ describe("searchThreads", () => {
     const results = searchThreads(threads, "orbit demo");
 
     expect(results).toEqual([]);
+  });
+
+  it("returns the same ranked results from a prebuilt index", () => {
+    const index = createMailboxSearchIndex(threads);
+
+    expect(searchThreads(index, "maya launch")).toEqual(
+      searchThreads(threads, "maya launch")
+    );
+  });
+
+  it("searches large indexed mailboxes without changing result semantics", () => {
+    const largeMailbox = Array.from({ length: 1_500 }, (_, index) =>
+      createThreadProjection(
+        `thread-bulk-${index}`,
+        {
+          subject: `Routine note ${index}`,
+          participantNames: [`Sender ${index}`],
+          participantEmails: [`sender-${index}@example.com`],
+          lastMessageAt: index
+        },
+        "Routine mailbox body."
+      )
+    );
+    const targetThread = createThreadProjection(
+      "thread-needle",
+      {
+        subject: "Needle renewal account",
+        participantNames: ["Scale Ops"],
+        participantEmails: ["scale@example.com"],
+        lastMessageAt: 2_000
+      },
+      "The high priority needle account needs review."
+    );
+    const index = createMailboxSearchIndex([...largeMailbox, targetThread]);
+
+    expect(
+      searchThreads(index, "needle account").map((thread) => thread.thread.id)
+    ).toEqual(["thread-needle"]);
   });
 });
