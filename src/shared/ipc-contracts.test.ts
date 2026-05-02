@@ -11,6 +11,10 @@ import {
   testMailAssistantProviderConnectionRequestSchema,
   unsubscribeThreadRequestSchema
 } from "./ipc-contracts";
+import {
+  isAllowedDevServerNavigation,
+  isSafeRemoteHttpsUrl
+} from "./security/url-safety";
 
 describe("ipc-contracts", () => {
   describe("gmailMailboxSyncRequestSchema", () => {
@@ -91,6 +95,50 @@ describe("ipc-contracts", () => {
       );
       expect(parsed.unsubscribe.method).toBe("mailto");
     });
+
+    it("rejects private https endpoints", () => {
+      expect(() =>
+        parseIpcPayload(
+          "mail:unsubscribe-gmail-thread",
+          unsubscribeThreadRequestSchema,
+          {
+            accountId: "a",
+            threadId: "t",
+            idempotencyKey: "k",
+            unsubscribe: {
+              method: "http-post",
+              endpoint: "https://127.0.0.1/unsubscribe",
+              oneClick: true,
+              sourceMessageId: "m"
+            }
+          }
+        )
+      ).toThrow(IpcValidationError);
+    });
+
+    it("rejects mailto subjects with line breaks", () => {
+      expect(() =>
+        parseIpcPayload(
+          "mail:unsubscribe-gmail-thread",
+          unsubscribeThreadRequestSchema,
+          {
+            accountId: "a",
+            threadId: "t",
+            idempotencyKey: "k",
+            unsubscribe: {
+              method: "mailto",
+              endpoint: "mailto:unsub@example.com",
+              oneClick: false,
+              sourceMessageId: "m",
+              mailto: {
+                to: ["unsub@example.com"],
+                subject: "unsubscribe\r\nBcc: attacker@example.com"
+              }
+            }
+          }
+        )
+      ).toThrow(IpcValidationError);
+    });
   });
 
   describe("sendDraftRequestSchema", () => {
@@ -109,6 +157,34 @@ describe("ipc-contracts", () => {
         })
       ).toThrow(IpcValidationError);
     });
+
+    it("rejects subject and client message id line breaks", () => {
+      const basePayload = {
+        accountId: "a",
+        draftId: "d",
+        threadId: "t",
+        clientMessageId: "c",
+        to: ["a@b.com"],
+        cc: [],
+        bcc: [],
+        subject: "hi",
+        bodyHtml: "<p>hi</p>"
+      };
+
+      expect(() =>
+        parseIpcPayload("mail:send-gmail-draft", sendDraftRequestSchema, {
+          ...basePayload,
+          subject: "hi\r\nBcc: attacker@example.com"
+        })
+      ).toThrow(IpcValidationError);
+
+      expect(() =>
+        parseIpcPayload("mail:send-gmail-draft", sendDraftRequestSchema, {
+          ...basePayload,
+          clientMessageId: "c\r\nX-Injected: yes"
+        })
+      ).toThrow(IpcValidationError);
+    });
   });
 
   describe("mail assistant settings", () => {
@@ -122,6 +198,14 @@ describe("ipc-contracts", () => {
       );
 
       expect(parsed.baseUrl).toBe("http://127.0.0.1:11434");
+    });
+
+    it("rejects a non-loopback Ollama base url", () => {
+      expect(() =>
+        parseIpcPayload("ai:list-ollama-models", listOllamaModelsRequestSchema, {
+          baseUrl: "https://ollama.example.com"
+        })
+      ).toThrow(IpcValidationError);
     });
 
     it("rejects fallback provider matching the primary provider", () => {
@@ -285,6 +369,35 @@ describe("ipc-contracts", () => {
     });
     it("blocks malformed URLs", () => {
       expect(isAllowedExternalUrl("not a url")).toBe(false);
+    });
+  });
+
+  describe("isAllowedDevServerNavigation", () => {
+    const devServerUrl = "http://127.0.0.1:5173";
+
+    it("allows the exact dev origin", () => {
+      expect(
+        isAllowedDevServerNavigation(`${devServerUrl}/src/main.tsx`, devServerUrl)
+      ).toBe(true);
+    });
+
+    it("blocks prefix lookalikes", () => {
+      expect(
+        isAllowedDevServerNavigation(
+          "http://127.0.0.1:5173@evil.example/p",
+          devServerUrl
+        )
+      ).toBe(false);
+      expect(
+        isAllowedDevServerNavigation("http://127.0.0.1:51730/p", devServerUrl)
+      ).toBe(false);
+    });
+  });
+
+  describe("isSafeRemoteHttpsUrl", () => {
+    it("blocks internal hostnames and IPv4-mapped loopback addresses", () => {
+      expect(isSafeRemoteHttpsUrl("https://intranet/unsub")).toBe(false);
+      expect(isSafeRemoteHttpsUrl("https://[::ffff:127.0.0.1]/unsub")).toBe(false);
     });
   });
 });

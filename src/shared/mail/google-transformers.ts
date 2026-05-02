@@ -8,6 +8,7 @@ import type {
   ThreadSnapshot
 } from "./models";
 import { createProviderAccountId } from "./provider-ids";
+import { isSafeRemoteHttpsUrl } from "../security/url-safety";
 
 export interface GmailLabelResource {
   id: string;
@@ -398,13 +399,7 @@ function parseListUnsubscribeHeader(input: {
     input.remoteMessageId
   );
   const oneClick = normalizeOneClickHeader(input.listUnsubscribePost);
-  const firstHttpsEntry = entries.find((entry) => {
-    try {
-      return new URL(entry).protocol === "https:";
-    } catch {
-      return false;
-    }
-  });
+  const firstHttpsEntry = entries.find((entry) => isSafeRemoteHttpsUrl(entry));
 
   if (oneClick && firstHttpsEntry) {
     return {
@@ -419,7 +414,7 @@ function parseListUnsubscribeHeader(input: {
     try {
       const parsed = new URL(entry);
 
-      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      if (parsed.protocol === "https:" && isSafeRemoteHttpsUrl(parsed.toString())) {
         return {
           method: "http-get",
           endpoint: parsed.toString(),

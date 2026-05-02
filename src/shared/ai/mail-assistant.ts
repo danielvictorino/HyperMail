@@ -1,4 +1,5 @@
 import type { InboxSplit, LocalMailMessage, ThreadProjection } from "../mail/models";
+import { isLoopbackHttpUrl } from "../security/url-safety";
 
 export const DEFAULT_OPENAI_MODEL = "gpt-5.4-mini";
 export const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
@@ -483,6 +484,10 @@ export function resolveMailAssistantMaxOutputTokens(
 }
 
 export function normalizeOllamaBaseUrl(baseUrl: string): string {
+  if (!isLoopbackHttpUrl(baseUrl)) {
+    return DEFAULT_OLLAMA_BASE_URL;
+  }
+
   const parsed = new URL(baseUrl);
   const normalizedPath = parsed.pathname.replace(/\/+$/, "");
 

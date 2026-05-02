@@ -42,8 +42,8 @@ We explicitly do **not** target defense against a local attacker with code execu
 ### AI providers
 - OpenAI and Anthropic requests originate from the Electron main process, not the renderer.
 - OpenAI and Anthropic API keys are stored via `keytar` and can also be bootstrapped from `.env`.
-- Provider selection, fallback routing, model ids, presets, and Ollama base URL are stored in a local app-owned settings file under Electron `userData`.
-- Ollama requests default to `http://127.0.0.1:11434` and can be redirected to another `http` or `https` endpoint from the in-app AI settings panel.
+- Provider selection, fallback routing, model ids, presets, and loopback-only Ollama base URL are stored in a local app-owned settings file under Electron `userData`.
+- Ollama requests default to `http://127.0.0.1:11434`; non-loopback Ollama endpoints are rejected at IPC and ignored when loaded from persisted or environment settings.
 
 ### Gmail API
 - `gmailJson` and `gmailModify` retry on 429 / 5xx / fetch TypeError / network error codes with `Retry-After` honored.
@@ -52,6 +52,7 @@ We explicitly do **not** target defense against a local attacker with code execu
 ### Auto-update
 - Disabled unless `HYPERMAIL_UPDATES_URL` is set **and** the app is packaged **and** the platform is Windows.
 - Channel read from `HYPERMAIL_UPDATE_CHANNEL` (defaults to `latest`). Use a staging channel during QA.
+- Windows release packaging requires code-signing credentials and enables update signature verification; unsigned Windows update builds fail closed before packaging.
 
 ### Release artifacts
 - Production builds still emit hidden source maps for local debugging and crash-symbolication workflows.

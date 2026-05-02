@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   GmailApiError,
+  encodeRawMimeMessage,
+  performGetUnsubscribe,
+  performOneClickUnsubscribe,
   gmailJson,
   isGmailApiTransientError
 } from "./google-mail-service";
@@ -93,5 +96,74 @@ describe("gmailJson retry behavior", () => {
 
     await expect(gmailJson("tok", "/labels")).rejects.toBeInstanceOf(GmailApiError);
     expect(attempt).toBe(3);
+  });
+});
+
+describe("encodeRawMimeMessage", () => {
+  it("rejects line breaks in MIME header values", () => {
+    expect(() =>
+      encodeRawMimeMessage({
+        from: "alex@example.com",
+        to: ["maya@example.com"],
+        cc: [],
+        bcc: [],
+        subject: "hello\r\nBcc: attacker@example.com",
+        bodyHtml: "<p>Hello</p>",
+        clientMessageId: "client-1"
+      })
+    ).toThrow("Subject cannot contain line breaks.");
+  });
+
+  it("keeps multiline body content valid", () => {
+    expect(() =>
+      encodeRawMimeMessage({
+        from: "alex@example.com",
+        to: ["maya@example.com"],
+        cc: [],
+        bcc: [],
+        subject: "hello",
+        bodyText: "Line one\r\nLine two",
+        clientMessageId: "client-1"
+      })
+    ).not.toThrow();
+  });
+});
+
+describe("unsubscribe fetch guards", () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  it("blocks private unsubscribe endpoints before fetch", async () => {
+    global.fetch = vi.fn() as typeof fetch;
+
+    await expect(performGetUnsubscribe("https://127.0.0.1/unsub")).rejects.toThrow(
+      "Unsubscribe endpoint is not an allowed remote HTTPS URL."
+    );
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("uses manual redirects for unsubscribe requests", async () => {
+    global.fetch = vi.fn(async () => jsonResponse(302, "")) as typeof fetch;
+
+    await expect(performGetUnsubscribe("https://example.com/unsub")).rejects.toThrow(
+      "Unsubscribe request failed with 302."
+    );
+    expect(global.fetch).toHaveBeenCalledWith("https://example.com/unsub", {
+      method: "GET",
+      redirect: "manual"
+    });
+  });
+
+  it("blocks private one-click unsubscribe endpoints before fetch", async () => {
+    global.fetch = vi.fn() as typeof fetch;
+
+    await expect(performOneClickUnsubscribe("https://10.0.0.1/unsub")).rejects.toThrow(
+      "Unsubscribe endpoint is not an allowed remote HTTPS URL."
+    );
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });

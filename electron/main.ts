@@ -69,6 +69,7 @@ import {
   initializeAutoUpdate,
   installDownloadedUpdate
 } from "./updater/auto-update-service";
+import { isAllowedDevServerNavigation } from "../src/shared/security/url-safety";
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -151,7 +152,7 @@ async function createMainWindow(): Promise<void> {
 
   mainWindow.webContents.on("will-navigate", (event, url) => {
     const devServerUrl = process.env.VITE_DEV_SERVER_URL;
-    if (devServerUrl && url.startsWith(devServerUrl)) {
+    if (devServerUrl && isAllowedDevServerNavigation(url, devServerUrl)) {
       return;
     }
     event.preventDefault();

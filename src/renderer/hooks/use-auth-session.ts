@@ -9,7 +9,9 @@ import type {
 } from "@shared/contracts";
 import { getDesktopApi } from "../lib/desktop-api";
 import { queryClient } from "../lib/query-client";
+import { deleteAccountCascade, hypermailDb } from "../offline/db/hypermail-db";
 import { useSessionStore } from "../state/session-store";
+import { buildAccountDescriptor } from "./use-mailbox-account";
 
 const SESSION_QUERY_KEY = ["hypermail", "auth-session"] as const;
 
@@ -131,7 +133,18 @@ export function useAuthSession() {
   });
 
   const signOutMutation = useMutation({
-    mutationFn: async () => getDesktopApi().auth.signOut(),
+    mutationFn: async () => {
+      const sessionToPurge = session;
+
+      await getDesktopApi().auth.signOut();
+
+      if (sessionToPurge) {
+        await deleteAccountCascade(
+          hypermailDb,
+          buildAccountDescriptor(sessionToPurge).id
+        );
+      }
+    },
     onSuccess: () => {
       queryClient.setQueryData(SESSION_QUERY_KEY, null);
       clearSession();

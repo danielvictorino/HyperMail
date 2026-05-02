@@ -113,6 +113,29 @@ describe("deleteAccountCascade", () => {
       idempotencyKey: "k"
     });
 
+    await database.metadata.bulkPut([
+      {
+        key: `assistant:summary:${purgeAccountId}:${purgeAccountId}:thread:1`,
+        value: "{}",
+        updatedAt: 1
+      },
+      {
+        key: `assistant:split:${purgeAccountId}:${purgeAccountId}:thread:1`,
+        value: "{}",
+        updatedAt: 1
+      },
+      {
+        key: `assistant:summary:${keepAccountId}:${keepAccountId}:thread:1`,
+        value: "{}",
+        updatedAt: 1
+      },
+      {
+        key: "app:unrelated",
+        value: "{}",
+        updatedAt: 1
+      }
+    ]);
+
     await deleteAccountCascade(database, purgeAccountId);
 
     expect(await database.accounts.get(purgeAccountId)).toBeUndefined();
@@ -129,5 +152,24 @@ describe("deleteAccountCascade", () => {
     expect(
       await database.threads.where("accountId").equals(keepAccountId).count()
     ).toBe(1);
+    expect(
+      await database.metadata
+        .where("key")
+        .startsWith(`assistant:summary:${purgeAccountId}:`)
+        .count()
+    ).toBe(0);
+    expect(
+      await database.metadata
+        .where("key")
+        .startsWith(`assistant:split:${purgeAccountId}:`)
+        .count()
+    ).toBe(0);
+    expect(
+      await database.metadata
+        .where("key")
+        .startsWith(`assistant:summary:${keepAccountId}:`)
+        .count()
+    ).toBe(1);
+    expect(await database.metadata.get("app:unrelated")).toBeDefined();
   });
 });

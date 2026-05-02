@@ -23,6 +23,10 @@ import {
 } from "../../src/shared/mail/google-transformers";
 import type { LocalMailUnsubscribe } from "../../src/shared/mail/models";
 import {
+  assertSingleLineHeaderValue,
+  isSafeRemoteHttpsUrl
+} from "../../src/shared/security/url-safety";
+import {
   fetchGmailAccountProfile,
   getAuthorizedGoogleSession
 } from "../oauth/google-oauth";
@@ -535,7 +539,7 @@ export async function sendGmailDraft(
   };
 }
 
-function encodeRawMimeMessage(input: {
+export function encodeRawMimeMessage(input: {
   from: string;
   to: string[];
   cc: string[];
@@ -545,6 +549,8 @@ function encodeRawMimeMessage(input: {
   bodyText?: string;
   clientMessageId: string;
 }): string {
+  assertMimeHeaderInput(input);
+
   const headers = [
     `From: ${input.from}`,
     `To: ${input.to.join(", ")}`,
@@ -566,6 +572,29 @@ function encodeRawMimeMessage(input: {
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/g, "");
+}
+
+function assertMimeHeaderInput(input: {
+  from: string;
+  to: string[];
+  cc: string[];
+  bcc: string[];
+  subject: string;
+  clientMessageId: string;
+}): void {
+  assertSingleLineHeaderValue("From", input.from);
+  assertSingleLineHeaderValue("Subject", input.subject);
+  assertSingleLineHeaderValue("X-Hypermail-Client-Message-Id", input.clientMessageId);
+
+  for (const [field, values] of [
+    ["To", input.to],
+    ["Cc", input.cc],
+    ["Bcc", input.bcc]
+  ] as const) {
+    for (const value of values) {
+      assertSingleLineHeaderValue(field, value);
+    }
+  }
 }
 
 function normalizeBase64Url(value: string): string {
@@ -592,7 +621,9 @@ async function performUnsubscribeRequest(
   }
 }
 
-async function performOneClickUnsubscribe(endpoint: string): Promise<void> {
+export async function performOneClickUnsubscribe(endpoint: string): Promise<void> {
+  assertSafeUnsubscribeFetchEndpoint(endpoint);
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -607,13 +638,22 @@ async function performOneClickUnsubscribe(endpoint: string): Promise<void> {
   }
 }
 
-async function performGetUnsubscribe(endpoint: string): Promise<void> {
+export async function performGetUnsubscribe(endpoint: string): Promise<void> {
+  assertSafeUnsubscribeFetchEndpoint(endpoint);
+
   const response = await fetch(endpoint, {
-    method: "GET"
+    method: "GET",
+    redirect: "manual"
   });
 
   if (!response.ok) {
     throw new Error(`Unsubscribe request failed with ${response.status}.`);
+  }
+}
+
+function assertSafeUnsubscribeFetchEndpoint(endpoint: string): void {
+  if (!isSafeRemoteHttpsUrl(endpoint)) {
+    throw new Error("Unsubscribe endpoint is not an allowed remote HTTPS URL.");
   }
 }
 

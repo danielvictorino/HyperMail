@@ -164,7 +164,7 @@ export function initializeAutoUpdate(): AutoUpdateStatus {
 
   if (!updateUrl) {
     currentStatus = createDisabledStatus(
-      "Set HYPERMAIL_UPDATES_URL to enable packaged update checks."
+      "Set HYPERMAIL_UPDATES_URL on a signed Windows build to enable packaged update checks."
     );
     return currentStatus;
   }
