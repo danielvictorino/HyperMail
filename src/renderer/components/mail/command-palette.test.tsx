@@ -52,6 +52,10 @@ describe("CommandPalette", () => {
     const input = view.container.querySelector("input");
     expect(input).toBeInstanceOf(HTMLInputElement);
     expect(document.activeElement).toBe(input);
+    expect(view.container.textContent).toContain("Investor update");
+    expect(
+      findButton(view.container, "Reply to Maya").getAttribute("aria-selected")
+    ).toBe("true");
 
     await setInputValue(input as HTMLInputElement, "reply maya");
     expect(onQueryChange).toHaveBeenCalledWith("reply maya");
